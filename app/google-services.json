@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "4846813538",
+    "project_id": "vastavikcomputers",
+    "storage_bucket": "vastavikcomputers.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4846813538:android:8a3f9a1b5875b513dbec3b",
+        "android_client_info": {
+          "package_name": "com.vastavik.computer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJGElzWJL3xhAKtYdGA7A7zywkpgO11Kk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

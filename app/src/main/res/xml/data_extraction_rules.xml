@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="database" path="." />
+        <include domain="sharedpref" path="vastavik_prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="vastavik_prefs.xml" />
+        <include domain="database" path="." />
+        <include domain="external" path="." />
+    </device-transfer>
+</data-extraction-rules>

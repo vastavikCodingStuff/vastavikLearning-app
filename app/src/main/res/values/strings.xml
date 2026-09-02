@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vastavik Computers</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
+    <string name="loading">Loading…</string>
+    <string name="retry">Retry</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="try_again">Try Again</string>
+    <string name="search">Search</string>
+    <string name="clear">Clear</string>
+    <string name="submit">Submit</string>
+    <string name="confirm">Confirm</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied to clipboard</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="view_all">View All</string>
+    <string name="see_all">See All</string>
+    <string name="of">of</string>
+
+    <!-- Auth -->
+    <string name="login">Log In</string>
+    <string name="signup">Sign Up</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="name">Name</string>
+    <string name="login_with_google">Log in with Google</string>
+    <string name="or_continue_with">or continue with</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="has_account">Already have an account?</string>
+    <string name="create_account">Create Account</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="welcome_to_vastavik">Welcome to Vastavik Computers</string>
+    <string name="login_subtitle">Log in to continue your learning journey</string>
+    <string name="signup_subtitle">Start learning programming today</string>
+    <string name="password_reset_sent">Password reset email sent</string>
+    <string name="invalid_credentials">Invalid email or password</string>
+    <string name="email_already_in_use">Email already in use</string>
+    <string name="weak_password">Password is too weak</string>
+    <string name="user_not_found">User not found</string>
+    <string name="account_deleted">Your account has been deleted</string>
+
+    <!-- Onboarding -->
+    <string name="welcome">Welcome</string>
+    <string name="welcome_description">Learn programming with interactive courses and AI-powered tutoring</string>
+    <string name="get_started">Get Started</string>
+    <string name="select_your_class">Select Your Class</string>
+    <string name="select_your_board">Select Your Board</string>
+    <string name="select_preferred_language">Preferred Language</string>
+    <string name="class_9">Class 9</string>
+    <string name="class_10">Class 10</string>
+    <string name="class_11">Class 11</string>
+    <string name="class_12">Class 12</string>
+    <string name="icse">ICSE</string>
+    <string name="cbse">CBSE</string>
+    <string name="state_board">State Board</string>
+    <string name="java">Java</string>
+    <string name="python">Python</string>
+    <string name="web_development">Web Development</string>
+
+    <!-- Home -->
+    <string name="home">Home</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
+    <string name="popular_topics">Popular Topics</string>
+    <string name="continue_learning">Continue Learning</string>
+    <string name="start_learning">Start Learning</string>
+    <string name="daily_streak">Daily Streak</string>
+    <string name="lessons_completed">Lessons Completed</string>
+    <string name="explore_courses">Explore Courses</string>
+    <string name="premium_banner_title">Upgrade to Premium</string>
+    <string name="premium_banner_subtitle">Unlock all courses and AI tutor</string>
+
+    <!-- Courses -->
+    <string name="courses">Courses</string>
+    <string name="course_catalog">Course Catalog</string>
+    <string name="parts">Parts</string>
+    <string name="subparts">Subparts</string>
+    <string name="lessons">Lessons</string>
+    <string name="course_progress">Course Progress</string>
+    <string name="completed">Completed</string>
+    <string name="in_progress">In Progress</string>
+    <string name="not_started">Not Started</string>
+    <string name="select_course">Select a Course</string>
+
+    <!-- Learning Path -->
+    <string name="learning_path">Learning Path</string>
+    <string name="your_learning_path">Your Learning Path</string>
+    <string name="continue_path">Continue Path</string>
+    <string name="lesson_complete">Lesson Complete!</string>
+    <string name="next_lesson">Next Lesson</string>
+
+    <!-- Video Lesson -->
+    <string name="video_lesson">Video Lesson</string>
+    <string name="video_not_available">Video not available</string>
+    <string name="code_sample">Code Sample</string>
+    <string name="notes">Notes</string>
+    <string name="whiteboard">Whiteboard</string>
+    <string name="take_quiz">Take Quiz</string>
+    <string name="mark_as_complete">Mark as Complete</string>
+    <string name="lesson_completed_success">Lesson marked as complete!</string>
+
+    <!-- Quiz -->
+    <string name="quiz">Quiz</string>
+    <string name="quizzes">Quizzes</string>
+    <string name="practice_quiz">Practice Quiz</string>
+    <string name="quiz_setup">Quiz Setup</string>
+    <string name="select_difficulty">Select Difficulty</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="start_quiz">Start Quiz</string>
+    <string name="quiz_in_progress">Quiz in Progress</string>
+    <string name="quiz_complete">Quiz Complete!</string>
+    <string name="your_score">Your Score</string>
+    <string name="correct_answers">Correct Answers</string>
+    <string name="total_questions">Total Questions</string>
+    <string name="question_of">Question %1$d of %2$d</string>
+    <string name="time_remaining">Time Remaining</string>
+    <string name="submit_quiz">Submit Quiz</string>
+    <string name="next_question">Next Question</string>
+    <string name="previous_question">Previous Question</string>
+    <string name="explanation">Explanation</string>
+    <string name="try_different_quiz">Try a Different Quiz</string>
+    <string name="quiz_history">Quiz History</string>
+    <string name="best_score">Best Score</string>
+    <string name="average_score">Average Score</string>
+
+    <!-- Practice -->
+    <string name="practice">Practice</string>
+    <string name="coding_challenges">Coding Challenges</string>
+    <string name="challenge">Challenge</string>
+    <string name="run_code">Run Code</string>
+    <string name="submit_code">Submit Code</string>
+    <string name="test_cases_passed">Test Cases Passed</string>
+    <string name="all_test_cases_passed">All test cases passed!</string>
+    <string name="some_test_cases_failed">Some test cases failed</string>
+    <string name="starter_code">Starter Code</string>
+    <string name="expected_output">Expected Output</string>
+    <string name="your_output">Your Output</string>
+    <string name="code_editor">Code Editor</string>
+
+    <!-- Chat -->
+    <string name="chat">AI Tutor</string>
+    <string name="chat_title">AI Tutor Chat</string>
+    <string name="new_chat">New Chat</string>
+    <string name="chat_history">Chat History</string>
+    <string name="type_message">Type your question…</string>
+    <string name="ai_thinking">AI is thinking…</string>
+    <string name="send_message">Send</string>
+    <string name="clear_chat">Clear Chat</string>
+    <string name="chat_sessions">Chat Sessions</string>
+    <string name="no_messages">No messages yet. Start a conversation!</string>
+    <string name="ai_response_error">Failed to get AI response. Please try again.</string>
+
+    <!-- Profile -->
+    <string name="profile">Profile</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="my_notes">My Notes</string>
+    <string name="settings">Settings</string>
+    <string name="payment_history">Payment History</string>
+    <string name="subscription">Subscription</string>
+    <string name="current_plan">Current Plan</string>
+    <string name="free_plan">Free Plan</string>
+    <string name="premium_plan">Premium Plan</string>
+    <string name="upgrade_to_premium">Upgrade to Premium</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language_setting">Language</string>
+    <string name="about">About</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="logout">Log Out</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_warning">This action cannot be undone. All your data will be permanently deleted.</string>
+    <string name="account_deleted_success">Account deleted successfully</string>
+    <string name="member_since">Member since %1$s</string>
+    <string name="total_xp">Total XP</string>
+    <string name="current_streak">Current Streak</string>
+    <string name="lessons_done">Lessons Done</string>
+    <string name="quizzes_passed">Quizzes Passed</string>
+
+    <!-- PYQ -->
+    <string name="pyq">Previous Year Questions</string>
+    <string name="pyq_title">Previous Year Papers</string>
+    <string name="year">Year</string>
+    <string name="board">Board</string>
+    <string name="subject">Subject</string>
+    <string name="question">Question</string>
+    <string name="solution">Solution</string>
+    <string name="no_pyq_available">No PYQ available for this filter</string>
+    <string name="filter_by_year">Filter by Year</string>
+    <string name="filter_by_board">Filter by Board</string>
+    <string name="filter_by_subject">Filter by Subject</string>
+
+    <!-- Search -->
+    <string name="search_results">Search Results</string>
+    <string name="no_results_found">No results found</string>
+    <string name="search_placeholder">Search courses, topics, lessons…</string>
+    <string name="recent_searches">Recent Searches</string>
+    <string name="clear_recent">Clear All</string>
+
+    <!-- Payment -->
+    <string name="payment">Payment</string>
+    <string name="select_plan">Select a Plan</string>
+    <string name="monthly_plan">Monthly</string>
+    <string name="yearly_plan">Yearly</string>
+    <string name="lifetime_plan">Lifetime</string>
+    <string name="per_month">per month</string>
+    <string name="per_year">per year</string>
+    <string name="one_time">one time</string>
+    <string name="pay_now">Pay Now</string>
+    <string name="payment_success">Payment Successful!</string>
+    <string name="payment_failed">Payment Failed</string>
+    <string name="payment_pending">Payment Pending</string>
+    <string name="payment_history_empty">No payment history yet</string>
+    <string name="amount">Amount</string>
+    <string name="date">Date</string>
+    <string name="status">Status</string>
+    <string name="plan">Plan</string>
+    <string name="transaction_id">Transaction ID</string>
+    <string name="pay_with_phonepe">Pay with PhonePe</string>
+
+    <!-- Admin -->
+    <string name="admin_dashboard">Admin Dashboard</string>
+    <string name="manage_courses">Manage Courses</string>
+    <string name="manage_users">Manage Users</string>
+    <string name="manage_quizzes">Manage Quizzes</string>
+    <string name="manage_banners">Manage Banners</string>
+    <string name="analytics">Analytics</string>
+    <string name="total_users">Total Users</string>
+    <string name="total_courses">Total Courses</string>
+    <string name="active_subscriptions">Active Subscriptions</string>
+    <string name="revenue">Revenue</string>
+    <string name="add_course">Add Course</string>
+    <string name="add_lesson">Add Lesson</string>
+    <string name="add_quiz">Add Quiz</string>
+    <string name="publish">Publish</string>
+    <string name="unpublish">Unpublish</string>
+
+    <!-- Errors -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_auth">Authentication error. Please log in again.</string>
+    <string name="error_permission">Permission denied</string>
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_course_not_found">Course not found</string>
+    <string name="error_lesson_not_found">Lesson not found</string>
+    <string name="error_quiz_not_found">Quiz not found</string>
+    <string name="error_empty_fields">Please fill in all fields</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_invalid_email">Please enter a valid email</string>
+
+    <!-- Notification -->
+    <string name="notification_title_new_lesson">New Lesson Available</string>
+    <string name="notification_title_quiz_reminder">Quiz Reminder</string>
+    <string name="notification_title_streak">Keep Your Streak!</string>
+    <string name="notification_title_premium">Premium Offer</string>
+    <string name="default_web_client_id">dummy-web-client-id</string>
+</resources>
