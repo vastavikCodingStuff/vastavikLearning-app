@@ -16,15 +16,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vastavik.computer.ui.theme.brutalBorderColor
 
 @Composable
 fun VastavikTopBar(
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val bb = brutalBorderColor()
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.background,
         shadowElevation = 0.dp
     ) {
         Row(
@@ -41,7 +43,7 @@ fun VastavikTopBar(
             )
             Text(
                 text = "Computer",
-                color = Color(0xFF0F172A),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp
             )
@@ -55,7 +57,7 @@ fun VastavikTopBar(
                             colors = listOf(Color(0xFF7C3AED), Color(0xFF06B6D4))
                         )
                     )
-                    .border(BorderStroke(1.5.dp, Color.Black), CircleShape)
+                    .border(BorderStroke(1.5.dp, bb), CircleShape)
                     .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {

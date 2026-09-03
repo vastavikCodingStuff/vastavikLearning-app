@@ -20,6 +20,7 @@ import com.vastavik.computer.ui.theme.VastavikColors
 @Composable
 fun ForgotPasswordScreen(
     onNavigate: (String) -> Unit,
+    onBack: () -> Unit = {},
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -30,7 +31,7 @@ fun ForgotPasswordScreen(
             TopAppBar(
                 title = { Text("Forgot Password") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("login") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }

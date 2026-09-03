@@ -1,6 +1,7 @@
 package com.vastavik.computer.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -79,7 +80,7 @@ fun AppNavHost(
                 navController.navigate(route) {
                     popUpTo("forgot_password") { inclusive = true }
                 }
-            })
+            }, onBack = { navController.popBackStack() })
         }
         composable("welcome") {
             WelcomeScreen(onNavigate = { route ->
@@ -109,7 +110,8 @@ fun AppNavHost(
                     backStackEntry.arguments?.getString("title") ?: "",
                     "UTF-8"
                 ),
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable("learning_path") {
@@ -129,7 +131,14 @@ fun AppNavHost(
         }
         composable("profile") {
             ProfileScreen(onNavigate = { route ->
-                navController.navigate(route)
+                if (route == "login") {
+                    // Logout: clear the whole stack so back from login can't return to the logged-in app
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                } else {
+                    navController.navigate(route)
+                }
             })
         }
         composable(
@@ -146,7 +155,8 @@ fun AppNavHost(
                 courseId = backStackEntry.arguments?.getString("courseId") ?: "",
                 partId = backStackEntry.arguments?.getString("partId") ?: "",
                 subpartId = backStackEntry.arguments?.getString("subpartId") ?: "",
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(
@@ -155,7 +165,8 @@ fun AppNavHost(
         ) { backStackEntry ->
             QuizSetupScreen(
                 topic = backStackEntry.arguments?.getString("topic") ?: "",
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(
@@ -164,35 +175,52 @@ fun AppNavHost(
         ) { backStackEntry ->
             QuizTakingScreen(
                 quizId = backStackEntry.arguments?.getString("quizId") ?: "",
-                onNavigate = { route -> navController.navigate(route) }
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                navigateHome = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
             )
         }
         composable("payment") {
-            PaymentScreen(onNavigate = { route -> navController.navigate(route) })
+            PaymentScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("payment_history") {
-            PaymentHistoryScreen(onNavigate = { route -> navController.navigate(route) })
+            PaymentHistoryScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("edit_profile") {
-            EditProfileScreen(onNavigate = { route -> navController.navigate(route) })
+            EditProfileScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("my_notes") {
-            MyNotesScreen(onNavigate = { route -> navController.navigate(route) })
+            MyNotesScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("settings") {
-            SettingsScreen(onNavigate = { route -> navController.navigate(route) })
+            SettingsScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("admin") {
-            AdminDashboardScreen(onNavigate = { route -> navController.navigate(route) })
+            if (com.vastavik.computer.utils.AdminSession.isAdmin.value) {
+                AdminDashboardScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
+            } else {
+                // Students can never see the admin dashboard — bounce to home
+                LaunchedEffect(Unit) {
+                    navController.navigate("home") { popUpTo("home") { inclusive = true } }
+                }
+            }
         }
         composable("account_deleted") {
-            AccountDeletedScreen(onNavigate = { route -> navController.navigate(route) })
+            AccountDeletedScreen(onNavigate = { route ->
+                navController.navigate(route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            })
         }
         composable("pyq") {
-            PYQScreen(onNavigate = { route -> navController.navigate(route) })
+            PYQScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("search") {
-            SearchResultsScreen(onNavigate = { route -> navController.navigate(route) })
+            SearchResultsScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable(
             route = "code_editor?initialCode={initialCode}&language={language}",
@@ -206,21 +234,22 @@ fun AppNavHost(
             val language = backStackEntry.arguments?.getString("language") ?: "Python"
             CodeEditorScreen(
                 onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
                 initialCode = initialCode,
                 initialLanguage = language
             )
         }
         composable("code_editor") {
-            CodeEditorScreen(onNavigate = { route -> navController.navigate(route) })
+            CodeEditorScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("ocr_exercise") {
-            OcrExerciseScreen(onNavigate = { route -> navController.navigate(route) })
+            OcrExerciseScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("notifications") {
-            NotificationsScreen(onNavigate = { route -> navController.navigate(route) })
+            NotificationsScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("app_update") {
-            AppUpdateScreen(onNavigate = { route -> navController.navigate(route) })
+            AppUpdateScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("course") {
             LearningPathScreen(onNavigate = { route -> navController.navigate(route) })
@@ -231,12 +260,12 @@ fun AppNavHost(
             val session = com.vastavik.computer.data.model.ClassSession(classId = classId, topic = "Live Class: $classId", adminId = "admin_$classId")
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "user_${System.currentTimeMillis()}"
             val name = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.displayName ?: "Student"
-            LobbyScreen(onNavigate = { r -> navController.navigate(r) }, classInfo = session, viewModel = vm, userId = uid, displayName = name)
+            LobbyScreen(onNavigate = { r -> navController.navigate(r) }, onBack = { navController.popBackStack() }, classInfo = session, viewModel = vm, userId = uid, displayName = name)
         }
         composable(route = "meeting_inclass/{classId}", arguments = listOf(navArgument("classId") { type = NavType.StringType })) { backStackEntry ->
             val vm = androidx.lifecycle.viewmodel.compose.viewModel<MeetingViewModel>()
             val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "user_${System.currentTimeMillis()}"
-            InClassScreen(onNavigate = { r -> navController.navigate(r) }, viewModel = vm, userId = uid)
+            InClassScreen(onNavigate = { r -> navController.navigate(r) }, onBack = { navController.popBackStack() }, viewModel = vm, userId = uid)
         }
     }
 }

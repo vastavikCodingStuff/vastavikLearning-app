@@ -26,12 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
-private val BgWhite = Color(0xFFF8FAFC)
-private val TextDark = Color(0xFF0F172A)
-private val TextMuted = Color(0xFF64748B)
 private val PrimaryIndigo = Color(0xFF2563EB)
-private val BorderBlack = Color.Black
 
 @Composable
 fun SignupScreen(
@@ -45,6 +43,8 @@ fun SignupScreen(
     var obscurePassword by remember { mutableStateOf(true) }
     var obscureConfirmPassword by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -64,14 +64,14 @@ fun SignupScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(PrimaryIndigo)
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(16.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -87,13 +87,13 @@ fun SignupScreen(
                 text = "Create Account",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = TextDark
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = "Start your learning journey today",
                 fontSize = 14.sp,
-                color = TextMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(40.dp))
@@ -106,10 +106,10 @@ fun SignupScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderBlack,
-                    focusedBorderColor = BorderBlack,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true
@@ -133,10 +133,10 @@ fun SignupScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderBlack,
-                    focusedBorderColor = BorderBlack,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
@@ -160,10 +160,10 @@ fun SignupScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderBlack,
-                    focusedBorderColor = BorderBlack,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
@@ -185,21 +185,26 @@ fun SignupScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Button(
                     onClick = {
                         if (email.isNotBlank() && password.isNotBlank() && password == confirmPassword) {
                             viewModel.signUp(email.trim(), password.trim())
                         } else {
-                            onNavigate("home")
+                            val msg = when {
+                                email.isBlank() || password.isBlank() -> "Please fill in all fields"
+                                password != confirmPassword -> "Passwords do not match"
+                                else -> "Please check your details"
+                            }
+                            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
@@ -223,7 +228,7 @@ fun SignupScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Already have an account?", color = TextMuted, fontSize = 14.sp)
+                Text("Already have an account?", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     "Log In",

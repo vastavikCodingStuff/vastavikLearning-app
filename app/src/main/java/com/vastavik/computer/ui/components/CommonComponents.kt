@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.data.model.*
 import com.vastavik.computer.ui.theme.VastavikColors
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @Composable
 fun VastavikCard(
@@ -51,13 +53,15 @@ fun VastavikCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val shape = RoundedCornerShape(16.dp)
+    val borderColor = brutalBorderColor()
+    val shadowColor = brutalShadowColor()
     Box(modifier = modifier.padding(end = 5.dp, bottom = 5.dp)) {
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .offset(x = 5.dp, y = 5.dp)
                 .clip(shape)
-                .background(Color.Black)
+                .background(shadowColor)
         )
         Card(
             modifier = Modifier
@@ -65,7 +69,7 @@ fun VastavikCard(
                 .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
             shape = shape,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = androidx.compose.foundation.BorderStroke(2.dp, Color.Black),
+            border = androidx.compose.foundation.BorderStroke(2.dp, borderColor),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp), content = content)
@@ -232,7 +236,8 @@ fun SectionHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (actionText != null && onActionClick != null) {
             Text(
@@ -661,7 +666,7 @@ fun ChatBubble(
 ) {
     val isUser = message.isUser
     val alignment = if (isUser) Alignment.CenterEnd else Alignment.CenterStart
-    val backgroundColor = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val backgroundColor = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
     val textColor = if (isUser) Color.White else MaterialTheme.colorScheme.onSurface
 
     Box(

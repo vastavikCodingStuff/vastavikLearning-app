@@ -21,6 +21,13 @@ object Constants {
     const val COLLECTION_ADMIN_SETTINGS = "adminSettings"
     const val COLLECTION_FCM_TOKENS = "fcmTokens"
 
+    // App Update (self-hosted APK, not Play Store)
+    const val ADMIN_SETTINGS_UPDATE_DOC = "appUpdate"
+    const val FIELD_UPDATE_LATEST_VERSION = "latestVersion"
+    const val FIELD_UPDATE_APK_URL = "apkUrl"
+    const val FIELD_UPDATE_REQUIRED = "forceUpdate"
+    const val FIELD_UPDATE_CHANGELOG = "changelog"
+
     // Firestore Fields
     const val FIELD_USER_ID = "uid"
     const val FIELD_COURSE_ID = "courseId"

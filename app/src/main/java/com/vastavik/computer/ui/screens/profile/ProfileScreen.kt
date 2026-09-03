@@ -21,9 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.BrutalCard
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @Composable
 fun ProfileScreen(onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
+    val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
@@ -41,13 +46,13 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                             .matchParentSize()
                             .offset(x = 5.dp, y = 5.dp)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(Color.Black)
+                            .background(bs)
                     )
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                        border = BorderStroke(2.dp, Color.Black),
+                        border = BorderStroke(2.dp, bb),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Box(
@@ -87,7 +92,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                             .size(84.dp)
                                             .clip(RoundedCornerShape(20.dp))
                                             .background(Color.White)
-                                            .border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(20.dp))
+                                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp))
                                             .padding(4.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -95,13 +100,13 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(RoundedCornerShape(16.dp))
-                                                .background(Color(0xFFF1F5F9)),
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Icon(
                                                 Icons.Filled.Person,
                                                 contentDescription = null,
-                                                tint = Color(0xFF64748B),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.size(40.dp)
                                             )
                                         }
@@ -128,8 +133,8 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(16.dp))
-                                                .background(Color.White)
-                                                .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(16.dp))
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(16.dp))
                                                 .padding(12.dp)
                                         ) {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -138,7 +143,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                                         .size(36.dp)
                                                         .clip(RoundedCornerShape(10.dp))
                                                         .background(Color(0xFFFFF7ED))
-                                                        .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.08f)), RoundedCornerShape(10.dp)),
+                                                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.2f)), RoundedCornerShape(10.dp)),
                                                     contentAlignment = Alignment.Center
                                                 ) {
                                                     Text("🔥", fontSize = 18.sp)
@@ -146,7 +151,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                                 Spacer(modifier = Modifier.width(10.dp))
                                                 Column {
                                                     Text("7 days", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground, lineHeight = 18.sp)
-                                                    Text("Day streak", fontSize = 11.sp, color = Color(0xFF64748B), lineHeight = 14.sp)
+                                                    Text("Day streak", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 14.sp)
                                                 }
                                             }
                                         }
@@ -154,8 +159,8 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(16.dp))
-                                                .background(Color.White)
-                                                .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(16.dp))
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(16.dp))
                                                 .padding(12.dp)
                                         ) {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -164,7 +169,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                                         .size(36.dp)
                                                         .clip(RoundedCornerShape(10.dp))
                                                         .background(Color(0xFFEEF2FF))
-                                                        .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.08f)), RoundedCornerShape(10.dp)),
+                                                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.2f)), RoundedCornerShape(10.dp)),
                                                     contentAlignment = Alignment.Center
                                                 ) {
                                                     Text("📚", fontSize = 18.sp)
@@ -172,7 +177,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                                 Spacer(modifier = Modifier.width(10.dp))
                                                 Column {
                                                     Text("24", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground, lineHeight = 18.sp)
-                                                    Text("Lessons done", fontSize = 11.sp, color = Color(0xFF64748B), lineHeight = 14.sp)
+                                                    Text("Lessons done", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 14.sp)
                                                 }
                                             }
                                         }
@@ -194,7 +199,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                             .matchParentSize()
                             .offset(x = 5.dp, y = 5.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color.Black)
+                            .background(bs)
                     )
                     Card(
                         modifier = Modifier
@@ -202,7 +207,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                             .clickable { onNavigate("payment") },
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                        border = BorderStroke(2.dp, Color.Black),
+                        border = BorderStroke(2.dp, bb),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Box(
@@ -225,7 +230,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                                 colors = listOf(Color(0xFFFBBF24), Color(0xFFF97316))
                                             )
                                         )
-                                        .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(12.dp)),
+                                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text("★", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -249,7 +254,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                         .size(34.dp)
                                         .clip(CircleShape)
                                         .background(Color.White)
-                                        .border(BorderStroke(1.5.dp, Color.Black), CircleShape),
+                                        .border(BorderStroke(1.5.dp, bb), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text("→", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -267,28 +272,39 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                 BrutalCard(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(20.dp),
-                    backgroundColor = Color.White
+                    backgroundColor = MaterialTheme.colorScheme.surface
                 ) {
                     Column {
-                        val menuItems = listOf(
-                            Quadruple("Edit Profile", "Manage info & avatar", Icons.Filled.Edit, "edit_profile"),
-                            Quadruple("Select Course", "Choose your path", Icons.Filled.MenuBook, "course"),
-                            Quadruple("Online Class", "Join live session", Icons.Filled.VideoCall, "meeting_lobby/default_live_class"),
-                            Quadruple("Code Editor", "Practice live", Icons.Filled.Code, "code_editor"),
-                            Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"),
-                            Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"),
-                            Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"),
-                            Quadruple("App Update", "Version & changelog", Icons.Filled.SystemUpdate, "app_update"),
-                            Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"),
-                            Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings")
-                        )
+                        val menuItems = buildList {
+                            add(Quadruple("Edit Profile", "Manage info & avatar", Icons.Filled.Edit, "edit_profile"))
+                            add(Quadruple("Select Course", "Choose your path", Icons.Filled.MenuBook, "course"))
+                            add(Quadruple("Online Class", "Join live session", Icons.Filled.VideoCall, "meeting_lobby/default_live_class"))
+                            add(Quadruple("Code Editor", "Practice live", Icons.Filled.Code, "code_editor"))
+                            add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
+                            add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
+                            add(Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"))
+                            add(Quadruple("App Update", "Version & changelog", Icons.Filled.SystemUpdate, "app_update"))
+                            add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
+                            add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
+                            if (isAdmin) {
+                                add(Quadruple("Admin Dashboard", "Admin-only controls", Icons.Filled.AdminPanelSettings, "admin"))
+                            }
+                        }
 
+                        val comingSoonTitles = setOf("Select Course", "Online Class", "OCR Exercise")
                         menuItems.forEachIndexed { index, (title, desc, icon, route) ->
+                            val isComingSoon = title in comingSoonTitles
                             Column {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { onNavigate(route) }
+                                        .clickable {
+                                            if (isComingSoon) {
+                                                onNavigate("coming_soon/${java.net.URLEncoder.encode(title, "UTF-8")}")
+                                            } else {
+                                                onNavigate(route)
+                                            }
+                                        }
                                         .padding(horizontal = 16.dp, vertical = 14.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -296,14 +312,14 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clip(RoundedCornerShape(10.dp))
-                                            .background(Color(0xFFF8FAFC))
-                                            .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(10.dp)),
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             icon,
                                             contentDescription = null,
-                                            tint = Color(0xFF0F172A),
+                                            tint = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(18.dp)
                                         )
                                     }
@@ -318,20 +334,37 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                         Text(
                                             desc,
                                             fontSize = 11.sp,
-                                            color = Color(0xFF64748B)
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+                                    }
+                                    if (isComingSoon) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(50.dp))
+                                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(50.dp))
+                                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(
+                                                text = "Coming soon",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
                                     }
                                     Icon(
                                         Icons.Filled.ChevronRight,
                                         contentDescription = null,
-                                        tint = Color(0xFF94A3B8),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
                                 if (index < menuItems.lastIndex) {
                                     HorizontalDivider(
                                         modifier = Modifier.padding(horizontal = 16.dp),
-                                        color = Color(0xFFE2E8F0)
+                                        color = MaterialTheme.colorScheme.outlineVariant
                                     )
                                 }
                             }
@@ -339,7 +372,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
 
                         HorizontalDivider(
                             modifier = Modifier.padding(horizontal = 16.dp),
-                            color = Color(0xFFE2E8F0)
+                            color = MaterialTheme.colorScheme.outlineVariant
                         )
                         Row(
                             modifier = Modifier
@@ -352,8 +385,8 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(Color(0xFFFEF2F2))
-                                    .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(10.dp)),
+                                    .background(MaterialTheme.colorScheme.errorContainer)
+                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -374,7 +407,7 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                             Icon(
                                 Icons.Filled.ChevronRight,
                                 contentDescription = null,
-                                tint = Color(0xFF94A3B8),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
                         }

@@ -21,15 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.vastavik.computer.BuildConfig
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.tasks.await
 
-private val BgWhite = Color(0xFFF8FAFC)
 private val PrimaryIndigo = Color(0xFF2563EB)
-private val TextDark = Color(0xFF0F172A)
-private val BorderBlack = Color.Black
 
 @Composable
 fun SplashScreen(onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val scale = remember { Animatable(0.5f) }
     val alpha = remember { Animatable(0f) }
 
@@ -43,6 +45,11 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             animationSpec = tween(durationMillis = 500)
         )
         delay(2000)
+        // Auto-check for a new APK on the server route (self-hosted updates, no Play Store)
+        if (hasUpdateOnRoute()) {
+            onNavigate("app_update")
+            return@LaunchedEffect
+        }
         if (BuildConfig.SECURITY_CHECK_ENABLED) {
             onNavigate("security_check")
         } else {
@@ -58,7 +65,7 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgWhite),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -71,14 +78,14 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Box(
                     modifier = Modifier
                         .size(96.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(PrimaryIndigo)
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(20.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -101,7 +108,7 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
                     text = "Computer",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = TextDark,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.alpha(alpha.value)
                 )
             }
@@ -109,9 +116,21 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             Text(
                 text = "Learn. Code. Succeed.",
                 fontSize = 14.sp,
-                color = Color(0xFF64748B),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.alpha(alpha.value)
             )
         }
     }
+}
+
+private suspend fun hasUpdateOnRoute(): Boolean = try {
+    val doc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        .collection(com.vastavik.computer.utils.Constants.COLLECTION_ADMIN_SETTINGS)
+        .document(com.vastavik.computer.utils.Constants.ADMIN_SETTINGS_UPDATE_DOC)
+        .get()
+        .await()
+    val latest = doc.getString("latestVersion") ?: ""
+    latest.isNotEmpty() && latest != BuildConfig.VERSION_NAME
+} catch (_: Exception) {
+    false
 }

@@ -19,18 +19,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val BorderBlack = Color.Black
 private val PrimaryBlue = Color(0xFF2563EB)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizSetupScreen(
     topic: String,
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
     var selectedTopic by remember { mutableStateOf(topic) }
     var questionCount by remember { mutableIntStateOf(10) }
@@ -38,6 +40,8 @@ fun QuizSetupScreen(
     var isGenerating by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     val topicOptions = listOf(
         "OOP Concepts", "Arrays & Lists", "Sorting Algorithms", "File Handling",
@@ -61,7 +65,7 @@ fun QuizSetupScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { onNavigate("home") }) {
+                IconButton(onClick = { onBack() }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                 }
                 Text(
@@ -88,17 +92,17 @@ fun QuizSetupScreen(
                             .matchParentSize()
                             .offset(x = 5.dp, y = 5.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(BorderBlack)
+                            .background(bs)
                     )
                     OutlinedTextField(
                         value = selectedTopic,
                         onValueChange = { selectedTopic = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Enter topic...", fontSize = 14.sp, color = Color(0xFF94A3B8)) },
+                        placeholder = { Text("Enter topic...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BorderBlack,
-                            unfocusedBorderColor = BorderBlack,
+                            focusedBorderColor = bb,
+                            unfocusedBorderColor = bb,
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface
                         ),
@@ -119,7 +123,7 @@ fun QuizSetupScreen(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(50.dp))
                                         .background(if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surface)
-                                        .border(BorderStroke(1.5.dp, BorderBlack), RoundedCornerShape(50.dp))
+                                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(50.dp))
                                         .clickable { selectedTopic = t }
                                         .padding(horizontal = 14.dp, vertical = 8.dp)
                                 ) {
@@ -148,7 +152,7 @@ fun QuizSetupScreen(
                                     .matchParentSize()
                                     .offset(x = 4.dp, y = 4.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(BorderBlack)
+                                    .background(bs)
                             )
                             Box(
                                 modifier = Modifier
@@ -156,7 +160,7 @@ fun QuizSetupScreen(
                                     .height(52.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(if (questionCount == count) PrimaryBlue else MaterialTheme.colorScheme.surface)
-                                    .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp))
+                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                                     .clickable { questionCount = count },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -180,7 +184,7 @@ fun QuizSetupScreen(
                                     .matchParentSize()
                                     .offset(x = 4.dp, y = 4.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(BorderBlack)
+                                    .background(bs)
                             )
                             Box(
                                 modifier = Modifier
@@ -188,7 +192,7 @@ fun QuizSetupScreen(
                                     .height(52.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(if (questionCount == count) PrimaryBlue else MaterialTheme.colorScheme.surface)
-                                    .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp))
+                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                                     .clickable { questionCount = count },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -222,7 +226,7 @@ fun QuizSetupScreen(
                                     .matchParentSize()
                                     .offset(x = 4.dp, y = 4.dp)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(BorderBlack)
+                                    .background(bs)
                             )
                             Box(
                                 modifier = Modifier
@@ -230,7 +234,7 @@ fun QuizSetupScreen(
                                     .height(52.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(if (isSelected) chipColor else MaterialTheme.colorScheme.surface)
-                                    .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp))
+                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                                     .clickable { difficulty = diff },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -270,7 +274,7 @@ fun QuizSetupScreen(
                             .matchParentSize()
                             .offset(x = 5.dp, y = 5.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(BorderBlack)
+                            .background(bs)
                     )
                     Button(
                         onClick = {
@@ -296,7 +300,7 @@ fun QuizSetupScreen(
                             .fillMaxWidth()
                             .height(60.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(14.dp)),
+                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp)),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                         shape = RoundedCornerShape(14.dp),
                         elevation = ButtonDefaults.buttonElevation(0.dp),

@@ -1,10 +1,11 @@
 package com.vastavik.computer.ui.screens.editor
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,11 +13,13 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +31,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.VastavikColors
+import com.vastavik.computer.ui.theme.brutalBorderColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,11 +144,13 @@ private fun highlightCode(code: String, language: String) = buildAnnotatedString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeEditorScreen(onNavigate: (String)->Unit, initialCode: String = "", initialLanguage: String = "Python") {
+fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, onBack: () -> Unit = {}, initialCode: String = "", initialLanguage: String = "Python", @Suppress("UNUSED_PARAMETER") initialQuestion: String = "") {
     var language by remember { mutableStateOf(initialLanguage.ifBlank { "Python" }) }
     var code by remember { mutableStateOf(initialCode.ifBlank { defaultCode(language) }) }
     var output by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
+    var question by remember { mutableStateOf(initialQuestion) }
+    var showQuestion by remember { mutableStateOf(initialQuestion.isNotBlank()) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(language) {
@@ -156,8 +162,13 @@ fun CodeEditorScreen(onNavigate: (String)->Unit, initialCode: String = "", initi
         topBar = {
             TopAppBar(
                 title = { Text("Code Editor", fontWeight = FontWeight.Bold) },
-                navigationIcon = { IconButton(onClick = { onNavigate("home") }) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") } },
+                navigationIcon = { IconButton(onClick = { onBack() }) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
+                    if (question.isNotBlank()) {
+                        IconButton(onClick = { showQuestion = !showQuestion }) {
+                            Icon(Icons.Filled.HelpOutline, contentDescription = "View question", tint = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                     var expanded by remember { mutableStateOf(false) }
                     Box {
                         TextButton(onClick = { expanded = true }) { Text(language, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
@@ -208,21 +219,21 @@ fun CodeEditorScreen(onNavigate: (String)->Unit, initialCode: String = "", initi
                                 conn.doOutput = true
                                 conn.connectTimeout = 30000
                                 conn.readTimeout = 30000
-                                val body = JSONObject().apply {
-                                    put("model", "mistral-small-latest")
-                                    put("messages", JSONArray().put(JSONObject().put("role", "user").put("content",
-                                        "You are a code runner for Class 5-12 students. This is $language code. Explain what the output would be when this code runs. Be concise — just show the expected output, then 1 line explanation.\n\nCode:\n$code")))
-                                    put("max_tokens", 512)
-                                    put("temperature", 0.1)
-                                }
-                                conn.outputStream.use { it.write(body.toString().toByteArray()) }
-                                val responseCode = conn.responseCode
-                                val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-                                val response = stream.bufferedReader().use { it.readText() }
-                                if (responseCode in 200..299) {
-                                    val json = JSONObject(response)
-                                    json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content")
-                                } else { "Error ($responseCode)" }
+                val body = JSONObject().apply {
+                    put("model", "mistral-small-latest")
+                    put("messages", JSONArray().put(JSONObject().put("role", "user").put("content",
+                        "You are a code runner for Class 5-12 students. This is $language code. Explain what the output would be when this code runs. Be concise — just show the expected output, then 1 line explanation.\n\nCode:\n$code")))
+                    put("max_tokens", 512)
+                    put("temperature", 0.1)
+                }
+                conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                val responseCode = conn.responseCode
+                val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
+                val response = stream.bufferedReader().use { it.readText() }
+                if (responseCode in 200..299) {
+                    val json = JSONObject(response)
+                    stripMarkdown(json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content"))
+                } else { "Error ($responseCode)" }
                             } catch (e: Exception) { "Error: ${e.message}" }
                         }
                         isRunning = false
@@ -236,6 +247,33 @@ fun CodeEditorScreen(onNavigate: (String)->Unit, initialCode: String = "", initi
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            if (showQuestion && question.isNotBlank()) {
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
+                    Text(
+                        text = "Question",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        letterSpacing = 0.6.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(12.dp))
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = question,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
             Row(modifier = Modifier.weight(1f).fillMaxWidth().background(Color(0xFF1E1E2E))) {
                 val lines = code.split("\n")
                 val lineCount = lines.size
@@ -273,4 +311,19 @@ private fun defaultCode(lang: String) = when(lang) {
     "JavaScript" -> "function greet(){\n  console.log(\"Hello Vastavik\");\n}\ngreet();"
     "SQL" -> "SELECT * FROM students\nWHERE class BETWEEN 5 AND 12;"
     else -> ""
+}
+
+private fun stripMarkdown(text: String): String {
+    return text
+        .replace(Regex("```[a-zA-Z]*\\n?"), "")
+        .replace(Regex("```"), "")
+        .replace(Regex("(?m)^#{1,6}\\s*"), "")
+        .replace(Regex("\\*\\*(.+?)\\*\\*"), "$1")
+        .replace(Regex("__(.+?)__"), "$1")
+        .replace(Regex("(?m)^\\*\\s+"), "")
+        .replace(Regex("(?m)^-\\s+"), "")
+        .replace(Regex("(?m)^\\d+\\.\\s+"), "")
+        .replace(Regex("`(.+?)`"), "$1")
+        .replace(Regex("(?m)^>\\s?"), "")
+        .trim()
 }

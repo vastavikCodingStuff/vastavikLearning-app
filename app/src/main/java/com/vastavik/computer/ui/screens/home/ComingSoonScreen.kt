@@ -23,18 +23,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Canvas
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
-private val BgWhite = Color(0xFFF8FAFC)
-private val TextDark = Color(0xFF0F172A)
-private val TextMuted = Color(0xFF64748B)
 private val PrimaryBlue = Color(0xFF2563EB)
-private val BorderBlack = Color.Black
 
 @Composable
 fun ComingSoonScreen(
     courseTitle: String,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    onBack: () -> Unit = {}
 ) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -44,8 +45,8 @@ fun ComingSoonScreen(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { onNavigate("home") }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = TextDark)
+                IconButton(onClick = { onBack() }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                 }
                 Text(
                     text = "Vastavik",
@@ -77,14 +78,14 @@ fun ComingSoonScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Box(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .background(PrimaryBlue)
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(20.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("🚧", fontSize = 40.sp)
@@ -113,13 +114,13 @@ fun ComingSoonScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFEEF2FF))
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                         .padding(horizontal = 20.dp, vertical = 10.dp)
                 ) {
                     Text(
@@ -143,15 +144,15 @@ fun ComingSoonScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Button(
-                    onClick = { onNavigate("home") },
+                    onClick = { onBack() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -170,6 +171,7 @@ fun ComingSoonScreen(
 
 @Composable
 private fun WaterfallAnimation() {
+    val bb = brutalBorderColor()
     val infiniteTransition = rememberInfiniteTransition(label = "waterfall")
     val flowProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -199,8 +201,8 @@ private fun WaterfallAnimation() {
             .fillMaxWidth()
             .height(260.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFEFF6FF))
-            .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
     ) {
         val w = size.width
         val h = size.height

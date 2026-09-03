@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.vastavik.computer.data.model.*
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 enum class WhiteboardTool { PEN, ERASER, RECTANGLE, ELLIPSE, LINE, ARROW, TEXT, HAND, SELECT }
 
@@ -52,6 +54,8 @@ fun NeoBrutalistWhiteboard(
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -61,17 +65,18 @@ fun NeoBrutalistWhiteboard(
             modifier = Modifier
                 .matchParentSize()
                 .padding(start = 5.dp, top = 5.dp)
-                .background(Color.Black, RoundedCornerShape(16.dp))
+                .background(bs, RoundedCornerShape(16.dp))
         )
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            border = androidx.compose.foundation.BorderStroke(2.dp, Color.Black),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = androidx.compose.foundation.BorderStroke(2.dp, bb),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize()
+                    .background(Color.White, RoundedCornerShape(16.dp))
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, zoom, _ ->
                             if (currentTool == WhiteboardTool.HAND || zoom != 1f) {
@@ -161,9 +166,9 @@ fun NeoBrutalistWhiteboard(
                             Icons.Filled.Remove to { scale = (scale - 0.2f).coerceIn(0.6f, 3.5f) }
                         )) {
                             Box(modifier = Modifier.size(42.dp).padding(end = 3.dp, bottom = 3.dp)) {
-                                Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
-                                Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(Color.White).border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp)).clickable { act() }, contentAlignment = Alignment.Center) {
-                                    Icon(icon, contentDescription = null, tint = Color.Black, modifier = Modifier.size(18.dp))
+                                Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(bs))
+                                Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surface).border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)).clickable { act() }, contentAlignment = Alignment.Center) {
+                                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                                 }
                             }
                         }
@@ -179,9 +184,9 @@ fun NeoBrutalistWhiteboard(
                         modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 12.dp)
                     ) {
                         Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(10.dp)).background(Color.Black))
-                            Box(modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(Color.White).border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(10.dp)).padding(horizontal = 10.dp, vertical = 6.dp)) {
-                                androidx.compose.material3.Text("Whiteboard • Draw  ${String.format("%.0f%%", scale * 100)}", fontSize = 11.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold, color = Color.Black)
+                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(10.dp)).background(bs))
+                            Box(modifier = Modifier.clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surface).border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(10.dp)).padding(horizontal = 10.dp, vertical = 6.dp)) {
+                                androidx.compose.material3.Text("Whiteboard • Draw  ${String.format("%.0f%%", scale * 100)}", fontSize = 11.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }
@@ -199,11 +204,13 @@ fun WhiteboardToolbar(
     onClear: () -> Unit
 ) {
     // Vertical column at bottom-left, SQUARE rounded-squares with brutal bottom/right shadow — per your ask (not circles)
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(2.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, bb),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         androidx.compose.foundation.layout.Column(
@@ -219,26 +226,26 @@ fun WhiteboardToolbar(
             )
             tools.forEach { (tool, icon) ->
                 Box(modifier = Modifier.size(44.dp).padding(end = 3.dp, bottom = 3.dp)) {
-                    Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
+                    Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                     Box(
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
-                            .background(if (currentTool == tool) Color.Black else Color.White)
-                            .border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp))
+                            .background(if (currentTool == tool) Color.Black else MaterialTheme.colorScheme.surfaceVariant)
+                            .border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                             .clickable { onToolChange(tool) },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(icon, contentDescription = tool.name, tint = if (currentTool == tool) Color.White else Color.Black, modifier = Modifier.size(18.dp))
+                        Icon(icon, contentDescription = tool.name, tint = if (currentTool == tool) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                     }
                 }
             }
             Box(modifier = Modifier.size(44.dp).padding(end = 3.dp, bottom = 3.dp)) {
-                Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
+                Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                 Box(
-                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(Color.White)
-                        .border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp))
+                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                         .clickable { onClear() },
                     contentAlignment = Alignment.Center
-                ) { Icon(Icons.Filled.Delete, contentDescription = "Clear", tint = Color.Black, modifier = Modifier.size(18.dp)) }
+                ) { Icon(Icons.Filled.Delete, contentDescription = "Clear", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp)) }
             }
         }
     }

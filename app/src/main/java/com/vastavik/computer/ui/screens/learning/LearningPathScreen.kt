@@ -24,21 +24,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LearningPathScreen(onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val courses = listOf("Java", "Python", "C++", "Web Dev")
     var selectedCourse by remember { mutableStateOf("Java") }
     var showPartSheet by remember { mutableStateOf(false) }
     var selectedPart by remember { mutableStateOf("") }
 
     val nodes = listOf(
-        "Introduction", "Variables", "Control Flow",
-        "Functions", "OOP Basics", "Collections",
-        "File I/O", "Project", "Final Project"
+        "Array", "String", "Functions", "Constructor", "Wrapper Functions"
     )
-    val offsets = listOf(0f, 0.4f, 0.8f, 0.4f, 0f, -0.4f, -0.8f, -0.4f, 0f)
+    val offsets = listOf(0f, 0.4f, 0f, -0.4f, 0f)
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -69,7 +71,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             .size(38.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primary)
-                            .border(BorderStroke(1.5.dp, Color.Black), CircleShape)
+                            .border(BorderStroke(1.5.dp, bb), CircleShape)
                             .clickable { onNavigate("profile") },
                         contentAlignment = Alignment.Center
                     ) {
@@ -92,7 +94,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
                                 .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                                .border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(50.dp))
+                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
                                 .clickable { selectedCourse = course }
                                 .padding(horizontal = 18.dp, vertical = 10.dp)
                         ) {
@@ -115,13 +117,13 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             .matchParentSize()
                             .offset(x = 5.dp, y = 5.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color.Black)
+                            .background(bs)
                     )
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(2.dp, Color.Black),
+                        border = BorderStroke(2.dp, bb),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Column(modifier = Modifier.padding(18.dp)) {
@@ -129,7 +131,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(MaterialTheme.colorScheme.primary)
-                                    .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(8.dp))
+                                    .border(BorderStroke(1.dp, bb), RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text("UNIT 1", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.sp)
@@ -137,7 +139,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("Java Fundamentals", color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Master the basics of Java programming", color = Color(0xFF64748B), fontSize = 13.sp)
+                            Text("Array • String • Functions • Constructor • Wrapper Functions", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                             Spacer(modifier = Modifier.height(12.dp))
                             Box(
                                 modifier = Modifier
@@ -145,18 +147,18 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     .height(8.dp)
                                     .clip(RoundedCornerShape(50.dp))
                                     .background(MaterialTheme.colorScheme.outline)
-                                    .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.12f)), RoundedCornerShape(50.dp))
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.12f)), RoundedCornerShape(50.dp))
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth(0.35f)
+                                        .fillMaxWidth(0.0f)
                                         .fillMaxHeight()
                                         .clip(RoundedCornerShape(50.dp))
                                         .background(MaterialTheme.colorScheme.primary)
                                 )
                             }
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text("35% completed", fontSize = 11.sp, color = Color(0xFF64748B), fontWeight = FontWeight.Medium)
+                            Text("0% completed", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -164,8 +166,8 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
 
             // Zigzag path
             itemsIndexed(nodes) { index, node ->
-                val isDone = index < 3
-                val isCurrent = index == 3
+                val isDone = false
+                val isCurrent = index == 0
                 val xOffset = offsets[index % offsets.size]
 
                 Column(
@@ -201,7 +203,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     .size(68.dp)
                                     .offset(x = 4.dp, y = 4.dp)
                                     .clip(CircleShape)
-                                    .background(Color.Black)
+                                    .background(bs)
                             )
                             Box(
                                 modifier = Modifier
@@ -210,11 +212,11 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     .background(
                                         when {
                                             isDone -> MaterialTheme.colorScheme.primary
-                                            isCurrent -> Color.White
+                                            isCurrent -> MaterialTheme.colorScheme.surface
                                             else -> MaterialTheme.colorScheme.outline
                                         }
                                     )
-                                    .border(BorderStroke(2.5.dp, Color.Black), CircleShape)
+                                    .border(BorderStroke(2.5.dp, bb), CircleShape)
                                     .clickable {
                                         if (index != nodes.lastIndex) {
                                             selectedPart = node
@@ -294,7 +296,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                 .matchParentSize()
                                 .offset(x = 4.dp, y = 4.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(Color.Black)
+                                .background(bs)
                         )
                         Card(
                             modifier = Modifier
@@ -304,8 +306,8 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     onNavigate("video_lesson/1/1/1/1")
                                 },
                             shape = RoundedCornerShape(14.dp),
-                            border = BorderStroke(2.dp, Color.Black),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                            border = BorderStroke(2.dp, bb),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Row(
                                 modifier = Modifier.padding(16.dp),
@@ -327,7 +329,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                 Icon(
                                     Icons.Filled.ChevronRight,
                                     contentDescription = null,
-                                    tint = Color(0xFF94A3B8)
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

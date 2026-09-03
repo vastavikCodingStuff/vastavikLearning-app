@@ -51,6 +51,7 @@ fun VideoLessonScreen(
     partId: String,
     subpartId: String,
     onNavigate: (String) -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: VideoLessonViewModel = hiltViewModel()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -72,7 +73,7 @@ fun VideoLessonScreen(
             TopAppBar(
                 title = { Text(lesson?.title ?: "Video Lesson", maxLines = 1) },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("home") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -454,7 +455,7 @@ private fun WhiteboardTab(whiteboardImageUrl: String?) {
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = neoShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize().transformable(state = transformState).graphicsLayer {

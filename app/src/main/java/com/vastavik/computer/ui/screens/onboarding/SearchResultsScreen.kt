@@ -21,7 +21,7 @@ import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultsScreen(onNavigate: (String) -> Unit) {
+fun SearchResultsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var searchQuery by remember { mutableStateOf("") }
 
     val results = listOf(
@@ -48,7 +48,7 @@ fun SearchResultsScreen(onNavigate: (String) -> Unit) {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("home") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },

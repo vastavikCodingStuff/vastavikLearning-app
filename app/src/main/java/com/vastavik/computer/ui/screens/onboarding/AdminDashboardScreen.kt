@@ -13,17 +13,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vastavik.computer.ui.theme.VastavikColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdminDashboardScreen(onNavigate: (String) -> Unit) {
+fun AdminDashboardScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Admin Dashboard") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("profile") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },

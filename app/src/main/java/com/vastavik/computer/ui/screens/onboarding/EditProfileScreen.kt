@@ -18,7 +18,7 @@ import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(onNavigate: (String) -> Unit) {
+fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var name by remember { mutableStateOf("Student") }
     var email by remember { mutableStateOf("student@example.com") }
     var school by remember { mutableStateOf("Delhi Public School") }
@@ -30,12 +30,12 @@ fun EditProfileScreen(onNavigate: (String) -> Unit) {
             TopAppBar(
                 title = { Text("Edit Profile") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("profile") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
-                    TextButton(onClick = { onNavigate("profile") }) {
+                    TextButton(onClick = { onBack() }) {
                         Text("Save", color = MaterialTheme.colorScheme.primary)
                     }
                 },
@@ -105,7 +105,7 @@ fun EditProfileScreen(onNavigate: (String) -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
-                onClick = { onNavigate("profile") },
+                onClick = { onBack() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.data.model.*
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @Composable
 fun MeetingChatPanel(
@@ -38,9 +40,11 @@ fun MeetingChatPanel(
     onReplyToChange: (ReplyPreview?) -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = modifier.padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
-        Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(2.dp, Color.Black), elevation = CardDefaults.cardElevation(0.dp)) {
+        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+        Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(2.dp, bb), elevation = CardDefaults.cardElevation(0.dp)) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Surface(modifier = Modifier.fillMaxWidth(), color = Color.Black, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
                     Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -49,13 +53,13 @@ fun MeetingChatPanel(
                     }
                 }
                 replyTo?.let { preview ->
-                    Surface(modifier = Modifier.fillMaxWidth().padding(8.dp), color = Color(0xFFFFF3E0), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, Color(0xFFFF9800))) {
+                    Surface(modifier = Modifier.fillMaxWidth().padding(8.dp), color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, Color(0xFFFF9800))) {
                         Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
                                 Text("Replying to ${preview.senderName}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFE65100))
-                                Text(preview.truncatedText, fontSize = 11.sp, color = Color.DarkGray, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(preview.truncatedText, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
-                            IconButton(onClick = { onReplyToChange(null) }) { Icon(Icons.Filled.Close, contentDescription = null, tint = Color.DarkGray) }
+                            IconButton(onClick = { onReplyToChange(null) }) { Icon(Icons.Filled.Close, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
                     }
                 }
@@ -78,6 +82,7 @@ fun MeetingChatPanel(
 
 @Composable
 private fun ChatBubble(msg: LiveChatMessage, isOwn: Boolean, onReply: (LiveChatMessage) -> Unit) {
+    val bb = brutalBorderColor()
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (isOwn) Arrangement.End else Arrangement.Start) {
         if (!isOwn) {
             Box(modifier = Modifier.size(32.dp).clip(CircleShape).background(Color.Black), contentAlignment = Alignment.Center) { Text(msg.senderName.first().uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
@@ -85,18 +90,18 @@ private fun ChatBubble(msg: LiveChatMessage, isOwn: Boolean, onReply: (LiveChatM
         }
         Column(modifier = Modifier.widthIn(max = 240.dp)) {
             msg.replyTo?.let { r ->
-                Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), color = Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.2f))) {
+                Surface(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, bb.copy(alpha = 0.4f))) {
                     Column(modifier = Modifier.padding(6.dp)) {
-                        Text(r.senderName, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-                        Text(r.truncatedText, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(r.senderName, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(r.truncatedText, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
-            Surface(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = if (isOwn) 16.dp else 4.dp, bottomEnd = if (isOwn) 4.dp else 16.dp), color = if (isOwn) Color.Black else Color.White, border = BorderStroke(1.5.dp, Color.Black)) {
+            Surface(shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = if (isOwn) 16.dp else 4.dp, bottomEnd = if (isOwn) 4.dp else 16.dp), color = if (isOwn) Color.Black else MaterialTheme.colorScheme.surfaceVariant, border = BorderStroke(1.5.dp, bb)) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    if (!isOwn) Text(msg.displayName, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    Text(msg.text, fontSize = 13.sp, color = if (isOwn) Color.White else Color.Black)
-                    Text(formatTime(msg.timestamp), fontSize = 9.sp, color = if (isOwn) Color.White.copy(alpha = 0.7f) else Color.Gray)
+                    if (!isOwn) Text(msg.displayName, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(msg.text, fontSize = 13.sp, color = if (isOwn) Color.White else MaterialTheme.colorScheme.onSurface)
+                    Text(formatTime(msg.timestamp), fontSize = 9.sp, color = if (isOwn) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             if (!isOwn) Text("Reply", modifier = Modifier.padding(top = 4.dp).clickable { onReply(msg) }, fontSize = 11.sp, color = Color.Blue)
@@ -122,9 +127,11 @@ fun ParticipantsPanel(
     onGrantScreenShare: (String) -> Unit,
     onRevokeScreenShare: (String) -> Unit
 ) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = modifier.padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
-        Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(2.dp, Color.Black), elevation = CardDefaults.cardElevation(0.dp)) {
+        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+        Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(2.dp, bb), elevation = CardDefaults.cardElevation(0.dp)) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Surface(modifier = Modifier.fillMaxWidth(), color = Color.Black, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
                     Text("Participants (${participants.count { it.isActive }})", modifier = Modifier.padding(12.dp), color = Color.White, fontWeight = FontWeight.Bold)
@@ -148,7 +155,8 @@ fun ParticipantRow(
     val canKick = currentUserRole == ParticipantRole.ADMIN || (currentUserRole == ParticipantRole.STARCAST && participant.role != ParticipantRole.ADMIN)
     val canManageStar = currentUserRole == ParticipantRole.ADMIN
     val canManageShare = currentUserRole == ParticipantRole.ADMIN
-    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), border = BorderStroke(2.dp, Color.Black), color = if (isCurrentUser) Color(0xFFE3F2FD) else Color.White) {
+    val bb = brutalBorderColor()
+    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), border = BorderStroke(2.dp, bb), color = if (isCurrentUser) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface) {
         Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(36.dp).clip(CircleShape).background(when (participant.role) { ParticipantRole.ADMIN -> Color(0xFF2196F3); ParticipantRole.STARCAST -> Color(0xFFFFD700); else -> Color.Gray }), contentAlignment = Alignment.Center) {
@@ -157,10 +165,10 @@ fun ParticipantRow(
                 Spacer(Modifier.width(10.dp))
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(participant.displayName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(participant.displayName, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                         if (participant.role == ParticipantRole.STARCAST) Text(" ★ starCast", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB77900))
                         if (participant.role == ParticipantRole.ADMIN) Text(" Admin", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.Blue)
-                        if (isCurrentUser) Text(" (You)", fontSize = 10.sp, color = Color.Gray)
+                        if (isCurrentUser) Text(" (You)", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         StatusDot(Icons.Filled.Mic, participant.micState == MediaState.ON)
@@ -189,8 +197,9 @@ fun ParticipantRow(
 
 @Composable
 private fun StatusDot(icon: ImageVector, active: Boolean) {
-    Box(modifier = Modifier.size(22.dp).clip(RoundedCornerShape(4.dp)).background(if (active) Color.Black else Color.White).border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
-        Icon(icon, contentDescription = null, tint = if (active) Color.White else Color.Black, modifier = Modifier.size(12.dp))
+    val bb = brutalBorderColor()
+    Box(modifier = Modifier.size(22.dp).clip(RoundedCornerShape(4.dp)).background(if (active) Color.Black else MaterialTheme.colorScheme.surfaceVariant).border(BorderStroke(1.dp, bb), RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
+        Icon(icon, contentDescription = null, tint = if (active) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(12.dp))
     }
 }
 
@@ -208,9 +217,11 @@ fun MeetingControlBar(
     val showShare = isAdmin || hasScreenSharePermission
     // screen-share limit: max 2 at a time (mock local state — without APIs we enforce locally)
     val activeSharers = 0 // will be passed via ViewModel in real API; here button visibility alone enforces via isScreenSharing count in screen
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = modifier.padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
-        Card(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(2.dp, Color.Black), elevation = CardDefaults.cardElevation(0.dp)) {
+        Box(modifier = Modifier.matchParentSize().padding(start = 5.dp, top = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+        Card(modifier = Modifier.wrapContentWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(2.dp, bb), elevation = CardDefaults.cardElevation(0.dp)) {
             Row(modifier = Modifier.wrapContentWidth().padding(horizontal = 10.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (recording) {
                     Row(modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(Color(0xFFC62828)).border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(20.dp)).padding(horizontal = 9.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -235,12 +246,14 @@ fun MeetingControlBar(
 
 @Composable
 private fun ControlButton(icon: ImageVector, active: Boolean, isDestructive: Boolean = false, onClick: () -> Unit) {
-    val bg = when { isDestructive -> Color(0xFFC62828); active -> Color(0xFF4CAF50); else -> Color.White }
-    val tint = if (active || isDestructive) Color.White else Color.Black
+    val bg = when { isDestructive -> Color(0xFFC62828); active -> Color(0xFF4CAF50); else -> MaterialTheme.colorScheme.surfaceVariant }
+    val tint = if (active || isDestructive) Color.White else MaterialTheme.colorScheme.onSurface
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     // New brutalistic: each control has its own bottom/right 3-4dp black offset, rounded square
     Box(modifier = Modifier.size(52.dp).padding(end = 3.dp, bottom = 3.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
-        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(bg).border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp)).clickable { onClick() }, contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(12.dp)).background(bs))
+        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(bg).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)).clickable { onClick() }, contentAlignment = Alignment.Center) {
             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
         }
     }
@@ -248,41 +261,43 @@ private fun ControlButton(icon: ImageVector, active: Boolean, isDestructive: Boo
 
 @Composable
 fun ClassLobbyCard(classInfo: ClassSession, onJoin: () -> Unit, onCancel: () -> Unit) {
-    // Brutal card — white div with 2dp black border + 5dp bottom/right black offset (site-wide), rounded 20dp
+    // Brutal card — surface div with 2dp border + 5dp bottom/right offset (site-wide), rounded 20dp
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = Modifier.fillMaxWidth().padding(24.dp).padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(20.dp)).background(Color.Black))
-        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(2.dp, Color.Black), elevation = CardDefaults.cardElevation(0.dp)) {
+        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(20.dp)).background(bs))
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(2.dp, bb), elevation = CardDefaults.cardElevation(0.dp)) {
             Column(modifier = Modifier.padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 // Brutal icon square — 72dp black rounded 16dp with 2dp border + shadow feel
                 Box(modifier = Modifier.size(72.dp).padding(end = 3.dp, bottom = 3.dp)) {
-                    Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
-                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)).background(Color.Black).border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.matchParentSize().offset(x = 3.dp, y = 3.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)).background(Color.Black).border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
                         Icon(Icons.Filled.VideoCall, contentDescription = null, tint = Color.White, modifier = Modifier.size(36.dp))
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                Text("Live Class", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = Color.Black)
+                Text("Live Class", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.height(6.dp))
-                Text(classInfo.topic, fontSize = 15.sp, textAlign = TextAlign.Center, color = Color(0xFF475569), fontWeight = FontWeight.SemiBold)
+                Text(classInfo.topic, fontSize = 15.sp, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(24.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    // Cancel — brutal white square with 2dp black + 4dp shadow (not OutlinedButton flat)
+                    // Cancel — brutal surface square with 2dp border + 4dp shadow (not OutlinedButton flat)
                     Box(modifier = Modifier.weight(1f).height(52.dp).padding(end = 4.dp, bottom = 4.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(14.dp)).background(Color.Black))
-                        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(Color.White).border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(14.dp)).clickable { onCancel() }, contentAlignment = Alignment.Center) {
-                            Text("Cancel", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Color.Black)
+                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(14.dp)).background(bs))
+                        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.surfaceVariant).border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp)).clickable { onCancel() }, contentAlignment = Alignment.Center) {
+                            Text("Cancel", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                     // Join — brutal black square with 2dp border + 4dp shadow (not Material Button)
                     Box(modifier = Modifier.weight(1f).height(52.dp).padding(end = 4.dp, bottom = 4.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(14.dp)).background(Color.Black))
-                        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(Color.Black).border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(14.dp)).clickable { onJoin() }, contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(14.dp)).background(bs))
+                        Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(Color.Black).border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp)).clickable { onJoin() }, contentAlignment = Alignment.Center) {
                             Text("Join Class", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = Color.White)
                         }
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                Text("Mic & camera will be OFF by default", fontSize = 11.sp, color = Color(0xFF64748B), textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold)
+                Text("Mic & camera will be OFF by default", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold)
             }
         }
     }

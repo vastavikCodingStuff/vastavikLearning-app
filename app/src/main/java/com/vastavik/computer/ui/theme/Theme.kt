@@ -101,8 +101,10 @@ fun VastavikTheme(
                 onBackground = NeoBrutalistColors.DarkTextPrimary,
                 onSurface = NeoBrutalistColors.DarkTextPrimary,
                 onSurfaceVariant = NeoBrutalistColors.DarkTextSecondary,
-                outline = NeoBrutalistColors.Black,
-                outlineVariant = NeoBrutalistColors.Black.copy(alpha = 0.3f),
+                // Gray borders in dark mode so brutalist cards stay visible
+                // on dark backgrounds (never black-on-black, never white bg).
+                outline = Color(0xFF64748B),
+                outlineVariant = Color(0xFF475569),
                 inverseSurface = NeoBrutalistColors.LightSurface,
                 inverseOnSurface = NeoBrutalistColors.LightTextPrimary,
                 inversePrimary = accentColor

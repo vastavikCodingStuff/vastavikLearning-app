@@ -27,7 +27,7 @@ data class AppNotification(val id:String, val title:String, val body:String, val
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationsScreen(onNavigate:(String)->Unit){
+fun NotificationsScreen(onNavigate:(String)->Unit, onBack: () -> Unit = {}){
     var items by remember { mutableStateOf(listOf(
         AppNotification("1","New Lesson: OOP in Java","VS Code + Whiteboard videos are live","2h ago",true,"new_lesson"),
         AppNotification("2","50% OFF ends soon","Premium at Rs 149/mo. Tap to grab.","5h ago",true,"promo"),
@@ -36,7 +36,7 @@ fun NotificationsScreen(onNavigate:(String)->Unit){
         AppNotification("5","Payment due in 3 days","Renew to keep Pro access.","3d ago",true,"expiry")
     ))}
     Scaffold(
-        topBar = { TopAppBar(title={Text("Notifications", fontWeight=FontWeight.Bold)}, navigationIcon={IconButton(onClick={onNavigate("home")}){Icon(Icons.Filled.ArrowBack,contentDescription=null)}} , actions={ TextButton(onClick={ items = items.map{ it.copy(unread=false)}}){Text("Mark all read")}})},
+        topBar = { TopAppBar(title={Text("Notifications", fontWeight=FontWeight.Bold)}, navigationIcon={IconButton(onClick={onBack()}){Icon(Icons.Filled.ArrowBack,contentDescription=null)}} , actions={ TextButton(onClick={ items = items.map{ it.copy(unread=false)}}){Text("Mark all read")}})},
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         if (items.isEmpty()){

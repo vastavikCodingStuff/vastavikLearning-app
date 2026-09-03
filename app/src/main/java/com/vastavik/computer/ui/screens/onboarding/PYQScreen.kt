@@ -22,7 +22,7 @@ import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PYQScreen(onNavigate: (String) -> Unit) {
+fun PYQScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var selectedBoard by remember { mutableStateOf("All") }
     var selectedYear by remember { mutableStateOf("All") }
 
@@ -46,7 +46,7 @@ fun PYQScreen(onNavigate: (String) -> Unit) {
             TopAppBar(
                 title = { Text("Past Year Questions") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("home") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },

@@ -21,7 +21,7 @@ import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyNotesScreen(onNavigate: (String) -> Unit) {
+fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var notes by remember { mutableStateOf(
         listOf(
             Pair("OOP Notes", "Classes, objects, inheritance..."),
@@ -36,7 +36,7 @@ fun MyNotesScreen(onNavigate: (String) -> Unit) {
             TopAppBar(
                 title = { Text("My Notes") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("profile") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },

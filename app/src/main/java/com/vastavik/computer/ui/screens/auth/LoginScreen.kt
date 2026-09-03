@@ -26,12 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
-private val BgWhite = Color(0xFFF8FAFC)
-private val TextDark = Color(0xFF0F172A)
-private val TextMuted = Color(0xFF64748B)
 private val PrimaryIndigo = Color(0xFF2563EB)
-private val BorderBlack = Color.Black
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +42,8 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
     val context = LocalContext.current
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -63,14 +63,14 @@ fun LoginScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(PrimaryIndigo)
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(16.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -92,7 +92,7 @@ fun LoginScreen(
             Text(
                 text = "Sign in to continue your learning journey",
                 fontSize = 14.sp,
-                color = TextMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(40.dp))
@@ -105,10 +105,10 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderBlack,
-                    focusedBorderColor = BorderBlack,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true
@@ -132,10 +132,10 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = BorderBlack,
-                    focusedBorderColor = BorderBlack,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true
@@ -155,21 +155,21 @@ fun LoginScreen(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(BorderBlack)
+                        .background(bs)
                 )
                 Button(
                     onClick = {
                         if (email.isNotBlank() && password.isNotBlank()) {
                             viewModel.signIn(email.trim(), password.trim())
                         } else {
-                            onNavigate("home")
+                            android.widget.Toast.makeText(context, "Please enter your email and password", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
@@ -193,7 +193,7 @@ fun LoginScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Don't have an account?", color = TextMuted, fontSize = 14.sp)
+                Text("Don't have an account?", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     "Sign Up",

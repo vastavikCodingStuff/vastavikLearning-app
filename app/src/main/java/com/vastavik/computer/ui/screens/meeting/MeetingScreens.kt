@@ -23,20 +23,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.data.model.*
 import com.vastavik.computer.ui.components.*
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LobbyScreen(
     onNavigate: (String) -> Unit,
+    onBack: () -> Unit = {},
     classInfo: ClassSession,
     viewModel: MeetingViewModel,
     userId: String,
     displayName: String
 ) {
     LaunchedEffect(Unit) { viewModel.joinClass(classInfo.classId, userId, displayName) }
-    Scaffold(containerColor = Color(0xFFF5F5F5)) { padding ->
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            ClassLobbyCard(classInfo = classInfo, onJoin = { onNavigate("meeting_inclass/${classInfo.classId}") }, onCancel = { onNavigate("profile") })
+            ClassLobbyCard(classInfo = classInfo, onJoin = { onNavigate("meeting_inclass/${classInfo.classId}") }, onCancel = { onBack() })
         }
     }
 }
@@ -45,6 +48,7 @@ fun LobbyScreen(
 @Composable
 fun InClassScreen(
     onNavigate: (String) -> Unit,
+    onBack: () -> Unit = {},
     viewModel: MeetingViewModel,
     userId: String
 ) {
@@ -61,9 +65,11 @@ fun InClassScreen(
     val handRaised by viewModel.localHandRaised.collectAsState()
     val screenSharing by viewModel.localScreenSharing.collectAsState()
     var showWhiteboard by remember { mutableStateOf(false) }
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     val participants = participantsMap.values.filter { it.isActive }
-    val currentUser = viewModel.currentUser
+    val currentUser by viewModel.currentUser.collectAsState()
     val isAdmin = currentUser?.role == ParticipantRole.ADMIN
     val hasSharePerm = currentUser?.hasScreenSharePermission == true || isAdmin
     val disabled = session?.disabledFeatures ?: emptySet()
@@ -78,7 +84,7 @@ fun InClassScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFE8EAF6))
+            .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
@@ -103,8 +109,8 @@ fun InClassScreen(
                     selectedSharerId?.let { selId ->
                         screenSharers.find { it.userId == selId }?.let { sel ->
                             Box(modifier = Modifier.fillMaxWidth().padding(end = 5.dp, bottom = 5.dp).padding(top = 48.dp)) {
-                                Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
-                                Box(modifier = Modifier.fillMaxWidth().aspectRatio(if (isVertical) 16f/9f else 16f/9f).clip(RoundedCornerShape(16.dp)).background(Color(0xFF0F172A)).border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                                Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+                                Box(modifier = Modifier.fillMaxWidth().aspectRatio(if (isVertical) 16f/9f else 16f/9f).clip(RoundedCornerShape(16.dp)).background(Color(0xFF0F172A)).border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Icon(Icons.Filled.ScreenShare, contentDescription = null, tint = Color.White.copy(0.85f), modifier = Modifier.size(28.dp))
                                         Spacer(Modifier.height(6.dp))
@@ -125,13 +131,13 @@ fun InClassScreen(
                             screenSharers.forEach { sharer ->
                                 val selected = sharer.userId == selectedSharerId
                                 Box(modifier = Modifier.weight(1f).aspectRatio(9f/16f).padding(end = 4.dp, bottom = 4.dp).clickable { selectedSharerId = sharer.userId }) {
-                                    Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
-                                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(if (selected) Color(0xFFFFE500) else Color.White).border(androidx.compose.foundation.BorderStroke(2.dp, if (selected) Color.Black else Color(0xFF1A1A1A)), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                                    Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
+                                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(if (selected) Color(0xFFFFE500) else MaterialTheme.colorScheme.surface).border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
                                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(8.dp)) {
-                                            Icon(Icons.Filled.ScreenShare, contentDescription = null, tint = Color.Black, modifier = Modifier.size(18.dp))
+                                            Icon(Icons.Filled.ScreenShare, contentDescription = null, tint = if (selected) Color.Black else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                                             Spacer(Modifier.height(4.dp))
-                                            Text(sharer.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, color = Color.Black, maxLines = 1)
-                                            Text(if (selected) "Viewing" else "Tap to view", fontSize = 9.sp, color = Color(0xFF64748B))
+                                            Text(sharer.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, color = if (selected) Color.Black else MaterialTheme.colorScheme.onBackground, maxLines = 1)
+                                            Text(if (selected) "Viewing" else "Tap to view", fontSize = 9.sp, color = if (selected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                 }
@@ -142,14 +148,14 @@ fun InClassScreen(
                             screenSharers.forEach { sharer ->
                                 val selected = sharer.userId == selectedSharerId
                                 Box(modifier = Modifier.fillMaxWidth().height(72.dp).padding(end = 4.dp, bottom = 4.dp).clickable { selectedSharerId = sharer.userId }) {
-                                    Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
-                                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(if (selected) Color(0xFFFFE500) else Color.White).border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp)).padding(10.dp), contentAlignment = Alignment.CenterStart) {
+                                    Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
+                                    Box(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)).background(if (selected) Color(0xFFFFE500) else MaterialTheme.colorScheme.surface).border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)).padding(10.dp), contentAlignment = Alignment.CenterStart) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(Color.Black), contentAlignment = Alignment.Center) { Icon(Icons.Filled.ScreenShare, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp)) }
+                                            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)).background(if (selected) Color.Black else MaterialTheme.colorScheme.onSurface), contentAlignment = Alignment.Center) { Icon(Icons.Filled.ScreenShare, contentDescription = null, tint = if (selected) Color.White else MaterialTheme.colorScheme.surface, modifier = Modifier.size(18.dp)) }
                                             Spacer(Modifier.width(10.dp))
                                             Column {
-                                                Text(sharer.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = Color.Black)
-                                                Text(if (selected) "Viewing • Tap to switch" else "Tap to view full screen", fontSize = 11.sp, color = Color(0xFF64748B))
+                                                Text(sharer.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = if (selected) Color.Black else MaterialTheme.colorScheme.onBackground)
+                                                Text(if (selected) "Viewing • Tap to switch" else "Tap to view full screen", fontSize = 11.sp, color = if (selected) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant)
                                             }
                                             Spacer(Modifier.weight(1f))
                                             if (selected) Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = Color.Black, modifier = Modifier.size(18.dp))
@@ -164,7 +170,7 @@ fun InClassScreen(
 
                 if (participants.isEmpty()) {
                     Box(Modifier.fillMaxWidth().weight(1f).padding(16.dp), contentAlignment = Alignment.Center) {
-                        Text("No participants yet", color = Color(0xFF64748B), fontWeight = FontWeight.Bold)
+                        Text("No participants yet", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     LazyVerticalGrid(
@@ -227,7 +233,7 @@ fun InClassScreen(
                 cameraEnabled = camEnabled, onCameraToggle = { viewModel.toggleCamera() },
                 screenShareEnabled = screenSharing, onScreenShareToggle = { viewModel.toggleScreenShare() },
                 hasScreenSharePermission = effectiveSharePerm, isAdmin = isAdmin && (screenSharers.size < 2 || screenSharing),
-                onLeave = { viewModel.leaveClass(); onNavigate("home") },
+                onLeave = { viewModel.leaveClass(); onBack() },
                 recording = recording, disabledFeatures = disabled,
                 whiteboardVisible = showWhiteboard,
                 onWhiteboardToggle = { showWhiteboard = !showWhiteboard }
@@ -249,16 +255,19 @@ fun InClassScreen(
 
 @Composable
 private fun BrutalStudentTile(participant: Participant, isMe: Boolean) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
+    val isDefaultRole = participant.role == ParticipantRole.STUDENT
     val bg = when (participant.role) {
         ParticipantRole.ADMIN -> Color(0xFFE0E7FF)
         ParticipantRole.STARCAST -> Color(0xFFFEF3C7)
-        else -> Color.White
+        else -> MaterialTheme.colorScheme.surface
     }
     Box(modifier = Modifier.aspectRatio(1f).padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(Color.Black))
+        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
         Box(
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)).background(bg)
-                .border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(16.dp)),
+                .border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(12.dp)) {
@@ -269,21 +278,21 @@ private fun BrutalStudentTile(participant: Participant, isMe: Boolean) {
                     Text(participant.displayName.firstOrNull()?.uppercase() ?: "?", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(participant.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = Color.Black, textAlign = TextAlign.Center, maxLines = 1)
+                Text(participant.displayName, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = if (isDefaultRole) MaterialTheme.colorScheme.onBackground else Color.Black, textAlign = TextAlign.Center, maxLines = 1)
                 Text(
                     when (participant.role) { ParticipantRole.ADMIN -> "Admin"; ParticipantRole.STARCAST -> "★ starCast"; else -> if (isMe) "You" else "Student" },
-                    fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF64748B)
+                    fontSize = 11.sp, fontWeight = FontWeight.Bold, color = if (isDefaultRole) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFF64748B)
                 )
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(if (participant.micState == MediaState.ON) Color.Black else Color.White).border(androidx.compose.foundation.BorderStroke(1.2.dp, Color.Black), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(if (participant.micState == MediaState.ON) Color.Black else Color.White).border(androidx.compose.foundation.BorderStroke(1.2.dp, bb), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
                         Icon(if (participant.micState == MediaState.ON) Icons.Filled.Mic else Icons.Filled.MicOff, contentDescription = null, tint = if (participant.micState == MediaState.ON) Color.White else Color.Black, modifier = Modifier.size(10.dp))
                     }
-                    Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(if (participant.cameraState == MediaState.ON) Color.Black else Color.White).border(androidx.compose.foundation.BorderStroke(1.2.dp, Color.Black), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(if (participant.cameraState == MediaState.ON) Color.Black else Color.White).border(androidx.compose.foundation.BorderStroke(1.2.dp, bb), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
                         Icon(if (participant.cameraState == MediaState.ON) Icons.Filled.Videocam else Icons.Filled.VideocamOff, contentDescription = null, tint = if (participant.cameraState == MediaState.ON) Color.White else Color.Black, modifier = Modifier.size(10.dp))
                     }
                     if (participant.handRaised) {
-                        Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFFFFE500)).border(androidx.compose.foundation.BorderStroke(1.2.dp, Color.Black), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.size(20.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFFFFE500)).border(androidx.compose.foundation.BorderStroke(1.2.dp, bb), RoundedCornerShape(6.dp)), contentAlignment = Alignment.Center) {
                             Icon(Icons.Filled.BackHand, contentDescription = null, tint = Color.Black, modifier = Modifier.size(10.dp))
                         }
                     }
@@ -295,18 +304,20 @@ private fun BrutalStudentTile(participant: Participant, isMe: Boolean) {
 
 @Composable
 private fun SquareTopButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String? = null, selected: Boolean, onClick: () -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = Modifier.size(52.dp).padding(end = 4.dp, bottom = 4.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black))
+        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
         Box(
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
-                .background(if (selected) Color.Black else Color.White)
-                .border(androidx.compose.foundation.BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp))
+                .background(if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.surface)
+                .border(androidx.compose.foundation.BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
                 .clickable { onClick() },
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(icon, contentDescription = null, tint = if (selected) Color.White else Color.Black, modifier = Modifier.size(20.dp))
-                if (label != null) Text(label, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = if (selected) Color.White else Color.Black)
+                Icon(icon, contentDescription = null, tint = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
+                if (label != null) Text(label, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.onSurface)
             }
         }
     }

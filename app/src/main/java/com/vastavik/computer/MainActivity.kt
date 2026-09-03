@@ -6,18 +6,21 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.vastavik.computer.ui.navigation.AppNavHost
 import com.vastavik.computer.ui.theme.VastavikTheme
+import com.vastavik.computer.utils.AdminSession
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.vastavik.computer.utils.ThemePreferences
 import javax.inject.Inject
 import androidx.compose.foundation.isSystemInDarkTheme
+import android.view.Display
+import android.os.Build
+import android.util.Log
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -29,10 +32,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Request the highest supported refresh rate (60/90/120 FPS) so the
+        // Compose UI renders at the device's full display capability.
+        setHighRefreshRate()
+
         setContent {
             val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = false)
             val isNeo by themePreferences.isNeoBrutalish.collectAsState(initial = true)
             val neoAccentIndex by themePreferences.neoBrutalAccentIndex.collectAsState(initial = 0)
+
+            AdminSession.update(FirebaseAuth.getInstance().currentUser)
+            val isAdmin by AdminSession.isAdmin.collectAsState()
+            DisposableEffect(isAdmin) {
+                if (isAdmin) {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                } else {
+                    window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+                }
+                onDispose { }
+            }
+
             VastavikTheme(darkTheme = isDarkMode, neoBrutalish = isNeo, neoBrutalAccentIndex = neoAccentIndex) {
                 val navController = rememberNavController()
                 AppNavHost(
@@ -43,17 +62,35 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Requests the display's maximum supported refresh rate (e.g. 120 Hz)
+     * by selecting the best display mode at the current resolution.
+     */
+    private fun setHighRefreshRate() {
+        try {
+            val display: Display? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                this@MainActivity.display
+            } else {
+                @Suppress("DEPRECATION")
+                windowManager.defaultDisplay
+            }
+            val modes = display?.supportedModes ?: return
+            val current = display.mode
+            // Pick the mode with the highest refresh rate at the current resolution
+            val best = modes
+                .filter { it.physicalWidth == current.physicalWidth && it.physicalHeight == current.physicalHeight }
+                .maxByOrNull { it.refreshRate } ?: return
+            if (best.refreshRate > current.refreshRate) {
+                window.attributes = window.attributes.apply { preferredDisplayModeId = best.modeId }
+            }
+        } catch (e: Exception) {
+            Log.w("MainActivity", "High refresh rate request failed: ${e.message}")
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-    }
-
-    private fun hideSystemUI() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     private fun getStartRoute(intent: Intent?): String {

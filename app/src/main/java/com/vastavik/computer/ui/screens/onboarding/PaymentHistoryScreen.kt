@@ -22,7 +22,7 @@ import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentHistoryScreen(onNavigate: (String) -> Unit) {
+fun PaymentHistoryScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     val transactions = listOf(
         Triple("Premium Monthly", "\u20B9299", "Completed"),
         Triple("Premium Yearly", "\u20B91,999", "Completed")
@@ -33,7 +33,7 @@ fun PaymentHistoryScreen(onNavigate: (String) -> Unit) {
             TopAppBar(
                 title = { Text("Payment History") },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigate("profile") }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },

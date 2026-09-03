@@ -49,11 +49,13 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.vastavik.computer.ui.theme.BrutalDefaults
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 import com.vastavik.computer.ui.theme.neoShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OcrExerciseScreen(onNavigate: (String)->Unit) {
+fun OcrExerciseScreen(onNavigate: (String)->Unit, onBack: () -> Unit = {}) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -69,6 +71,8 @@ fun OcrExerciseScreen(onNavigate: (String)->Unit) {
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
     var camera by remember { mutableStateOf<androidx.camera.core.Camera?>(null) }
     val previewViewRef = remember { mutableStateOf<PreviewView?>(null) }
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     fun runOcr(bitmap: Bitmap) {
         isProcessing = true
@@ -120,7 +124,7 @@ fun OcrExerciseScreen(onNavigate: (String)->Unit) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title={Text("Coding Exercise", fontWeight=FontWeight.Bold)}, navigationIcon={IconButton(onClick={onNavigate("home")}){Icon(Icons.Filled.ArrowBack,contentDescription=null)}}) },
+        topBar = { TopAppBar(title={Text("Coding Exercise", fontWeight=FontWeight.Bold)}, navigationIcon={IconButton(onClick={onBack()}){Icon(Icons.Filled.ArrowBack,contentDescription=null)}}) },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp).verticalScroll(rememberScrollState())) {
@@ -161,10 +165,10 @@ fun OcrExerciseScreen(onNavigate: (String)->Unit) {
                     val hasPermission = context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                     // outer brutal wrapper
                     Box(modifier = Modifier.fillMaxWidth().padding(end = BrutalDefaults.ShadowOffset, bottom = BrutalDefaults.ShadowOffset)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = BrutalDefaults.ShadowOffset, y = BrutalDefaults.ShadowOffset).clip(RoundedCornerShape(BrutalDefaults.RadiusLarge)).background(Color.Black))
+                        Box(modifier = Modifier.matchParentSize().offset(x = BrutalDefaults.ShadowOffset, y = BrutalDefaults.ShadowOffset).clip(RoundedCornerShape(BrutalDefaults.RadiusLarge)).background(bs))
                         Box(
                             modifier = Modifier.fillMaxWidth().aspectRatio(3f/4f).clip(RoundedCornerShape(BrutalDefaults.RadiusLarge))
-                                .background(Color(0xFF0F172A)).border(BrutalDefaults.BorderWidth, Color.Black, RoundedCornerShape(BrutalDefaults.RadiusLarge)),
+                                .background(Color(0xFF0F172A)).border(BrutalDefaults.BorderWidth, bb, RoundedCornerShape(BrutalDefaults.RadiusLarge)),
                             contentAlignment = Alignment.Center
                         ) {
                             if (hasPermission) {
@@ -217,27 +221,27 @@ fun OcrExerciseScreen(onNavigate: (String)->Unit) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         // Flash — brutal pill
                         Box(modifier = Modifier.weight(1f).height(48.dp).padding(end = 4.dp, bottom = 4.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(RoundedCornerShape(14.dp)).background(Color.Black))
+                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(RoundedCornerShape(14.dp)).background(bs))
                             Box(
                                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
-                                    .background(if (isFlashOn) Color(0xFFFFE500) else Color.White)
-                                    .border(BrutalDefaults.BorderWidth, Color.Black, RoundedCornerShape(14.dp))
+                                    .background(if (isFlashOn) Color(0xFFFFE500) else MaterialTheme.colorScheme.surface)
+                                    .border(BrutalDefaults.BorderWidth, bb, RoundedCornerShape(14.dp))
                                     .clickable { isFlashOn = !isFlashOn },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(if (isFlashOn) Icons.Filled.FlashlightOn else Icons.Filled.FlashlightOff, contentDescription=null, tint = Color.Black, modifier=Modifier.size(18.dp))
+                                    Icon(if (isFlashOn) Icons.Filled.FlashlightOn else Icons.Filled.FlashlightOff, contentDescription=null, tint = if (isFlashOn) Color.Black else MaterialTheme.colorScheme.onSurface, modifier=Modifier.size(18.dp))
                                     Spacer(Modifier.width(6.dp))
-                                    Text(if (isFlashOn) "Flash On" else "Flash Off", fontWeight=FontWeight.ExtraBold, fontSize=12.sp, color=Color.Black)
+                                    Text(if (isFlashOn) "Flash On" else "Flash Off", fontWeight=FontWeight.ExtraBold, fontSize=12.sp, color=if (isFlashOn) Color.Black else MaterialTheme.colorScheme.onSurface)
                                 }
                             }
                         }
                         // Camera — brutal circle, in-app capture (no system camera intent)
                         Box(modifier = Modifier.size(68.dp).padding(end=4.dp, bottom=4.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(CircleShape).background(Color.Black))
+                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(CircleShape).background(bs))
                             Box(
-                                modifier = Modifier.fillMaxSize().clip(CircleShape).background(Color.White)
-                                    .border(BrutalDefaults.BorderWidth, Color.Black, CircleShape)
+                                modifier = Modifier.fillMaxSize().clip(CircleShape).background(MaterialTheme.colorScheme.surface)
+                                    .border(BrutalDefaults.BorderWidth, bb, CircleShape)
                                     .clickable {
                                         val cap = imageCapture
                                         if (cap != null) {
@@ -256,29 +260,29 @@ fun OcrExerciseScreen(onNavigate: (String)->Unit) {
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Filled.CameraAlt, contentDescription="Capture", tint=Color.Black, modifier=Modifier.size(26.dp))
+                                Icon(Icons.Filled.CameraAlt, contentDescription="Capture", tint=MaterialTheme.colorScheme.onSurface, modifier=Modifier.size(26.dp))
                             }
                         }
                         // Gallery — brutal pill
                         Box(modifier = Modifier.weight(1f).height(48.dp).padding(end=4.dp, bottom=4.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(RoundedCornerShape(14.dp)).background(Color.Black))
+                            Box(modifier = Modifier.matchParentSize().offset(x=4.dp, y=4.dp).clip(RoundedCornerShape(14.dp)).background(bs))
                             Box(
-                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(Color.White)
-                                    .border(BrutalDefaults.BorderWidth, Color.Black, RoundedCornerShape(14.dp))
+                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp)).background(MaterialTheme.colorScheme.surface)
+                                    .border(BrutalDefaults.BorderWidth, bb, RoundedCornerShape(14.dp))
                                     .clickable { pickImageLauncher.launch("image/*") },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Filled.PhotoLibrary, contentDescription=null, tint=Color.Black, modifier=Modifier.size(18.dp))
+                                    Icon(Icons.Filled.PhotoLibrary, contentDescription=null, tint=MaterialTheme.colorScheme.onSurface, modifier=Modifier.size(18.dp))
                                     Spacer(Modifier.width(6.dp))
-                                    Text("Gallery", fontWeight=FontWeight.ExtraBold, fontSize=12.sp, color=Color.Black)
+                                    Text("Gallery", fontWeight=FontWeight.ExtraBold, fontSize=12.sp, color=MaterialTheme.colorScheme.onSurface)
                                 }
                             }
                         }
                     }
 
                     Spacer(Modifier.height(14.dp))
-                    Text("In-app camera — captures directly from the preview above. No system camera app.", color=Color(0xFF64748B), fontSize=11.sp, fontWeight=FontWeight.SemiBold)
+                    Text("In-app camera — captures directly from the preview above. No system camera app.", color=MaterialTheme.colorScheme.onSurfaceVariant, fontSize=11.sp, fontWeight=FontWeight.SemiBold)
                     Spacer(Modifier.height(2.dp))
                     Text("OCR (ML Kit) extracts text, you edit, then Gemini explains.", color=MaterialTheme.colorScheme.onSurfaceVariant, fontSize=11.sp)
                 }

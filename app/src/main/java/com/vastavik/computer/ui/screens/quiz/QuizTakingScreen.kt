@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.vastavik.computer.BuildConfig
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +50,6 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-private val BorderBlack = ComposeColor.Black
 private val PrimaryBlue = ComposeColor(0xFF2563EB)
 
 private fun parseMarkdown(text: String): AnnotatedString {
@@ -247,7 +248,9 @@ private fun saveReviewAndOpenPdf(
 @Composable
 fun QuizTakingScreen(
     quizId: String,
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onBack: () -> Unit = {},
+    navigateHome: () -> Unit = {}
 ) {
     var currentQuestion by remember { mutableIntStateOf(0) }
     var selectedAnswer by remember { mutableIntStateOf(-1) }
@@ -256,6 +259,8 @@ fun QuizTakingScreen(
     var score by remember { mutableIntStateOf(0) }
     val userAnswers = remember { mutableStateMapOf<Int, Int>() }
     val context = LocalContext.current
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     val questions = remember { QuizManager.getQuestions().ifEmpty {
         listOf(
@@ -267,7 +272,7 @@ fun QuizTakingScreen(
 
     if (questions.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No questions generated. Go back and try again.", color = ComposeColor(0xFF0F172A))
+            Text("No questions generated. Go back and try again.", color = MaterialTheme.colorScheme.onBackground)
         }
         return
     }
@@ -277,13 +282,14 @@ fun QuizTakingScreen(
             questions = questions,
             userAnswers = userAnswers,
             onBack = { showReview = false },
-            onNavigate = onNavigate
+            onNavigate = onNavigate,
+            navigateHome = navigateHome
         )
         return
     }
 
     if (showResult) {
-        Scaffold(containerColor = ComposeColor(0xFFF8FAFC)) { padding ->
+        Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -293,32 +299,32 @@ fun QuizTakingScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Box(modifier = Modifier.padding(bottom = 20.dp)) {
-                    Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(20.dp)).background(BorderBlack))
+                    Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(20.dp)).background(bs))
                     Box(
-                        modifier = Modifier.size(96.dp).clip(RoundedCornerShape(20.dp)).background(PrimaryBlue).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(20.dp)),
+                        modifier = Modifier.size(96.dp).clip(RoundedCornerShape(20.dp)).background(PrimaryBlue).border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(Icons.Filled.EmojiEvents, contentDescription = null, modifier = Modifier.size(48.dp), tint = ComposeColor.White)
                     }
                 }
-                Text("Quiz Complete!", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = ComposeColor(0xFF0F172A))
+                Text("Quiz Complete!", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("You scored $score out of ${questions.size}", fontSize = 18.sp, color = ComposeColor(0xFF64748B))
+                Text("You scored $score out of ${questions.size}", fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-                    Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(6.dp)).background(BorderBlack))
+                    Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(6.dp)).background(bs))
                     LinearProgressIndicator(
                         progress = { score.toFloat() / questions.size },
-                        modifier = Modifier.fillMaxWidth().height(14.dp).clip(RoundedCornerShape(6.dp)).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(6.dp)),
+                        modifier = Modifier.fillMaxWidth().height(14.dp).clip(RoundedCornerShape(6.dp)).border(BorderStroke(2.dp, bb), RoundedCornerShape(6.dp)),
                         color = PrimaryBlue,
-                        trackColor = ComposeColor.White
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                ResultButton(text = "Back to Home", icon = Icons.Filled.Home, onClick = { onNavigate("home") })
+                ResultButton(text = "Back to Home", icon = Icons.Filled.Home, onClick = { navigateHome() })
                 Spacer(modifier = Modifier.height(12.dp))
                 ResultOutlinedButton(text = "Download Questions", icon = Icons.Filled.Download, onClick = { saveAndOpenPdf(context, questions) })
                 Spacer(modifier = Modifier.height(12.dp))
@@ -327,7 +333,7 @@ fun QuizTakingScreen(
         }
     } else {
         Scaffold(
-            containerColor = ComposeColor(0xFFF8FAFC)
+            containerColor = MaterialTheme.colorScheme.background
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
                 // Top bar: Close + "Vastavik Computer"
@@ -335,27 +341,27 @@ fun QuizTakingScreen(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { onNavigate("home") }) {
-                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = ComposeColor(0xFF0F172A))
+                    IconButton(onClick = { onBack() }) {
+                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onBackground)
                     }
                     Text("Vastavik", color = PrimaryBlue, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-                    Text("Computer", color = ComposeColor(0xFF0F172A), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                    Text("Computer", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
                 }
 
                 Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Question ${currentQuestion + 1} of ${questions.size}", fontWeight = FontWeight.Bold, color = ComposeColor(0xFF0F172A))
+                        Text("Question ${currentQuestion + 1} of ${questions.size}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                         Text("${((currentQuestion + 1).toFloat() / questions.size * 100).toInt()}%", color = PrimaryBlue, fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(4.dp)).background(BorderBlack))
+                        Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(4.dp)).background(bs))
                         LinearProgressIndicator(
                             progress = { (currentQuestion + 1).toFloat() / questions.size },
-                            modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(4.dp)).border(BorderStroke(1.5.dp, BorderBlack), RoundedCornerShape(4.dp)),
+                            modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(4.dp)).border(BorderStroke(1.5.dp, bb), RoundedCornerShape(4.dp)),
                             color = PrimaryBlue,
-                            trackColor = ComposeColor.White
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     }
 
@@ -365,21 +371,21 @@ fun QuizTakingScreen(
                     val hasCode = containsCode(questionText)
 
                     Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(BorderBlack))
+                        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = ComposeColor.White),
-                            border = BorderStroke(2.dp, BorderBlack),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            border = BorderStroke(2.dp, bb),
                             elevation = CardDefaults.cardElevation(0.dp)
                         ) {
                             if (hasCode) {
                                 Column(modifier = Modifier.padding(16.dp).heightIn(min = 120.dp, max = 300.dp).verticalScroll(rememberScrollState())) {
-                                    Text(questionText, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = ComposeColor(0xFF0F172A), fontFamily = FontFamily.Monospace, lineHeight = 20.sp)
+                                    Text(questionText, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onBackground, fontFamily = FontFamily.Monospace, lineHeight = 20.sp)
                                 }
                             } else {
                                 Column(modifier = Modifier.padding(20.dp)) {
-                                    Text(questionText, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ComposeColor(0xFF0F172A))
+                                    Text(questionText, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                                 }
                             }
                         }
@@ -390,27 +396,27 @@ fun QuizTakingScreen(
                     questions[currentQuestion].options.forEachIndexed { index, option ->
                         val isSelected = selectedAnswer == index
                         Box(modifier = Modifier.padding(bottom = 6.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                             Card(
                                 modifier = Modifier.fillMaxWidth().clickable { selectedAnswer = index },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) PrimaryBlue else ComposeColor.White
+                                    containerColor = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surface
                                 ),
-                                border = BorderStroke(2.dp, BorderBlack),
+                                border = BorderStroke(2.dp, bb),
                                 elevation = CardDefaults.cardElevation(0.dp)
                             ) {
                                 Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Box(
                                         modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp))
-                                            .background(if (isSelected) ComposeColor.White else ComposeColor(0xFFE2E8F0))
-                                            .border(BorderStroke(1.dp, BorderBlack), RoundedCornerShape(8.dp)),
+                                            .background(if (isSelected) ComposeColor.White else MaterialTheme.colorScheme.surfaceVariant)
+                                            .border(BorderStroke(1.dp, bb), RoundedCornerShape(8.dp)),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Text(('A' + index).toString(), color = if (isSelected) PrimaryBlue else ComposeColor(0xFF475569), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                        Text(('A' + index).toString(), color = if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                     }
                                     Spacer(modifier = Modifier.width(12.dp))
-                                    Text(option, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (isSelected) ComposeColor.White else ComposeColor(0xFF0F172A))
+                                    Text(option, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (isSelected) ComposeColor.White else MaterialTheme.colorScheme.onBackground)
                                 }
                             }
                         }
@@ -418,11 +424,11 @@ fun QuizTakingScreen(
                 }
 
                 Box(
-                    modifier = Modifier.fillMaxWidth().background(ComposeColor.White).border(BorderStroke(1.dp, BorderBlack.copy(alpha = 0.15f))).padding(horizontal = 20.dp, vertical = 12.dp)
+                    modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).border(BorderStroke(1.dp, bb.copy(alpha = 0.15f))).padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp).weight(1f)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                             OutlinedButton(
                                 onClick = {
                                     if (currentQuestion > 0) {
@@ -432,16 +438,16 @@ fun QuizTakingScreen(
                                         selectedAnswer = userAnswers[currentQuestion] ?: -1
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth().height(50.dp).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                                modifier = Modifier.fillMaxWidth().height(50.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                                 enabled = currentQuestion > 0,
                                 shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(containerColor = ComposeColor.White)
+                                colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface)
                             ) {
-                                Text("Previous", fontWeight = FontWeight.Bold, color = ComposeColor(0xFF0F172A))
+                                Text("Previous", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                             }
                         }
                         Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp).weight(1f)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+                            Box(modifier = Modifier.matchParentSize().offset(x = 4.dp, y = 4.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                             Button(
                                 onClick = {
                                     userAnswers[currentQuestion] = selectedAnswer
@@ -453,7 +459,7 @@ fun QuizTakingScreen(
                                         showResult = true
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth().height(50.dp).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                                modifier = Modifier.fillMaxWidth().height(50.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                                 enabled = selectedAnswer >= 0,
                                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                                 shape = RoundedCornerShape(12.dp),
@@ -471,11 +477,13 @@ fun QuizTakingScreen(
 
 @Composable
 private fun ResultButton(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(bs))
         Button(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
             shape = RoundedCornerShape(12.dp),
             elevation = ButtonDefaults.buttonElevation(0.dp)
@@ -489,17 +497,19 @@ private fun ResultButton(text: String, icon: androidx.compose.ui.graphics.vector
 
 @Composable
 private fun ResultOutlinedButton(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(bs))
         OutlinedButton(
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = ComposeColor.White)
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = ComposeColor(0xFF0F172A))
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.width(8.dp))
-            Text(text, fontWeight = FontWeight.Bold, color = ComposeColor(0xFF0F172A))
+            Text(text, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
@@ -510,7 +520,8 @@ private fun ReviewAnswersScreen(
     questions: List<QuizQuestionData>,
     userAnswers: Map<Int, Int>,
     onBack: () -> Unit,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    navigateHome: () -> Unit = {}
 ) {
     var explanations by remember { mutableStateOf<Map<Int, String>>(emptyMap()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -518,6 +529,8 @@ private fun ReviewAnswersScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
 
     LaunchedEffect(reloadTrigger) {
         isLoading = true
@@ -538,7 +551,7 @@ private fun ReviewAnswersScreen(
     }
 
     Scaffold(
-        containerColor = ComposeColor(0xFFF8FAFC)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding() * 0.4f, start = padding.calculateStartPadding(layoutDirection), end = padding.calculateEndPadding(layoutDirection), bottom = padding.calculateBottomPadding())) {
             // Top bar: Back + "Review Answers" + Reload + Download
@@ -547,9 +560,9 @@ private fun ReviewAnswersScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = ComposeColor(0xFF0F172A))
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                 }
-                Text("Review Answers", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = ComposeColor(0xFF0F172A))
+                Text("Review Answers", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.weight(1f))
                 if (!isLoading) {
                     IconButton(onClick = { reloadTrigger++ }) {
@@ -568,7 +581,7 @@ private fun ReviewAnswersScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = PrimaryBlue)
                         Spacer(Modifier.height(16.dp))
-                        Text("Generating explanations...", color = ComposeColor(0xFF64748B))
+                        Text("Generating explanations...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             } else {
@@ -579,12 +592,12 @@ private fun ReviewAnswersScreen(
                         val isCorrect = userAns == correct
 
                         Box(modifier = Modifier.padding(end = 5.dp, bottom = 10.dp)) {
-                            Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(14.dp)).background(BorderBlack))
+                            Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(14.dp)).background(bs))
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(containerColor = ComposeColor.White),
-                                border = BorderStroke(2.dp, BorderBlack),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                border = BorderStroke(2.dp, bb),
                                 elevation = CardDefaults.cardElevation(0.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
@@ -596,7 +609,7 @@ private fun ReviewAnswersScreen(
                                             modifier = Modifier.size(24.dp)
                                         )
                                         Spacer(Modifier.width(8.dp))
-                                        Text("Q${i + 1}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = ComposeColor(0xFF0F172A))
+                                        Text("Q${i + 1}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
                                         Spacer(Modifier.weight(1f))
                                         Text(
                                             if (isCorrect) "Correct" else "Wrong",
@@ -606,7 +619,7 @@ private fun ReviewAnswersScreen(
                                         )
                                     }
                                     Spacer(Modifier.height(8.dp))
-                                    Text(q.question, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = ComposeColor(0xFF0F172A))
+                                    Text(q.question, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onBackground)
 
                                     Spacer(Modifier.height(10.dp))
 
@@ -619,7 +632,7 @@ private fun ReviewAnswersScreen(
                                         val textColor = when {
                                             j == correct -> ComposeColor(0xFF10B981)
                                             j == userAns && j != correct -> ComposeColor(0xFFEF4444)
-                                            else -> ComposeColor(0xFF334155)
+                                            else -> MaterialTheme.colorScheme.onSurfaceVariant
                                         }
                                         Box(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).clip(RoundedCornerShape(8.dp)).background(bg)) {
                                             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -637,7 +650,7 @@ private fun ReviewAnswersScreen(
                                         Row(modifier = Modifier.padding(12.dp)) {
                                             Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = PrimaryBlue, modifier = Modifier.size(18.dp))
                                             Spacer(Modifier.width(8.dp))
-                                            Text(parseMarkdown(explanations[i] ?: "Loading..."), fontSize = 13.sp, color = ComposeColor(0xFF475569), lineHeight = 18.sp)
+                                            Text(parseMarkdown(explanations[i] ?: "Loading..."), fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 18.sp)
                                         }
                                     }
                                 }
@@ -648,10 +661,10 @@ private fun ReviewAnswersScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(BorderBlack))
+                        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(12.dp)).background(bs))
                         Button(
-                            onClick = { onNavigate("home") },
-                            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                            onClick = { navigateHome() },
+                            modifier = Modifier.fillMaxWidth().height(52.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                             shape = RoundedCornerShape(12.dp),
                             elevation = ButtonDefaults.buttonElevation(0.dp)

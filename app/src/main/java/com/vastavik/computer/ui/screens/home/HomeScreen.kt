@@ -1,40 +1,65 @@
 package com.vastavik.computer.ui.screens.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.ExperimentalFoundationApi
 import com.vastavik.computer.ui.components.VastavikTopBar
 import com.vastavik.computer.ui.components.PromoPopup
 import com.vastavik.computer.ui.components.PromoData
+import com.vastavik.computer.ui.components.UnderDevelopmentBanner
 import com.vastavik.computer.ui.theme.BrutalBoxCard
 import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.BrutalDefaults
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 private var promoShown = false
+private var devBannerShown = false
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
+    val pagerState = rememberPagerState(initialPage = 0) { 4 }
     var selectedIndex by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
     var showPromo by remember { mutableStateOf(!promoShown) }
+    var showDevBanner by remember { mutableStateOf(!devBannerShown) }
 
     val sampleCourses = listOf(
         Triple("Java Programming", Color(0xFF8B5CF6) to Color(0xFF6366F1), "42 lessons"),
@@ -52,6 +77,31 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         )
     }
 
+    if (showDevBanner) {
+        devBannerShown = true
+        UnderDevelopmentBanner(
+            onDismiss = { showDevBanner = false }
+        )
+    }
+
+    // Keep selectedIndex in sync with horizontal swipes.
+    LaunchedEffect(pagerState.currentPage) {
+        selectedIndex = pagerState.currentPage
+    }
+    // Keep pager in sync when the bottom nav is tapped — smooth scroll
+    // with a spring so multi-page jumps glide instead of stuttering.
+    LaunchedEffect(selectedIndex) {
+        if (pagerState.currentPage != selectedIndex && !pagerState.isScrollInProgress) {
+            pagerState.animateScrollToPage(
+                page = selectedIndex,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+        }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -61,13 +111,19 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             )
         }
     ) { padding ->
-        Box(modifier = Modifier
-            .padding(padding)
-            .consumeWindowInsets(padding)
-        ) {
-            when (selectedIndex) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .consumeWindowInsets(padding),
+            // Keep the current page (and its scroll state) in memory so the
+            // bottom nav still works smoothly and the top bar is not lost.
+            beyondViewportPageCount = 1
+        ) { page ->
+            when (page) {
                 0 -> HomeTab(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxSize(),
                     onNavigate = onNavigate,
                     searchQuery = searchQuery,
                     onSearchChange = { searchQuery = it },
@@ -89,6 +145,8 @@ private fun HomeTab(
     onSearchChange: (String) -> Unit,
     courses: List<Triple<String, Pair<Color, Color>, String>>
 ) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
@@ -105,13 +163,13 @@ private fun HomeTab(
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color.Black)
+                        .background(bs)
                 )
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    border = BorderStroke(2.dp, Color.Black),
+                    border = BorderStroke(2.dp, bb),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column {
@@ -168,8 +226,8 @@ private fun HomeTab(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clip(RoundedCornerShape(50.dp))
-                                            .background(Color.White)
-                                            .border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(50.dp))
+                                            .background(MaterialTheme.colorScheme.surface)
+                                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
                                             .clickable { onNavigate("search") }
                                             .padding(horizontal = 16.dp, vertical = 14.dp)
                                     ) {
@@ -177,14 +235,14 @@ private fun HomeTab(
                                             Icon(
                                                 Icons.Filled.Search,
                                                 contentDescription = null,
-                                                tint = Color(0xFF94A3B8),
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 modifier = Modifier.size(18.dp)
                                             )
                                             Spacer(modifier = Modifier.width(10.dp))
                                             Text(
                                                 text = if (searchQuery.isEmpty()) "Search courses, topics, lessons..." else searchQuery,
                                                 fontSize = 13.sp,
-                                                color = if (searchQuery.isEmpty()) Color(0xFF94A3B8) else Color(0xFF1E293B),
+                                                color = if (searchQuery.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground,
                                                 fontWeight = FontWeight.Medium
                                             )
                                         }
@@ -192,11 +250,11 @@ private fun HomeTab(
                                 }
                             }
                         }
-                        // Stats footer white strip
+                        // Stats footer strip (theme-aware)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color.White)
+                                .background(MaterialTheme.colorScheme.surface)
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -216,7 +274,7 @@ private fun HomeTab(
                                 Text(
                                     text = "  |  ",
                                     fontSize = 13.sp,
-                                    color = Color(0xFFCBD5E1)
+                                    color = MaterialTheme.colorScheme.outline
                                 )
                                 Text(
                                     text = "65% avg progress",
@@ -362,13 +420,15 @@ private fun HomeTab(
 
 @Composable
 private fun ContinueLearningCard(onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Box(modifier = Modifier.padding(horizontal = 16.dp).padding(end = 5.dp, bottom = 5.dp)) {
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .offset(x = 5.dp, y = 5.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color.Black)
+                .background(bs)
         )
         Card(
             modifier = Modifier
@@ -376,7 +436,7 @@ private fun ContinueLearningCard(onNavigate: (String) -> Unit) {
                 .clickable { onNavigate("video_lesson/1/1/1/1") },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = BorderStroke(2.dp, Color.Black),
+            border = BorderStroke(2.dp, bb),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Box(
@@ -472,13 +532,13 @@ private fun ContinueLearningCard(onNavigate: (String) -> Unit) {
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
                                 .background(Color.White)
-                                .border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(50.dp))
+                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
                                 .clickable { onNavigate("video_lesson/1/1/1/1") }
                                 .padding(horizontal = 20.dp, vertical = 10.dp)
                         ) {
                             Text(
                                 text = "Continue →",
-                                color = MaterialTheme.colorScheme.onBackground,
+                                color = Color(0xFF0F172A),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 13.sp
                             )
@@ -552,6 +612,7 @@ private fun CourseCatalogCard(
     lessons: String,
     onClick: () -> Unit
 ) {
+    val bb = brutalBorderColor()
     BrutalCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
@@ -564,7 +625,7 @@ private fun CourseCatalogCard(
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Brush.linearGradient(colors = listOf(colors.first, colors.second)))
-                    .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(12.dp)),
+                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -613,6 +674,7 @@ private fun StatsBrutalCard(
     iconBg: Color,
     iconTint: Color
 ) {
+    val bb = brutalBorderColor()
     BrutalCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
@@ -629,7 +691,7 @@ private fun StatsBrutalCard(
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(iconBg)
-                    .border(BorderStroke(1.5.dp, Color.Black.copy(alpha = 0.1f)), RoundedCornerShape(12.dp)),
+                    .border(BorderStroke(1.5.dp, bb.copy(alpha = 0.12f)), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(icon, fontSize = 18.sp, color = iconTint, fontWeight = FontWeight.Bold)
@@ -658,13 +720,13 @@ private fun PopularTopicItem(title: String, subject: String, duration: String) {
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .border(BorderStroke(1.dp, Color.Black.copy(alpha = 0.06f)), RoundedCornerShape(12.dp)),
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Filled.PlayArrow,
                     contentDescription = null,
-                    tint = Color(0xFF2563EB),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -683,18 +745,28 @@ private fun PopularTopicItem(title: String, subject: String, duration: String) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Icon(
-                Icons.Filled.ChevronRight,
-                contentDescription = null,
-                tint = Color(0xFF94A3B8),
-                modifier = Modifier.size(18.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(50.dp))
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Coming soon",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val items = listOf(
         Triple(Icons.Filled.Home, "Home", 0),
         Triple(Icons.Filled.Map, "Learn", 1),
@@ -714,12 +786,12 @@ private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
                     .matchParentSize()
                     .offset(x = 5.dp, y = 5.dp)
                     .clip(RoundedCornerShape(50.dp))
-                    .background(Color.Black)
+                    .background(bs)
             )
             Surface(
                 shape = RoundedCornerShape(50.dp),
                 color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(2.dp, Color.Black),
+                border = BorderStroke(2.dp, bb),
                 shadowElevation = 0.dp
             ) {
                 Row(
@@ -731,32 +803,48 @@ private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
                 ) {
                     items.forEach { (icon, label, index) ->
                         val isSelected = selectedIndex == index
+                        val pillBg = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                        val pillPadding = if (isSelected) 18.dp else 14.dp
+                        val iconScale = if (isSelected) 1.12f else 1f
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50.dp))
-                                .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                .background(pillBg)
                                 .border(
-                                    if (isSelected) BorderStroke(1.5.dp, Color.Black) else BorderStroke(0.dp, Color.Transparent),
+                                    if (isSelected) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
                                     RoundedCornerShape(50.dp)
                                 )
                                 .clickable { onItemSelected(index) }
-                                .padding(horizontal = if (isSelected) 18.dp else 14.dp, vertical = 10.dp),
+                                .padding(horizontal = pillPadding, vertical = 10.dp),
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     icon,
                                     contentDescription = label,
                                     tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(18.dp)
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .scale(iconScale)
                                 )
-                                if (isSelected) {
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        label,
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp
-                                    )
+                                AnimatedVisibility(
+                                    visible = isSelected,
+                                    enter = expandHorizontally(
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessMediumLow
+                                        )
+                                    ) + fadeIn(tween(150)),
+                                    exit = shrinkHorizontally(tween(140)) + fadeOut(tween(90))
+                                ) {
+                                    Row {
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            label,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.sp
+                                        )
+                                    }
                                 }
                             }
                         }

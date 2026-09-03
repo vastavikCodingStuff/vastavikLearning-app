@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 
 data class PromoData(
     val id: String = "promo_50",
@@ -38,10 +40,9 @@ fun PromoPopup(
     onDismiss: () -> Unit,
     onCta: (String) -> Unit
 ) {
-    val BorderBlack = Color.Black
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val PrimaryIndigo = Color(0xFF2563EB)
-    val TextDark = Color(0xFF0F172A)
-    val TextMuted = Color(0xFF64748B)
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Box(modifier = Modifier.fillMaxWidth(0.92f).padding(16.dp)) {
@@ -50,14 +51,14 @@ fun PromoPopup(
                     .matchParentSize()
                     .offset(x = 5.dp, y = 5.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(BorderBlack)
+                    .background(bs)
             )
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(20.dp)),
+                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp)),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Box {
@@ -70,7 +71,7 @@ fun PromoPopup(
                                     .fillMaxWidth()
                                     .height(150.dp)
                                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                                    .background(Color(0xFFF8FAFC)),
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
@@ -95,10 +96,10 @@ fun PromoPopup(
                                 promo.title,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = TextDark
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(Modifier.height(8.dp))
-                            Text(promo.body, fontSize = 14.sp, color = TextMuted)
+                            Text(promo.body, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(Modifier.height(16.dp))
 
                             Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
@@ -107,14 +108,14 @@ fun PromoPopup(
                                         .matchParentSize()
                                         .offset(x = 5.dp, y = 5.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(BorderBlack)
+                                        .background(bs)
                                 )
                                 Button(
                                     onClick = { onCta(promo.ctaLink) },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(48.dp)
-                                        .border(BorderStroke(2.dp, BorderBlack), RoundedCornerShape(12.dp)),
+                                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
                                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
                                     shape = RoundedCornerShape(12.dp),
                                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
@@ -131,10 +132,10 @@ fun PromoPopup(
                             .padding(8.dp)
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White)
-                            .border(BorderStroke(1.5.dp, BorderBlack), RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
                     ) {
-                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = TextDark, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Filled.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(18.dp))
                     }
                 }
             }

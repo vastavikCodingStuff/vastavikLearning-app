@@ -33,7 +33,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.Canvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontFamily
@@ -44,7 +43,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import com.vastavik.computer.ui.theme.neoShape
-import com.vastavik.computer.ui.theme.neoCircleShape
+import com.vastavik.computer.ui.theme.brutalBorderColor
+import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -113,6 +113,8 @@ private fun callMistralApi(messages: List<ChatMessage>): String {
 
 @Composable
 fun ChatScreen(onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val viewModel = remember { ChatViewModel.getInstance() }
     val messages by viewModel.messages.collectAsState()
     var inputText by remember { mutableStateOf("") }
@@ -138,7 +140,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
             try {
                 callMistralApi(messages + ChatMessage(prompt, isUser = true))
             } catch (e: Exception) {
-                "Error: ${'$'}{e.message}. Check your internet connection."
+                "Error: ${e.message}. Check your internet connection."
             }
         }
     }
@@ -259,7 +261,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 Surface(
                     shape = RoundedCornerShape(50.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(1.dp, Color.Black)
+                    border = BorderStroke(1.dp, bb)
                 ) {
                     Text(
                         "Mistral Small",
@@ -274,7 +276,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.primary)
-                        .border(BorderStroke(1.5.dp, Color.Black), RoundedCornerShape(12.dp))
+                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
                         .clickable { viewModel.clearMessages() }
                         .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
@@ -312,8 +314,8 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                             }
                         },
                         shape = RoundedCornerShape(50.dp),
-                        color = Color.White,
-                        border = BorderStroke(2.dp, Color.Black),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(2.dp, bb),
                         shadowElevation = 0.dp
                     ) {
                         Text(
@@ -321,7 +323,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF0F172A)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -391,9 +393,9 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
             if (!isVoiceMode) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 0.dp,
-                    border = BorderStroke(2.dp, Color.Black)
+                    border = BorderStroke(2.dp, bb)
                 ) {
                     Row(
                         modifier = Modifier
@@ -404,7 +406,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         OutlinedTextField(
                             value = inputText,
                             onValueChange = { inputText = it },
-                            placeholder = { Text("Ask anything...", fontSize = 14.sp, color = Color(0xFF94A3B8)) },
+                            placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             trailingIcon = {
                                 if (inputText.isEmpty()) {
                                     Box(
@@ -412,7 +414,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                             .size(36.dp)
                                             .clip(CircleShape)
                                             .background(MaterialTheme.colorScheme.primary)
-                                            .border(BorderStroke(1.5.dp, Color.Black), CircleShape)
+                                            .border(BorderStroke(1.5.dp, bb), CircleShape)
                                             .clickable { isVoiceMode = true },
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -432,10 +434,10 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                             singleLine = false,
                             maxLines = 4,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color.Black,
-                                unfocusedBorderColor = Color.Black,
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color.White
+                                focusedBorderColor = bb,
+                                unfocusedBorderColor = bb,
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface
                             )
                         )
                         Spacer(Modifier.width(8.dp))
@@ -472,6 +474,8 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
 
 @Composable
 private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start
@@ -482,7 +486,7 @@ private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
                     .size(32.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
-                    .border(BorderStroke(1.5.dp, Color.Black), CircleShape),
+                    .border(BorderStroke(1.5.dp, bb), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.SmartToy, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
@@ -496,8 +500,8 @@ private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
                 bottomStart = if (message.isUser) 16.dp else 4.dp,
                 bottomEnd = if (message.isUser) 4.dp else 16.dp
             ),
-            color = if (message.isUser) Color(0xFF2563EB) else Color.White,
-            border = BorderStroke(1.8.dp, Color.Black),
+            color = if (message.isUser) Color(0xFF2563EB) else MaterialTheme.colorScheme.surface,
+            border = BorderStroke(1.8.dp, bb),
             shadowElevation = 0.dp,
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
@@ -520,7 +524,7 @@ private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
                     .size(32.dp)
                     .clip(CircleShape)
                     .background(Color(0xFF0F172A))
-                    .border(BorderStroke(1.5.dp, Color.Black), CircleShape),
+                    .border(BorderStroke(1.5.dp, bb), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Filled.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
@@ -537,13 +541,15 @@ fun VoiceInputOverlay(
     onConfirm: () -> Unit,
     onCancel: () -> Unit
 ) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
     val primaryBlue = Color(0xFF2563EB)
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 0.dp,
-        border = BorderStroke(2.dp, Color.Black)
+        border = BorderStroke(2.dp, bb)
     ) {
         Column(
             modifier = Modifier
@@ -555,13 +561,13 @@ fun VoiceInputOverlay(
                 text = if (isListening) "Listening..." else "Tap the mic to speak",
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 18.sp,
-                color = Color(0xFF0F172A)
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(Modifier.height(6.dp))
             Text(
                 text = "Say everything you need to get done.",
                 fontSize = 14.sp,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(24.dp))
 
@@ -580,14 +586,14 @@ fun VoiceInputOverlay(
             if (partialTranscript.isNotEmpty()) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFF1F5F9),
-                    border = BorderStroke(1.dp, Color.Black)
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(1.dp, bb)
                 ) {
                     Text(
                         text = partialTranscript,
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
                         fontSize = 14.sp,
-                        color = Color(0xFF334155),
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 3
                     )
                 }
@@ -605,15 +611,15 @@ fun VoiceInputOverlay(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFF1F5F9))
-                        .border(BorderStroke(2.dp, Color.Black), CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(BorderStroke(2.dp, bb), CircleShape)
                         .clickable { onCancel() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = "Cancel",
-                        tint = Color(0xFF64748B),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
                 }
@@ -624,7 +630,7 @@ fun VoiceInputOverlay(
                         .size(64.dp)
                         .clip(CircleShape)
                         .background(primaryBlue)
-                        .border(BorderStroke(2.5.dp, Color.Black), CircleShape)
+                        .border(BorderStroke(2.5.dp, bb), CircleShape)
                         .clickable {
                             if (partialTranscript.isNotEmpty()) onConfirm()
                         },
@@ -648,6 +654,7 @@ fun WaveformVisualizer(
     amplitude: Float,
     modifier: Modifier = Modifier
 ) {
+    val bb = brutalBorderColor()
     val primaryBlue = Color(0xFF2563EB)
     val barCount = 32
 
@@ -678,8 +685,8 @@ fun WaveformVisualizer(
     Canvas(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFFF8FAFC))
-            .border(BorderStroke(2.dp, Color.Black), RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
         val totalW = size.width
@@ -709,30 +716,47 @@ fun WaveformVisualizer(
     }
 }
 
+private data class MarkdownSegment(
+    val isCode: Boolean,
+    val content: String,
+    val language: String = ""
+)
+
+private fun parseMarkdownSegments(text: String): List<MarkdownSegment> {
+    val segments = mutableListOf<MarkdownSegment>()
+    // Match fenced code blocks: ```lang\n ... \n```  (or ```\n ... \n```)
+    val regex = Regex("```(\\w*)\\n([\\s\\S]*?)```", RegexOption.IGNORE_CASE)
+    var lastIndex = 0
+    regex.findAll(text).forEach { match ->
+        val start = match.range.first
+        if (start > lastIndex) {
+            segments.add(MarkdownSegment(false, text.substring(lastIndex, start)))
+        }
+        val lang = match.groupValues[1].trim()
+        val code = match.groupValues[2].trimEnd()
+        if (code.isNotBlank()) {
+            segments.add(MarkdownSegment(true, code, lang))
+        }
+        lastIndex = match.range.last + 1
+    }
+    if (lastIndex < text.length) {
+        segments.add(MarkdownSegment(false, text.substring(lastIndex)))
+    }
+    return segments
+}
+
 @Composable
 fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: ((String) -> Unit)? = null) {
-    val parts = text.split("`")
-    val codeBlocks = mutableListOf<Pair<String, String>>()
-    parts.forEachIndexed { index, part ->
-        if (index % 2 == 1) {
-            val lines = part.trim().lines()
-            val lang = lines.firstOrNull()?.trim() ?: ""
-            val codeLines = if (lines.size > 1) lines.drop(1) else listOf()
-            val codeContent = codeLines.joinToString("\n")
-            if (codeContent.isNotBlank()) codeBlocks.add(lang to codeContent)
-        }
-    }
+    val bb = brutalBorderColor()
+    val segments = parseMarkdownSegments(text)
+    val codeBlocks = segments.filter { it.isCode }
+
     Column(modifier = modifier) {
-        parts.forEachIndexed { index, part ->
-            if (index % 2 == 1) {
-                val lines = part.trim().lines()
-                val language = lines.firstOrNull()?.trim() ?: ""
-                val codeLines = if (lines.size > 1) lines.drop(1) else listOf()
-                val codeContent = codeLines.joinToString("\n")
-                val isFirstCode = codeBlocks.isNotEmpty() && codeContent == codeBlocks.first().second
-                if (onNavigate != null && codeContent.isNotBlank() && isFirstCode) {
-                    val allCode = codeBlocks.joinToString("\n\n") { it.second }
-                    val ext = when (language.lowercase()) {
+        segments.forEach { seg ->
+            if (seg.isCode) {
+                val isFirstCode = codeBlocks.firstOrNull() == seg
+                if (onNavigate != null && isFirstCode) {
+                    val ext = when (seg.language.lowercase()) {
                         "python", "py" -> "py"
                         "javascript", "js" -> "js"
                         "sql" -> "sql"
@@ -741,12 +765,12 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                     val filename = "code.$ext"
                     Surface(
                         onClick = {
-                            val encoded = Uri.encode(allCode, "UTF-8")
-                            onNavigate("code_editor?initialCode=$encoded&language=$language")
+                            val encoded = Uri.encode(seg.content, "UTF-8")
+                            onNavigate("code_editor?initialCode=$encoded&language=${seg.language}")
                         },
                         shape = RoundedCornerShape(10.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        border = BorderStroke(1.5.dp, Color.Black),
+                        border = BorderStroke(1.5.dp, bb),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 4.dp, vertical = 4.dp)
@@ -763,7 +787,8 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                             }
                         }
                     }
-                } else if (codeContent.isNotBlank()) {
+                } else if (seg.content.isNotBlank()) {
+                    val codeLines = seg.content.lines()
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = Color(0xFF1E1E2E),
@@ -772,14 +797,14 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                             .padding(vertical = 8.dp)
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            if (language.isNotEmpty()) {
-                                Text(language, fontSize = 10.sp, color = Color.Gray)
+                            if (seg.language.isNotEmpty()) {
+                                Text(seg.language, fontSize = 10.sp, color = Color.Gray)
                                 Spacer(Modifier.height(8.dp))
                             }
                             codeLines.forEachIndexed { i, line ->
                                 Row(modifier = Modifier.fillMaxWidth()) {
                                     Text(
-                                        text = "${'$'}{i + 1}",
+                                        text = "${i + 1}",
                                         color = Color(0xFF858585),
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 11.sp,
@@ -789,7 +814,7 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                                             .padding(end = 8.dp)
                                     )
                                     Text(
-                                        text = highlightCode(if (line.isEmpty()) " " else line, language),
+                                        text = highlightCode(if (line.isEmpty()) " " else line, seg.language),
                                         color = Color(0xFFD4D4D4),
                                         fontFamily = FontFamily.Monospace,
                                         fontSize = 11.sp,
@@ -801,9 +826,9 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                     }
                 }
             } else {
-                if (part.trim().isNotEmpty()) {
+                if (seg.content.trim().isNotEmpty()) {
                     Text(
-                        text = parseBasicMarkdown(part.trim()),
+                        text = parseBasicMarkdown(seg.content.trim()),
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 14.sp,
                         lineHeight = 20.sp,
