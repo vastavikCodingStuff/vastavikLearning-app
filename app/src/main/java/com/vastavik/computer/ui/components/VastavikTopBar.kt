@@ -54,31 +54,9 @@ fun VastavikTopBar(
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(Color(0xFF7C3AED), Color(0xFF06B6D4))
-                        )
-                    )
-                    .border(BorderStroke(1.5.dp, bb), CircleShape)
-                    .clickable { onProfileClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    "S",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-            }
-
             if (onNotificationClick != null) {
                 val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
                 val hasUpdate = updateInfo?.isUpdateAvailable == true
-                Spacer(modifier = Modifier.width(8.dp))
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -106,6 +84,28 @@ fun VastavikTopBar(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(Color(0xFF7C3AED), Color(0xFF06B6D4))
+                        )
+                    )
+                    .border(BorderStroke(1.5.dp, bb), CircleShape)
+                    .clickable { onProfileClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "S",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
             }
         }
     }

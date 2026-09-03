@@ -66,18 +66,6 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .border(BorderStroke(1.5.dp, bb), CircleShape)
-                            .clickable { onNavigate("profile") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
                     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
                     val hasUpdate = updateInfo?.isUpdateAvailable == true
                     Box(
@@ -106,6 +94,18 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     .border(BorderStroke(1.dp, Color.Black), CircleShape)
                             )
                         }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .border(BorderStroke(1.5.dp, bb), CircleShape)
+                            .clickable { onNavigate("profile") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
                     }
                 }
             }
