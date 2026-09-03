@@ -37,6 +37,14 @@ fun ProfileScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
     val isDarkMode by settingsViewModel.isDarkMode.collectAsState(initial = false)
+    val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+    val isUpdateAvailable = updateInfo?.isUpdateAvailable == true
+
+    LaunchedEffect(Unit) {
+        if (updateInfo == null) {
+            com.vastavik.computer.utils.AppUpdater.checkGitHubRelease()
+        }
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -133,6 +141,17 @@ fun ProfileScreen(
                                 tint = Color.White,
                                 modifier = Modifier.size(18.dp)
                             )
+                            if (isUpdateAvailable) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(9.dp)
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = (-4).dp, y = 4.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFFFD600))
+                                        .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                                )
+                            }
                         }
                     }
                 }
@@ -384,7 +403,14 @@ fun ProfileScreen(
                             add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
                             add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
                             add(Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"))
-                            add(Quadruple("App Update", "Version & changelog", Icons.Filled.SystemUpdate, "app_update"))
+                            add(
+                                Quadruple(
+                                    "App Update",
+                                    if (isUpdateAvailable) "v${updateInfo?.latestVersion} available • Tap to update" else "Version & changelog",
+                                    Icons.Filled.SystemUpdate,
+                                    "app_update"
+                                )
+                            )
                             add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
                             add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
                             if (isAdmin) {
@@ -413,14 +439,14 @@ fun ProfileScreen(
                                         modifier = Modifier
                                             .size(36.dp)
                                             .clip(RoundedCornerShape(10.dp))
-                                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)),
+                                            .background(if (title == "App Update" && isUpdateAvailable) Color(0xFF2563EB).copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant)
+                                            .border(BorderStroke(1.5.dp, if (title == "App Update" && isUpdateAvailable) Color(0xFF2563EB) else bb), RoundedCornerShape(10.dp)),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             icon,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurface,
+                                            tint = if (title == "App Update" && isUpdateAvailable) Color(0xFF2563EB) else MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(18.dp)
                                         )
                                     }
@@ -435,8 +461,26 @@ fun ProfileScreen(
                                         Text(
                                             desc,
                                             fontSize = 11.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            fontWeight = if (title == "App Update" && isUpdateAvailable) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (title == "App Update" && isUpdateAvailable) Color(0xFF2563EB) else MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+                                    }
+                                    if (title == "App Update" && isUpdateAvailable) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(50.dp))
+                                                .background(Color(0xFF2563EB))
+                                                .border(BorderStroke(1.dp, bb), RoundedCornerShape(50.dp))
+                                                .padding(horizontal = 9.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(
+                                                text = "UPDATE",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = Color.White
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
                                     }
                                     if (isComingSoon) {
                                         Box(

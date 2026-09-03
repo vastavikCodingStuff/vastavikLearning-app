@@ -78,6 +78,8 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                         Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
+                    val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+                    val hasUpdate = updateInfo?.isUpdateAvailable == true
                     Box(
                         modifier = Modifier
                             .size(38.dp)
@@ -93,6 +95,17 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             tint = Color.White,
                             modifier = Modifier.size(18.dp)
                         )
+                        if (hasUpdate) {
+                            Box(
+                                modifier = Modifier
+                                    .size(9.dp)
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = (-4).dp, y = 4.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFFFD600))
+                                    .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                            )
+                        }
                     }
                 }
             }

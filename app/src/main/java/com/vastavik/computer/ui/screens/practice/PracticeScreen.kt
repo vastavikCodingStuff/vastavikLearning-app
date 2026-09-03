@@ -246,6 +246,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         }
 
                         // Notification Button
+                        val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+                        val hasUpdate = updateInfo?.isUpdateAvailable == true
                         Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
                             Box(
                                 modifier = Modifier
@@ -269,6 +271,17 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
+                                if (hasUpdate) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(9.dp)
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = (-4).dp, y = 4.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFFFFD600))
+                                            .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                                    )
+                                }
                             }
                         }
                     }
