@@ -18,8 +18,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -56,7 +55,7 @@ private var devBannerShown = false
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
-    val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 0) { 4 }
+    val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 1) { 5 }
     val coroutineScope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
     var showPromo by remember { mutableStateOf(!promoShown) }
@@ -87,14 +86,23 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         )
     }
 
-    val currentTab = if (pagerState.isScrollInProgress) pagerState.targetPage else pagerState.currentPage
+    // Intercept back button if not on Home tab (page 1) to return to Home
+    BackHandler(enabled = pagerState.currentPage != 1) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(1, animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing))
+        }
+    }
+
+    val targetPage = if (pagerState.isScrollInProgress) pagerState.targetPage else pagerState.currentPage
+    val currentTab = targetPage - 1
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             BottomNavBar(
                 selectedIndex = currentTab,
-                onItemSelected = { page ->
+                onItemSelected = { tabIdx ->
+                    val page = tabIdx + 1
                     if (page != pagerState.currentPage) {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(
@@ -110,10 +118,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         val tabNav: (String) -> Unit = remember(onNavigate) {
             { route ->
                 when (route) {
-                    "home" -> coroutineScope.launch { pagerState.animateScrollToPage(0, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
-                    "learning_path" -> coroutineScope.launch { pagerState.animateScrollToPage(1, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
-                    "practice" -> coroutineScope.launch { pagerState.animateScrollToPage(2, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
-                    "chat" -> coroutineScope.launch { pagerState.animateScrollToPage(3, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "profile" -> coroutineScope.launch { pagerState.animateScrollToPage(0, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "home" -> coroutineScope.launch { pagerState.animateScrollToPage(1, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "learning_path" -> coroutineScope.launch { pagerState.animateScrollToPage(2, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "practice" -> coroutineScope.launch { pagerState.animateScrollToPage(3, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "chat" -> coroutineScope.launch { pagerState.animateScrollToPage(4, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
                     else -> onNavigate(route)
                 }
             }
@@ -121,7 +130,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         androidx.compose.foundation.pager.HorizontalPager(
             state = pagerState,
-            beyondViewportPageCount = 0,
+            beyondViewportPageCount = 1,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -129,16 +138,17 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             key = { it }
         ) { page ->
             when (page) {
-                0 -> HomeTab(
+                0 -> com.vastavik.computer.ui.screens.profile.ProfileScreen(onNavigate = tabNav)
+                1 -> HomeTab(
                     modifier = Modifier.fillMaxSize(),
                     onNavigate = tabNav,
                     searchQuery = searchQuery,
                     onSearchChange = { searchQuery = it },
                     courses = sampleCourses
                 )
-                1 -> com.vastavik.computer.ui.screens.learning.LearningPathScreen(onNavigate = tabNav)
-                2 -> com.vastavik.computer.ui.screens.practice.PracticeScreen(onNavigate = tabNav)
-                3 -> com.vastavik.computer.ui.screens.chat.ChatScreen(onNavigate = tabNav)
+                2 -> com.vastavik.computer.ui.screens.learning.LearningPathScreen(onNavigate = tabNav)
+                3 -> com.vastavik.computer.ui.screens.practice.PracticeScreen(onNavigate = tabNav)
+                4 -> com.vastavik.computer.ui.screens.chat.ChatScreen(onNavigate = tabNav)
             }
         }
     }
@@ -155,40 +165,15 @@ private fun HomeTab(
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
 
-    var totalDragX by remember { mutableFloatStateOf(0f) }
-    var dragStartX by remember { mutableFloatStateOf(0f) }
-
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragStart = { offset ->
-                        dragStartX = offset.x
-                        totalDragX = 0f
-                    },
-                    onDragEnd = {
-                        totalDragX = 0f
-                    },
-                    onDragCancel = {
-                        totalDragX = 0f
-                    },
-                    onHorizontalDrag = { change, dragAmount ->
-                        if (dragStartX < 250.dp.toPx() && (dragAmount > 0 || totalDragX > 0)) {
-                            totalDragX += dragAmount
-                            if (totalDragX > 60.dp.toPx()) {
-                                change.consume()
-                                totalDragX = 0f
-                                onNavigate("profile")
-                            }
-                        }
-                    }
-                )
-            },
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item {
-            VastavikTopBar(onProfileClick = { onNavigate("profile") })
+            VastavikTopBar(
+                onProfileClick = { onNavigate("profile") },
+                onNotificationClick = { onNavigate("notifications") }
+            )
         }
 
         // Hero Brutal Card with integrated stats footer

@@ -106,6 +106,35 @@ fun ProfileScreen(
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Blue rounded notification button
+                    Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .offset(x = 2.dp, y = 2.dp)
+                                .clip(CircleShape)
+                                .background(bs)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF2563EB))
+                                .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                .clickable { onNavigate("notifications") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.Notifications,
+                                contentDescription = "Notifications",
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
             }

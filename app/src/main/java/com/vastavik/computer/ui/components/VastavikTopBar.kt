@@ -18,9 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.brutalBorderColor
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+
 @Composable
 fun VastavikTopBar(
     onProfileClick: () -> Unit,
+    onNotificationClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val bb = brutalBorderColor()
@@ -67,6 +71,26 @@ fun VastavikTopBar(
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
+            }
+
+            if (onNotificationClick != null) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2563EB))
+                        .border(BorderStroke(1.5.dp, bb), CircleShape)
+                        .clickable { onNotificationClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Filled.Notifications,
+                        contentDescription = "Notifications",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
