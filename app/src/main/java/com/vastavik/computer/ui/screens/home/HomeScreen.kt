@@ -18,6 +18,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -152,8 +154,37 @@ private fun HomeTab(
 ) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
+
+    var totalDragX by remember { mutableFloatStateOf(0f) }
+    var dragStartX by remember { mutableFloatStateOf(0f) }
+
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragStart = { offset ->
+                        dragStartX = offset.x
+                        totalDragX = 0f
+                    },
+                    onDragEnd = {
+                        totalDragX = 0f
+                    },
+                    onDragCancel = {
+                        totalDragX = 0f
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        if (dragStartX < 250.dp.toPx() && (dragAmount > 0 || totalDragX > 0)) {
+                            totalDragX += dragAmount
+                            if (totalDragX > 60.dp.toPx()) {
+                                change.consume()
+                                totalDragX = 0f
+                                onNavigate("profile")
+                            }
+                        }
+                    }
+                )
+            },
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item {
@@ -782,7 +813,8 @@ private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 4.dp, bottom = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
