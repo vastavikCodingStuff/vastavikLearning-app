@@ -33,6 +33,14 @@ object MistralDiskCache {
     }
 
     /**
+     * Removes a cached solution from disk.
+     */
+    fun removeSolution(context: Context, key: String) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().remove(PREFIX_SOL + key).apply()
+    }
+
+    /**
      * Loads custom/dynamically generated AI MCQs from persistent storage.
      */
     fun getSavedMCQs(context: Context): List<Pair<String, String>> {
