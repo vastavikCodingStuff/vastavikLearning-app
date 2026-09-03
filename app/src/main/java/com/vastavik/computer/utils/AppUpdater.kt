@@ -68,14 +68,25 @@ object AppUpdater {
                 var apkSizeBytes = 0L
                 val assets = json.optJSONArray("assets")
                 if (assets != null) {
+                    var fallbackUrl = ""
+                    var fallbackSize = 0L
                     for (i in 0 until assets.length()) {
                         val asset = assets.getJSONObject(i)
                         val assetName = asset.optString("name", "")
                         if (assetName.endsWith(".apk", ignoreCase = true)) {
-                            apkDownloadUrl = asset.optString("browser_download_url", "")
-                            apkSizeBytes = asset.optLong("size", 0L)
-                            break
+                            if (assetName.contains(latestVer, ignoreCase = true)) {
+                                apkDownloadUrl = asset.optString("browser_download_url", "")
+                                apkSizeBytes = asset.optLong("size", 0L)
+                                break
+                            } else if (fallbackUrl.isEmpty()) {
+                                fallbackUrl = asset.optString("browser_download_url", "")
+                                fallbackSize = asset.optLong("size", 0L)
+                            }
                         }
+                    }
+                    if (apkDownloadUrl.isEmpty()) {
+                        apkDownloadUrl = fallbackUrl
+                        apkSizeBytes = fallbackSize
                     }
                 }
 

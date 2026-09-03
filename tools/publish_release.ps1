@@ -86,17 +86,6 @@ if (Test-Path $ApkPath) {
     $asset = Invoke-RestMethod -Uri $uploadUrl -Headers $uploadHeaders -Method Post -Body $bytes
     Write-Host "Asset uploaded successfully!"
     Write-Host "Asset Download URL: $($asset.browser_download_url)"
-
-    # Also upload as generic 'app-debug.apk' for convenience
-    $genericName = "app-debug.apk"
-    $existingGeneric = $release.assets | Where-Object { $_.name -eq $genericName }
-    if ($existingGeneric) {
-        Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/assets/$($existingGeneric.id)" -Headers $headers -Method Delete
-    }
-    $genericUploadUrl = "https://uploads.github.com/repos/$repo/releases/$($release.id)/assets?name=$genericName"
-    $genericAsset = Invoke-RestMethod -Uri $genericUploadUrl -Headers $uploadHeaders -Method Post -Body $bytes
-    Write-Host "Generic asset app-debug.apk uploaded successfully!"
-    Write-Host "Generic Download URL: $($genericAsset.browser_download_url)"
 } else {
     Write-Error "APK file not found at $ApkPath"
 }
