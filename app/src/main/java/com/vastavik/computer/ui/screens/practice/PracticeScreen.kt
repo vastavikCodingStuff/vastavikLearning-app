@@ -78,17 +78,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
 
     var selectedTab by remember { mutableIntStateOf(0) } // 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
-    var tabWindowStart by remember { mutableIntStateOf(0) } // 0: [MCQs, Predict Output, Coding], 1: [Predict Output, Coding, PYQs]
     var selectedSource by remember { mutableStateOf(QuestionSource.AI) } // 1. Top Toggle AI vs Sir
     val tabs = listOf("MCQs", "Predict the Output", "Coding", "PYQs")
-
-    LaunchedEffect(selectedTab) {
-        if (selectedTab >= 3 && tabWindowStart == 0) {
-            tabWindowStart = 1
-        } else if (selectedTab == 0 && tabWindowStart == 1) {
-            tabWindowStart = 0
-        }
-    }
 
     // Active AI coding item for Mistral solution sheet
     var activeCodingItem by remember { mutableStateOf<CodingItem?>(null) }
@@ -254,7 +245,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // CATEGORY TABS [ MCQs | Predict the Output | Coding | PYQs ] with 3 Visible Options and Scroll Arrows
+            // CATEGORY TABS [ MCQs | Predict the Output | Coding | PYQs ] with PYQs on the right-most side
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -268,140 +259,62 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         .clip(RoundedCornerShape(16.dp))
                         .background(bs)
                 )
-                BoxWithConstraints(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
                         .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
-                        .padding(5.dp)
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val totalWidth = maxWidth
-                    val arrowWidth = 32.dp
-                    val spacing = 4.dp
-                    val availableForTabs = totalWidth - arrowWidth - spacing
-                    val singleTabWidth = availableForTabs / 3
-
-                    val animatedOffset by animateFloatAsState(
-                        targetValue = if (tabWindowStart == 0) 0f else 1f,
-                        animationSpec = tween(durationMillis = 260, easing = FastOutSlowInEasing),
-                        label = "tabScrollOffset"
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .pointerInput(Unit) {
-                                detectHorizontalDragGestures { _, dragAmount ->
-                                    if (dragAmount < -15f) tabWindowStart = 1
-                                    else if (dragAmount > 15f) tabWindowStart = 0
-                                }
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Left Arrow Button (shown when scrolled to right, asking us to scroll back to left)
-                        if (tabWindowStart == 1) {
-                            Box(
-                                modifier = Modifier
-                                    .size(width = arrowWidth, height = 44.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp))
-                                    .clickable { tabWindowStart = 0 },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Filled.ChevronLeft,
-                                    contentDescription = "Scroll Left",
-                                    tint = Color(0xFF2563EB),
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(spacing))
-                        }
-
-                        // 3-Visible Options Window
+                    tabs.forEachIndexed { index, title ->
+                        val isSelected = selectedTab == index
                         Box(
                             modifier = Modifier
-                                .width(availableForTabs)
-                                .clipToBounds()
+                                .weight(1f)
+                                .height(44.dp)
+                                .padding(horizontal = 2.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(if (isSelected) Color(0xFF2563EB) else Color.Transparent)
+                                .border(
+                                    if (isSelected) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .clickable {
+                                    selectedTab = index
+                                },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .offset(x = -singleTabWidth * animatedOffset)
-                            ) {
-                                tabs.forEachIndexed { index, title ->
-                                    val isSelected = selectedTab == index
-                                    Box(
-                                        modifier = Modifier
-                                            .width(singleTabWidth)
-                                            .height(44.dp)
-                                            .padding(horizontal = 2.dp)
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(if (isSelected) Color(0xFF2563EB) else Color.Transparent)
-                                            .border(
-                                                if (isSelected) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
-                                                RoundedCornerShape(10.dp)
-                                            )
-                                            .clickable {
-                                                selectedTab = index
-                                                if (index == 3) tabWindowStart = 1
-                                                if (index == 0) tabWindowStart = 0
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (index == 1) {
-                                            // Predict the Output: Predict on top line, Output on bottom line in same div
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.Center
-                                            ) {
-                                                Text(
-                                                    text = "Predict",
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.ExtraBold,
-                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    lineHeight = 12.sp
-                                                )
-                                                Text(
-                                                    text = "Output",
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.ExtraBold,
-                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    lineHeight = 12.sp
-                                                )
-                                            }
-                                        } else {
-                                            Text(
-                                                text = title,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                maxLines = 1
-                                            )
-                                        }
-                                    }
+                            if (index == 1) {
+                                // Predict the Output: Predict on top line, Output on bottom line in same div
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = "Predict",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        lineHeight = 12.sp
+                                    )
+                                    Text(
+                                        text = "Output",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        lineHeight = 12.sp
+                                    )
                                 }
-                            }
-                        }
-
-                        // Right Arrow Button (shown when at start, asking us to scroll right)
-                        if (tabWindowStart == 0) {
-                            Spacer(modifier = Modifier.width(spacing))
-                            Box(
-                                modifier = Modifier
-                                    .size(width = arrowWidth, height = 44.dp)
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp))
-                                    .clickable { tabWindowStart = 1 },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Filled.ChevronRight,
-                                    contentDescription = "Scroll Right",
-                                    tint = Color(0xFF2563EB),
-                                    modifier = Modifier.size(20.dp)
+                            } else {
+                                Text(
+                                    text = title,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
                                 )
                             }
                         }
@@ -1576,11 +1489,14 @@ private fun PredictOutputCard(
                     )
 
                     Row(
+                        modifier = Modifier.height(IntrinsicSize.Min),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
+                                .fillMaxHeight()
+                                .defaultMinSize(minHeight = 28.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Color(0xFF2563EB))
                                 .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
@@ -1601,18 +1517,20 @@ private fun PredictOutputCard(
                         if (onDelete != null) {
                             Box(
                                 modifier = Modifier
+                                    .fillMaxHeight()
+                                    .defaultMinSize(minHeight = 28.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEF4444).copy(alpha = 0.12f))
                                     .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
                                     .clickable { onDelete(item) }
-                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Filled.DeleteOutline,
                                     contentDescription = "Delete Set",
                                     tint = Color(0xFFDC2626),
-                                    modifier = Modifier.size(14.dp)
+                                    modifier = Modifier.size(15.dp)
                                 )
                             }
                         }
@@ -1897,17 +1815,20 @@ private fun CodingCard(
 
                     // Action buttons
                     Row(
+                        modifier = Modifier.height(IntrinsicSize.Min),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (item.source == QuestionSource.AI) {
                             Box(
                                 modifier = Modifier
+                                    .fillMaxHeight()
+                                    .defaultMinSize(minHeight = 28.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFF2563EB))
                                     .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
                                     .clickable { onOpenMistralAi(item) }
-                                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1920,6 +1841,8 @@ private fun CodingCard(
 
                         Box(
                             modifier = Modifier
+                                .fillMaxHeight()
+                                .defaultMinSize(minHeight = 28.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
@@ -1927,7 +1850,7 @@ private fun CodingCard(
                                     val encodedQ = Uri.encode(item.title, "UTF-8")
                                     onNavigate("code_editor?question=$encodedQ")
                                 }
-                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1941,18 +1864,20 @@ private fun CodingCard(
                         if (onDelete != null) {
                             Box(
                                 modifier = Modifier
+                                    .fillMaxHeight()
+                                    .defaultMinSize(minHeight = 28.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFFEF4444).copy(alpha = 0.12f))
                                     .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
                                     .clickable { onDelete(item) }
-                                    .padding(horizontal = 8.dp, vertical = 5.dp),
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     Icons.Filled.DeleteOutline,
                                     contentDescription = "Delete Question",
                                     tint = Color(0xFFDC2626),
-                                    modifier = Modifier.size(14.dp)
+                                    modifier = Modifier.size(15.dp)
                                 )
                             }
                         }
