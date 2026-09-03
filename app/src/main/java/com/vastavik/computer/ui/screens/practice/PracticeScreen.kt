@@ -64,6 +64,7 @@ private enum class QuestionSource(val label: String, val tagBg: Color, val tagTe
 }
 
 private data class MCQItem(val title: String, val sub: String, val source: QuestionSource)
+private data class PredictOutputItem(val setNumber: Int, val title: String, val topic: String, val questionCount: String, val difficulty: String, val codeSnippet: String, val source: QuestionSource)
 private data class CodingItem(val title: String, val difficulty: String, val topic: String, val source: QuestionSource)
 private data class PYQItem(val title: String, val questions: String, val source: QuestionSource)
 
@@ -76,9 +77,18 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    var selectedTab by remember { mutableIntStateOf(1) } // 0: MCQs, 1: Coding, 2: PYQs
+    var selectedTab by remember { mutableIntStateOf(0) } // 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
+    var tabWindowStart by remember { mutableIntStateOf(0) } // 0: [MCQs, Predict Output, Coding], 1: [Predict Output, Coding, PYQs]
     var selectedSource by remember { mutableStateOf(QuestionSource.AI) } // 1. Top Toggle AI vs Sir
-    val tabs = listOf("MCQs", "Coding", "PYQs")
+    val tabs = listOf("MCQs", "Predict the Output", "Coding", "PYQs")
+
+    LaunchedEffect(selectedTab) {
+        if (selectedTab >= 3 && tabWindowStart == 0) {
+            tabWindowStart = 1
+        } else if (selectedTab == 0 && tabWindowStart == 1) {
+            tabWindowStart = 0
+        }
+    }
 
     // Active AI coding item for Mistral solution sheet
     var activeCodingItem by remember { mutableStateOf<CodingItem?>(null) }
@@ -244,7 +254,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // CATEGORY TABS [ MCQs | Coding | PYQs ] with Neo-Brutalist Thick Borders
+            // CATEGORY TABS [ MCQs | Predict the Output | Coding | PYQs ] with 3 Visible Options and Scroll Arrows
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -258,36 +268,142 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         .clip(RoundedCornerShape(16.dp))
                         .background(bs)
                 )
-                Row(
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.surface)
                         .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(5.dp)
                 ) {
-                    tabs.forEachIndexed { index, title ->
-                        val isSelected = selectedTab == index
+                    val totalWidth = maxWidth
+                    val arrowWidth = 32.dp
+                    val spacing = 4.dp
+                    val availableForTabs = totalWidth - arrowWidth - spacing
+                    val singleTabWidth = availableForTabs / 3
+
+                    val animatedOffset by animateFloatAsState(
+                        targetValue = if (tabWindowStart == 0) 0f else 1f,
+                        animationSpec = tween(durationMillis = 260, easing = FastOutSlowInEasing),
+                        label = "tabScrollOffset"
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectHorizontalDragGestures { _, dragAmount ->
+                                    if (dragAmount < -15f) tabWindowStart = 1
+                                    else if (dragAmount > 15f) tabWindowStart = 0
+                                }
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Left Arrow Button (shown when scrolled to right, asking us to scroll back to left)
+                        if (tabWindowStart == 1) {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = arrowWidth, height = 44.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp))
+                                    .clickable { tabWindowStart = 0 },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.ChevronLeft,
+                                    contentDescription = "Scroll Left",
+                                    tint = Color(0xFF2563EB),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(spacing))
+                        }
+
+                        // 3-Visible Options Window
                         Box(
                             modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(if (isSelected) Color(0xFF2563EB) else Color.Transparent)
-                                .border(
-                                    if (isSelected) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .clickable { selectedTab = index }
-                                .padding(vertical = 10.dp),
-                            contentAlignment = Alignment.Center
+                                .width(availableForTabs)
+                                .clipToBounds()
                         ) {
-                            Text(
-                                text = title,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .offset(x = -singleTabWidth * animatedOffset)
+                            ) {
+                                tabs.forEachIndexed { index, title ->
+                                    val isSelected = selectedTab == index
+                                    Box(
+                                        modifier = Modifier
+                                            .width(singleTabWidth)
+                                            .height(44.dp)
+                                            .padding(horizontal = 2.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (isSelected) Color(0xFF2563EB) else Color.Transparent)
+                                            .border(
+                                                if (isSelected) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
+                                                RoundedCornerShape(10.dp)
+                                            )
+                                            .clickable {
+                                                selectedTab = index
+                                                if (index == 3) tabWindowStart = 1
+                                                if (index == 0) tabWindowStart = 0
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (index == 1) {
+                                            // Predict the Output: Predict on top line, Output on bottom line in same div
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                Text(
+                                                    text = "Predict",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    lineHeight = 12.sp
+                                                )
+                                                Text(
+                                                    text = "Output",
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    lineHeight = 12.sp
+                                                )
+                                            }
+                                        } else {
+                                            Text(
+                                                text = title,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 1
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Right Arrow Button (shown when at start, asking us to scroll right)
+                        if (tabWindowStart == 0) {
+                            Spacer(modifier = Modifier.width(spacing))
+                            Box(
+                                modifier = Modifier
+                                    .size(width = arrowWidth, height = 44.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp))
+                                    .clickable { tabWindowStart = 1 },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.ChevronRight,
+                                    contentDescription = "Scroll Right",
+                                    tint = Color(0xFF2563EB),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -307,7 +423,11 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         selectedSource = selectedSource,
                         onNavigate = onNavigate
                     )
-                    1 -> CodingContent(
+                    1 -> PredictOutputContent(
+                        selectedSource = selectedSource,
+                        onNavigate = onNavigate
+                    )
+                    2 -> CodingContent(
                         selectedSource = selectedSource,
                         onNavigate = onNavigate,
                         onOpenMistralAi = { item ->
@@ -316,7 +436,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                             loadMistralSolution(item, "Java")
                         }
                     )
-                    2 -> PYQContent(
+                    3 -> PYQContent(
                         selectedSource = selectedSource,
                         onNavigate = onNavigate
                     )
@@ -1137,6 +1257,379 @@ private fun MCQContent(
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
         items(displayedItems) { item -> MCQCard(item, onNavigate) }
+    }
+}
+
+@Composable
+private fun PredictOutputContent(
+    selectedSource: QuestionSource,
+    onNavigate: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val saved = remember { MistralDiskCache.getSavedPredictOutput(context) }
+    val aiItems = remember {
+        mutableStateListOf<PredictOutputItem>().apply {
+            if (saved.isNotEmpty()) {
+                addAll(saved.mapIndexed { idx, item ->
+                    PredictOutputItem(
+                        setNumber = idx + 1,
+                        title = item.first,
+                        topic = "AI Generated",
+                        questionCount = item.second,
+                        difficulty = item.third,
+                        codeSnippet = getSnippetForTopic(item.first),
+                        source = QuestionSource.AI
+                    )
+                })
+            } else {
+                val defaults = listOf(
+                    PredictOutputItem(
+                        setNumber = 1,
+                        title = "Loop Tracing & Conditionals",
+                        topic = "Loops & Control Flow",
+                        questionCount = "12 Questions",
+                        difficulty = "Easy",
+                        codeSnippet = "int sum = 0;\nfor (int i = 1; i <= 5; i++) {\n    if (i % 2 == 0) continue;\n    sum += i;\n}\nSystem.out.println(sum);",
+                        source = QuestionSource.AI
+                    ),
+                    PredictOutputItem(
+                        setNumber = 2,
+                        title = "String Operations & Substrings",
+                        topic = "Strings & Characters",
+                        questionCount = "15 Questions",
+                        difficulty = "Medium",
+                        codeSnippet = "String s = \"KNOWLEDGE\";\nSystem.out.println(s.substring(3, 7));\nSystem.out.println(s.indexOf('E', 5));",
+                        source = QuestionSource.AI
+                    ),
+                    PredictOutputItem(
+                        setNumber = 3,
+                        title = "Array Indexing & Shifting",
+                        topic = "1D & 2D Arrays",
+                        questionCount = "10 Questions",
+                        difficulty = "Medium",
+                        codeSnippet = "int[] a = {2, 4, 6, 8};\nfor (int i = 0; i < a.length - 1; i++) {\n    a[i+1] += a[i];\n}\nSystem.out.println(a[3]);",
+                        source = QuestionSource.AI
+                    ),
+                    PredictOutputItem(
+                        setNumber = 4,
+                        title = "Method Calls & Recursion",
+                        topic = "Recursion & Logic",
+                        questionCount = "8 Questions",
+                        difficulty = "Hard",
+                        codeSnippet = "int test(int n) {\n    if (n <= 1) return 1;\n    return n + test(n - 2);\n}\nSystem.out.println(test(5));",
+                        source = QuestionSource.AI
+                    )
+                )
+                addAll(defaults)
+                MistralDiskCache.savePredictOutput(context, defaults.map { Triple(it.title, it.questionCount, it.difficulty) })
+            }
+        }
+    }
+
+    val sirItems = remember { listOf(
+        PredictOutputItem(
+            setNumber = 1,
+            title = "Sir's Pick: Operator Precedence & Increments",
+            topic = "Operators & Expressions",
+            questionCount = "15 Questions",
+            difficulty = "Easy",
+            codeSnippet = "int x = 5;\nint y = ++x * 2 + x--;\nSystem.out.println(\"x=\" + x + \", y=\" + y);",
+            source = QuestionSource.SIR
+        ),
+        PredictOutputItem(
+            setNumber = 2,
+            title = "Sir's Pick: Nested Loops & Break/Continue",
+            topic = "Loop Constructs",
+            questionCount = "18 Questions",
+            difficulty = "Medium",
+            codeSnippet = "for(int i = 0; i < 3; i++) {\n    for(int j = 0; j < 3; j++) {\n        if(i == j) continue;\n        System.out.print(j);\n    }\n}",
+            source = QuestionSource.SIR
+        ),
+        PredictOutputItem(
+            setNumber = 3,
+            title = "Sir's Pick: Class 10 ICSE Board Snippets",
+            topic = "ICSE Board Questions",
+            questionCount = "20 Questions",
+            difficulty = "Hard",
+            codeSnippet = "char ch = 'B';\nint code = ch + 3;\nSystem.out.println((char)code + \":\" + code);",
+            source = QuestionSource.SIR
+        ),
+        PredictOutputItem(
+            setNumber = 4,
+            title = "Sir's Pick: Static Blocks & Constructors",
+            topic = "OOP Mechanics",
+            questionCount = "12 Questions",
+            difficulty = "Hard",
+            codeSnippet = "class Demo {\n    static int c = 10;\n    Demo() { c += 5; }\n}\n// Value of c after 2 instances?",
+            source = QuestionSource.SIR
+        )
+    )}
+
+    var showDialog by remember { mutableStateOf(false) }
+    if (showDialog) {
+        SuggestTopicDialog(
+            onDismiss = { showDialog = false },
+            onSubmit = { topic ->
+                val newSetNum = aiItems.size + 1
+                val newItem = PredictOutputItem(
+                    setNumber = newSetNum,
+                    title = "$topic — Set $newSetNum",
+                    topic = "Custom Topic",
+                    questionCount = "10 Questions",
+                    difficulty = "Medium",
+                    codeSnippet = getSnippetForTopic(topic),
+                    source = QuestionSource.AI
+                )
+                aiItems.add(0, newItem)
+                MistralDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
+                showDialog = false
+            }
+        )
+    }
+
+    val displayedItems = if (selectedSource == QuestionSource.AI) aiItems else sirItems
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 24.dp)
+    ) {
+        item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
+        items(displayedItems, key = { it.title + it.setNumber }) { item ->
+            PredictOutputCard(
+                item = item,
+                onNavigate = onNavigate,
+                onDelete = if (item.source == QuestionSource.AI) {
+                    { toDelete ->
+                        aiItems.remove(toDelete)
+                        MistralDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
+                        Toast.makeText(context, "Set deleted", Toast.LENGTH_SHORT).show()
+                    }
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+private fun PredictOutputCard(
+    item: PredictOutputItem,
+    onNavigate: (String) -> Unit,
+    onDelete: ((PredictOutputItem) -> Unit)? = null
+) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
+
+    Box(modifier = Modifier.padding(end = 5.dp, bottom = 14.dp)) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .offset(x = 5.dp, y = 5.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(bs)
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val encoded = Uri.encode(item.title, "UTF-8")
+                    onNavigate("quiz_setup/$encoded")
+                },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(2.dp, bb),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Header: Set pill + Title + Difficulty pill
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF2563EB))
+                                .border(BorderStroke(1.dp, bb), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 7.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "SET ${item.setNumber}",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = item.title,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(
+                                when (item.difficulty) {
+                                    "Easy" -> Color(0xFF065F46)
+                                    "Medium" -> Color(0xFF92400E)
+                                    else -> Color(0xFF991B1B)
+                                }
+                            )
+                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(50.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = item.difficulty,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = when (item.difficulty) {
+                                "Easy" -> Color(0xFF6EE7B7)
+                                "Medium" -> Color(0xFFFCD34D)
+                                else -> Color(0xFFFCA5A5)
+                            }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Topic + Question count
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = item.topic,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(" • ", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = item.questionCount,
+                        fontSize = 12.sp,
+                        color = Color(0xFF2563EB),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Code Snippet Preview Box
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
+                    border = BorderStroke(1.dp, bb.copy(alpha = 0.25f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.Terminal,
+                                contentDescription = null,
+                                tint = Color(0xFF2563EB),
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Code Tracing Preview",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = item.codeSnippet,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            lineHeight = 15.sp,
+                            maxLines = 4,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Bottom Action Buttons: Practice Set + Delete (if AI)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Predict console output",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF2563EB))
+                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
+                                .clickable {
+                                    val encoded = Uri.encode(item.title, "UTF-8")
+                                    onNavigate("quiz_setup/$encoded")
+                                }
+                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("Solve Set", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
+                            }
+                        }
+
+                        if (onDelete != null) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                    .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
+                                    .clickable { onDelete(item) }
+                                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.DeleteOutline,
+                                    contentDescription = "Delete Set",
+                                    tint = Color(0xFFDC2626),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun getSnippetForTopic(topic: String): String {
+    val lower = topic.lowercase()
+    return when {
+        lower.contains("loop") -> "int c = 0;\nfor (int i = 0; i < 4; i++) {\n    c += i;\n}\nSystem.out.println(c);"
+        lower.contains("string") -> "String s = \"COMPUTER\";\nSystem.out.println(s.substring(1, 5));"
+        lower.contains("array") -> "int[] a = {1, 2, 3};\nSystem.out.println(a[1] + a[2]);"
+        else -> "// Output snippet for $topic\nint res = 15 + 25;\nSystem.out.println(\"Result=\" + res);"
     }
 }
 
