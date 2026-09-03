@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,9 +51,11 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 private var promoShown = false
 private var devBannerShown = false
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 0) { 4 }
+    val coroutineScope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
     var showPromo by remember { mutableStateOf(!promoShown) }
     var showDevBanner by remember { mutableStateOf(!devBannerShown) }
@@ -82,38 +85,46 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         )
     }
 
+    val currentTab = if (pagerState.isScrollInProgress) pagerState.targetPage else pagerState.currentPage
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             BottomNavBar(
-                selectedIndex = selectedIndex,
-                onItemSelected = { selectedIndex = it }
+                selectedIndex = currentTab,
+                onItemSelected = { page ->
+                    if (page != pagerState.currentPage) {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(
+                                page = page,
+                                animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    }
+                }
             )
         }
     ) { padding ->
         val tabNav: (String) -> Unit = remember(onNavigate) {
             { route ->
                 when (route) {
-                    "home" -> selectedIndex = 0
-                    "learning_path" -> selectedIndex = 1
-                    "practice" -> selectedIndex = 2
-                    "chat" -> selectedIndex = 3
+                    "home" -> coroutineScope.launch { pagerState.animateScrollToPage(0, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "learning_path" -> coroutineScope.launch { pagerState.animateScrollToPage(1, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "practice" -> coroutineScope.launch { pagerState.animateScrollToPage(2, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
+                    "chat" -> coroutineScope.launch { pagerState.animateScrollToPage(3, animationSpec = tween(220, easing = FastOutSlowInEasing)) }
                     else -> onNavigate(route)
                 }
             }
         }
 
-        AnimatedContent(
-            targetState = selectedIndex,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(120, easing = FastOutSlowInEasing)) togetherWith
-                fadeOut(animationSpec = tween(80, easing = FastOutSlowInEasing))
-            },
-            label = "BottomNavTabTransition",
+        androidx.compose.foundation.pager.HorizontalPager(
+            state = pagerState,
+            beyondViewportPageCount = 0,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .consumeWindowInsets(padding)
+                .consumeWindowInsets(padding),
+            key = { it }
         ) { page ->
             when (page) {
                 0 -> HomeTab(

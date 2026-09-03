@@ -41,6 +41,8 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
+import com.vastavik.computer.utils.MistralDiskCache
+
 private enum class QuestionSource(val label: String, val tagBg: Color, val tagText: Color) {
     AI("AI-Generated", Color(0xFF2563EB), Color.White),
     SIR("Sir-Generated", Color(0xFFF59E0B), Color(0xFF0F172A))
@@ -68,14 +70,19 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     var selectedLanguage by remember { mutableStateOf("Java") }
     var aiSolutionMarkdown by remember { mutableStateOf("") }
     var isGeneratingCode by remember { mutableStateOf(false) }
-    val mistralCache = remember { mutableStateMapOf<String, String>() }
 
     fun loadMistralSolution(item: CodingItem, lang: String) {
-        val cacheKey = "${item.title}_$lang"
-        if (mistralCache.containsKey(cacheKey)) {
-            aiSolutionMarkdown = mistralCache[cacheKey]!!
+        val sanitizedTitle = item.title.trim().lowercase().replace(Regex("[^a-z0-9]"), "_")
+        val cacheKey = "code_${sanitizedTitle}_${lang.lowercase()}"
+        
+        // 1. Check persistent disk cache first (persists even if phone restarted)
+        val cached = MistralDiskCache.getSolution(context, cacheKey)
+        if (!cached.isNullOrBlank()) {
+            aiSolutionMarkdown = cached
+            isGeneratingCode = false
             return
         }
+
         isGeneratingCode = true
         aiSolutionMarkdown = ""
         coroutineScope.launch {
@@ -85,7 +92,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 difficulty = item.difficulty,
                 language = lang
             )
-            mistralCache[cacheKey] = response
+            // 2. Persist to disk cache permanently
+            MistralDiskCache.saveSolution(context, cacheKey, response)
             aiSolutionMarkdown = response
             isGeneratingCode = false
         }
@@ -481,8 +489,9 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         Button(
                             onClick = {
                                 val encoded = Uri.encode(rawCode, "UTF-8")
+                                val encodedQ = Uri.encode(item.title, "UTF-8")
                                 activeCodingItem = null
-                                onNavigate("code_editor?initialCode=$encoded&language=$selectedLanguage")
+                                onNavigate("code_editor?initialCode=$encoded&language=$selectedLanguage&question=$encodedQ")
                             },
                             modifier = Modifier
                                 .weight(1.3f)
@@ -663,12 +672,22 @@ private fun MCQContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit
 ) {
-    val aiItems = remember { mutableStateListOf(
-        MCQItem("OOP Concepts", "10 questions", QuestionSource.AI),
-        MCQItem("Arrays & Lists", "15 questions", QuestionSource.AI),
-        MCQItem("Sorting", "12 questions", QuestionSource.AI),
-        MCQItem("File Handling", "8 questions", QuestionSource.AI)
-    )}
+    val context = LocalContext.current
+    val saved = remember { MistralDiskCache.getSavedMCQs(context) }
+    val aiItems = remember {
+        mutableStateListOf<MCQItem>().apply {
+            if (saved.isNotEmpty()) {
+                addAll(saved.map { MCQItem(it.first, it.second, QuestionSource.AI) })
+            } else {
+                addAll(listOf(
+                    MCQItem("OOP Concepts", "10 questions", QuestionSource.AI),
+                    MCQItem("Arrays & Lists", "15 questions", QuestionSource.AI),
+                    MCQItem("Sorting", "12 questions", QuestionSource.AI),
+                    MCQItem("File Handling", "8 questions", QuestionSource.AI)
+                ))
+            }
+        }
+    }
     val sirItems = remember { listOf(
         MCQItem("Java Fundamentals", "20 questions", QuestionSource.SIR),
         MCQItem("OOP Deep-Dive", "18 questions", QuestionSource.SIR),
@@ -682,6 +701,7 @@ private fun MCQContent(
             onSubmit = { topic ->
                 aiItems.add(0, MCQItem(topic, "10 questions", QuestionSource.AI))
                 if (aiItems.size > 4) aiItems.removeLast()
+                MistralDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
                 showDialog = false
             }
         )
@@ -704,11 +724,21 @@ private fun CodingContent(
     onNavigate: (String) -> Unit,
     onOpenMistralAi: (CodingItem) -> Unit
 ) {
-    val aiItems = remember { mutableStateListOf(
-        CodingItem("Reverse a String", "Easy", "Strings", QuestionSource.AI),
-        CodingItem("Two Sum", "Medium", "Arrays", QuestionSource.AI),
-        CodingItem("Merge Intervals", "Hard", "Intervals", QuestionSource.AI)
-    )}
+    val context = LocalContext.current
+    val saved = remember { MistralDiskCache.getSavedCoding(context) }
+    val aiItems = remember {
+        mutableStateListOf<CodingItem>().apply {
+            if (saved.isNotEmpty()) {
+                addAll(saved.map { CodingItem(it.first, it.second, it.third, QuestionSource.AI) })
+            } else {
+                addAll(listOf(
+                    CodingItem("Reverse a String", "Easy", "Strings", QuestionSource.AI),
+                    CodingItem("Two Sum", "Medium", "Arrays", QuestionSource.AI),
+                    CodingItem("Merge Intervals", "Hard", "Intervals", QuestionSource.AI)
+                ))
+            }
+        }
+    }
     val sirItems = remember { listOf(
         CodingItem("Array Rotation", "Easy", "Arrays", QuestionSource.SIR),
         CodingItem("Palindrome Check", "Easy", "Strings", QuestionSource.SIR),
@@ -723,6 +753,7 @@ private fun CodingContent(
             onSubmit = { topic ->
                 aiItems.add(0, CodingItem(topic, "Medium", "Custom", QuestionSource.AI))
                 if (aiItems.size > 4) aiItems.removeLast()
+                MistralDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
                 showDialog = false
             }
         )
@@ -750,11 +781,21 @@ private fun PYQContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit
 ) {
-    val aiItems = remember { mutableStateListOf(
-        PYQItem("ICSE 2023", "45 questions", QuestionSource.AI),
-        PYQItem("CBSE 2022", "50 questions", QuestionSource.AI),
-        PYQItem("ICSE 2022", "40 questions", QuestionSource.AI)
-    )}
+    val context = LocalContext.current
+    val saved = remember { MistralDiskCache.getSavedPYQs(context) }
+    val aiItems = remember {
+        mutableStateListOf<PYQItem>().apply {
+            if (saved.isNotEmpty()) {
+                addAll(saved.map { PYQItem(it.first, it.second, QuestionSource.AI) })
+            } else {
+                addAll(listOf(
+                    PYQItem("ICSE 2023", "45 questions", QuestionSource.AI),
+                    PYQItem("CBSE 2022", "50 questions", QuestionSource.AI),
+                    PYQItem("ICSE 2022", "40 questions", QuestionSource.AI)
+                ))
+            }
+        }
+    }
     val sirItems = remember { listOf(
         PYQItem("Sir's Picks — Java", "30 questions", QuestionSource.SIR),
         PYQItem("Sir's Picks — OOP", "25 questions", QuestionSource.SIR)
@@ -767,6 +808,7 @@ private fun PYQContent(
             onSubmit = { topic ->
                 aiItems.add(0, PYQItem(topic, "30 questions", QuestionSource.AI))
                 if (aiItems.size > 4) aiItems.removeLast()
+                MistralDiskCache.savePYQs(context, aiItems.map { Pair(it.title, it.questions) })
                 showDialog = false
             }
         )
@@ -864,7 +906,8 @@ private fun CodingCard(
                     if (item.source == QuestionSource.AI) {
                         onOpenMistralAi(item)
                     } else {
-                        onNavigate("code_editor")
+                        val encodedQ = Uri.encode(item.title, "UTF-8")
+                        onNavigate("code_editor?question=$encodedQ")
                     }
                 },
             shape = RoundedCornerShape(16.dp),
@@ -954,7 +997,10 @@ private fun CodingCard(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
-                                .clickable { onNavigate("code_editor") }
+                                .clickable {
+                                    val encodedQ = Uri.encode(item.title, "UTF-8")
+                                    onNavigate("code_editor?question=$encodedQ")
+                                }
                                 .padding(horizontal = 10.dp, vertical = 5.dp),
                             contentAlignment = Alignment.Center
                         ) {

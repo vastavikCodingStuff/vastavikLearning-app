@@ -3,7 +3,9 @@ package com.vastavik.computer.ui.screens.editor
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -151,7 +153,21 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
     var isRunning by remember { mutableStateOf(false) }
     var question by remember { mutableStateOf(initialQuestion) }
     var showQuestion by remember { mutableStateOf(initialQuestion.isNotBlank()) }
+    var isWordWrap by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val vScrollState = rememberScrollState()
+    val hScrollState = rememberScrollState()
+
+    val lines = remember(code) { code.split("\n") }
+    val lineCount = lines.size
+    val lineHeightSp = 22.sp
+    val fontSizeSp = 13.sp
+    val lineNumbersString = remember(lineCount) {
+        (1..lineCount).joinToString("\n")
+    }
 
     LaunchedEffect(language) {
         if (initialCode.isBlank() && (code==defaultCode("Java")||code==defaultCode("Python")||code==defaultCode("JavaScript")||code==defaultCode("SQL")))
@@ -164,10 +180,13 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                 title = { Text("Code Editor", fontWeight = FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = { onBack() }) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
-                    if (question.isNotBlank()) {
-                        IconButton(onClick = { showQuestion = !showQuestion }) {
-                            Icon(Icons.Filled.HelpOutline, contentDescription = "View question", tint = MaterialTheme.colorScheme.primary)
-                        }
+                    // Question Icon - Always accessible on top right
+                    IconButton(onClick = { showQuestion = !showQuestion }) {
+                        Icon(
+                            Icons.Filled.HelpOutline,
+                            contentDescription = "View question",
+                            tint = if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     var expanded by remember { mutableStateOf(false) }
                     Box {
@@ -219,21 +238,21 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                 conn.doOutput = true
                                 conn.connectTimeout = 30000
                                 conn.readTimeout = 30000
-                val body = JSONObject().apply {
-                    put("model", "mistral-small-latest")
-                    put("messages", JSONArray().put(JSONObject().put("role", "user").put("content",
-                        "You are a code runner for Class 5-12 students. This is $language code. Explain what the output would be when this code runs. Be concise — just show the expected output, then 1 line explanation.\n\nCode:\n$code")))
-                    put("max_tokens", 512)
-                    put("temperature", 0.1)
-                }
-                conn.outputStream.use { it.write(body.toString().toByteArray()) }
-                val responseCode = conn.responseCode
-                val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-                val response = stream.bufferedReader().use { it.readText() }
-                if (responseCode in 200..299) {
-                    val json = JSONObject(response)
-                    stripMarkdown(json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content"))
-                } else { "Error ($responseCode)" }
+                                val body = JSONObject().apply {
+                                    put("model", "mistral-small-latest")
+                                    put("messages", JSONArray().put(JSONObject().put("role", "user").put("content",
+                                        "You are a code runner for Class 5-12 students. This is $language code. Explain what the output would be when this code runs. Be concise — just show the expected output, then 1 line explanation.\n\nCode:\n$code")))
+                                    put("max_tokens", 512)
+                                    put("temperature", 0.1)
+                                }
+                                conn.outputStream.use { it.write(body.toString().toByteArray()) }
+                                val responseCode = conn.responseCode
+                                val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
+                                val response = stream.bufferedReader().use { it.readText() }
+                                if (responseCode in 200..299) {
+                                    val json = JSONObject(response)
+                                    stripMarkdown(json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content"))
+                                } else { "Error ($responseCode)" }
                             } catch (e: Exception) { "Error: ${e.message}" }
                         }
                         isRunning = false
@@ -247,74 +266,233 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            if (showQuestion && question.isNotBlank()) {
-                ModalBottomSheet(
+            // Big Sized Tooltip Overlay: Height 50% of screen, Width 98% horizontally
+            if (showQuestion) {
+                androidx.compose.ui.window.Dialog(
                     onDismissRequest = { showQuestion = false },
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.fillMaxHeight(0.5f)
+                    properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
-                        Text(
-                            text = "Question",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            letterSpacing = 0.6.sp
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.98f)
+                            .fillMaxHeight(0.50f)
+                            .padding(end = 4.dp, bottom = 4.dp)
+                    ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                                .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(12.dp))
-                                .padding(16.dp)
+                                .matchParentSize()
+                                .offset(x = 4.dp, y = 4.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(brutalBorderColor())
+                        )
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(2.dp, brutalBorderColor())
                         ) {
-                            Text(
-                                text = question,
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                lineHeight = 20.sp
-                            )
+                            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(Color(0xFF2563EB))
+                                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                        ) {
+                                            Text("QUESTION OVERVIEW", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp)
+                                        }
+                                        Spacer(Modifier.width(8.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                .border(BorderStroke(1.dp, brutalBorderColor().copy(alpha = 0.3f)), RoundedCornerShape(8.dp))
+                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(language, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                                        }
+                                    }
+                                    IconButton(
+                                        onClick = { showQuestion = false },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(Icons.Filled.Clear, contentDescription = "Close", modifier = Modifier.size(20.dp))
+                                    }
+                                }
+
+                                Spacer(Modifier.height(10.dp))
+                                HorizontalDivider(color = brutalBorderColor().copy(alpha = 0.2f), thickness = 1.5.dp)
+                                Spacer(Modifier.height(10.dp))
+
+                                val displayQuestion = if (question.isNotBlank()) question else "Write and test your solution for this problem. Choose your preferred language from the dropdown menu and press 'Run' to see output and analysis."
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
+                                        .verticalScroll(rememberScrollState())
+                                ) {
+                                    Text(
+                                        text = displayQuestion,
+                                        fontSize = 15.sp,
+                                        lineHeight = 22.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-            Row(modifier = Modifier.weight(1f).fillMaxWidth().background(Color(0xFF1E1E2E))) {
-                val lines = code.split("\n")
-                val lineCount = lines.size
-                val highlighted = remember(code, language) { highlightCode(code, language) }
 
-                LazyColumn(modifier = Modifier.width(36.dp).fillMaxHeight().background(Color(0xFF252526)).padding(vertical=12.dp), horizontalAlignment = Alignment.End) {
-                    items(lineCount) { idx ->
-                        Text(
-                            text = "${idx + 1}",
-                            color = Color(0xFF858585),
-                            fontFamily = mono,
-                            fontSize = 13.sp,
-                            modifier = Modifier.padding(end=6.dp, top=1.dp, bottom=1.dp)
-                        )
-                    }
+            // MONOCODE EDITOR TOOLBAR
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF181825))
+                    .border(BorderStroke(1.dp, Color(0xFF313244)))
+                    .padding(horizontal = 12.dp, vertical = 7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(Color(0xFF22C55E))
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = when (language.lowercase()) {
+                            "python" -> "main.py"
+                            "javascript" -> "index.js"
+                            "sql" -> "query.sql"
+                            else -> "Main.java"
+                        },
+                        fontFamily = mono,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFCDD6F4)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = "$lineCount lines",
+                        fontFamily = mono,
+                        fontSize = 11.sp,
+                        color = Color(0xFF6C7086)
+                    )
                 }
 
-                Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(12.dp)) {
-                    androidx.compose.foundation.text.BasicTextField(
-                        value = code,
-                        onValueChange = { code = it },
-                        textStyle = TextStyle(
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Wrap Toggle
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (isWordWrap) Color(0xFF2563EB).copy(alpha = 0.25f) else Color.Transparent)
+                            .border(BorderStroke(1.dp, if (isWordWrap) Color(0xFF2563EB) else Color(0xFF45475A)), RoundedCornerShape(6.dp))
+                            .clickable { isWordWrap = !isWordWrap }
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = if (isWordWrap) "Wrap: ON" else "Wrap: OFF",
                             fontFamily = mono,
-                            fontSize = 13.sp,
-                            lineHeight = 18.sp,
-                            color = SyntaxColors.normal
-                        ),
-                        visualTransformation = { text ->
-                            androidx.compose.ui.text.input.TransformedText(
-                                highlightCode(text.text, language),
-                                androidx.compose.ui.text.input.OffsetMapping.Identity
-                            )
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isWordWrap) Color(0xFF93C5FD) else Color(0xFFA6ADC8)
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    // Copy button
+                    IconButton(
+                        onClick = {
+                            clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(code))
+                            android.widget.Toast.makeText(context, "Code copied!", android.widget.Toast.LENGTH_SHORT).show()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.size(26.dp)
+                    ) {
+                        Icon(Icons.Filled.ContentCopy, contentDescription = "Copy code", tint = Color(0xFFA6ADC8), modifier = Modifier.size(15.dp))
+                    }
+                }
+            }
+
+            // MONOCODE EDITOR CANVAS (Unified Vertical Scroll, 100% Aligned Gutter)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(Color(0xFF1E1E2E))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(vScrollState)
+                ) {
+                    // 1. Gutter / Line Numbers column
+                    Box(
+                        modifier = Modifier
+                            .width(44.dp)
+                            .background(Color(0xFF181825))
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = lineNumbersString,
+                            fontFamily = mono,
+                            fontSize = fontSizeSp,
+                            lineHeight = lineHeightSp,
+                            color = Color(0xFF6C7086),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp)
+                        )
+                    }
+
+                    // Divider line between line numbers and code
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                            .background(Color(0xFF313244))
                     )
+
+                    // 2. Code Area
+                    val codeBoxModifier = if (isWordWrap) {
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 24.dp)
+                    } else {
+                        Modifier
+                            .weight(1f)
+                            .horizontalScroll(hScrollState)
+                            .padding(start = 12.dp, end = 24.dp, top = 12.dp, bottom = 24.dp)
+                    }
+
+                    Box(modifier = codeBoxModifier) {
+                        androidx.compose.foundation.text.BasicTextField(
+                            value = code,
+                            onValueChange = { code = it },
+                            textStyle = TextStyle(
+                                fontFamily = mono,
+                                fontSize = fontSizeSp,
+                                lineHeight = lineHeightSp,
+                                color = SyntaxColors.normal
+                            ),
+                            visualTransformation = { text ->
+                                androidx.compose.ui.text.input.TransformedText(
+                                    highlightCode(text.text, language),
+                                    androidx.compose.ui.text.input.OffsetMapping.Identity
+                                )
+                            },
+                            cursorBrush = androidx.compose.ui.graphics.SolidColor(Color(0xFF2563EB)),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }

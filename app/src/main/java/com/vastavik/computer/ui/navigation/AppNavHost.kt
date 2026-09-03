@@ -223,20 +223,38 @@ fun AppNavHost(
             SearchResultsScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable(
-            route = "code_editor?initialCode={initialCode}&language={language}",
+            route = "code_editor?initialCode={initialCode}&language={language}&question={question}",
             arguments = listOf(
                 navArgument("initialCode") { type = NavType.StringType; defaultValue = "" },
-                navArgument("language") { type = NavType.StringType; defaultValue = "Python" }
+                navArgument("language") { type = NavType.StringType; defaultValue = "Python" },
+                navArgument("question") { type = NavType.StringType; defaultValue = "" }
             )
         ) { backStackEntry ->
             val rawCode = backStackEntry.arguments?.getString("initialCode") ?: ""
             val initialCode = try { URLDecoder.decode(rawCode, "UTF-8") } catch (_: Exception) { rawCode }
             val language = backStackEntry.arguments?.getString("language") ?: "Python"
+            val rawQuestion = backStackEntry.arguments?.getString("question") ?: ""
+            val initialQuestion = try { URLDecoder.decode(rawQuestion, "UTF-8") } catch (_: Exception) { rawQuestion }
             CodeEditorScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onBack = { navController.popBackStack() },
                 initialCode = initialCode,
-                initialLanguage = language
+                initialLanguage = language,
+                initialQuestion = initialQuestion
+            )
+        }
+        composable(
+            route = "code_editor?question={question}",
+            arguments = listOf(
+                navArgument("question") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) { backStackEntry ->
+            val rawQuestion = backStackEntry.arguments?.getString("question") ?: ""
+            val initialQuestion = try { URLDecoder.decode(rawQuestion, "UTF-8") } catch (_: Exception) { rawQuestion }
+            CodeEditorScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() },
+                initialQuestion = initialQuestion
             )
         }
         composable("code_editor") {
