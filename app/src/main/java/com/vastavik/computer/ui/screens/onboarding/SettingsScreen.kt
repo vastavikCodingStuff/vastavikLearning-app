@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.ui.theme.BrutalCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,7 +146,7 @@ fun SettingsScreen(
             SettingsRow(
                 icon = Icons.Filled.Info,
                 title = "About",
-                subtitle = "Version 1.0.0",
+                subtitle = "Version ${BuildConfig.VERSION_NAME}",
                 accent = accent,
                 textPrimary = textPrimary,
                 textSecondary = textSecondary,
