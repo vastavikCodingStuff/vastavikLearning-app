@@ -45,6 +45,7 @@
 ### 🤖 AI Study Assistant
 - Multi-model intelligent tutoring integration (Google Gemini & Mistral AI).
 - Context-aware code debugging, doubt clearing, and instant step-by-step concept explanations.
+- **Mistral Problem Overviews**: Line-by-line code generation with integrated caching to prevent duplicate API calls and reduce latency.
 
 ### 📝 Quiz & Assessment Engine
 - Dynamic timed quizzes categorized by board, subject, and difficulty (MCQs and open-ended queries).

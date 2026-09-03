@@ -68,8 +68,14 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     var selectedLanguage by remember { mutableStateOf("Java") }
     var aiSolutionMarkdown by remember { mutableStateOf("") }
     var isGeneratingCode by remember { mutableStateOf(false) }
+    val mistralCache = remember { mutableStateMapOf<String, String>() }
 
     fun loadMistralSolution(item: CodingItem, lang: String) {
+        val cacheKey = "${item.title}_$lang"
+        if (mistralCache.containsKey(cacheKey)) {
+            aiSolutionMarkdown = mistralCache[cacheKey]!!
+            return
+        }
         isGeneratingCode = true
         aiSolutionMarkdown = ""
         coroutineScope.launch {
@@ -79,6 +85,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 difficulty = item.difficulty,
                 language = lang
             )
+            mistralCache[cacheKey] = response
             aiSolutionMarkdown = response
             isGeneratingCode = false
         }
@@ -99,14 +106,14 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Practice",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                    Text(
+                        text = "Practice",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
 
                 // 1. Toggle at the top for AI and Sir with blue color for selected one
                 Box(modifier = Modifier.padding(end = 3.dp, bottom = 3.dp)) {
@@ -187,27 +194,27 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
-
-                // Profile Avatar Button
-                Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 2.dp, y = 2.dp)
-                            .clip(CircleShape)
-                            .background(bs)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF2563EB))
-                            .border(BorderStroke(2.dp, bb), CircleShape)
-                            .clickable { onNavigate("profile") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                    // Profile Avatar Button
+                    Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .offset(x = 2.dp, y = 2.dp)
+                                .clip(CircleShape)
+                                .background(bs)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF2563EB))
+                                .border(BorderStroke(2.dp, bb), CircleShape)
+                                .clickable { onNavigate("profile") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
+                        }
                     }
                 }
             }
@@ -497,7 +504,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
 }
 
 @Composable
-private fun SectionHeading(source: QuestionSource) {
+private fun SectionHeading(source: QuestionSource, onSuggestNew: (() -> Unit)? = null) {
     val bb = brutalBorderColor()
     Row(
         modifier = Modifier
@@ -529,6 +536,12 @@ private fun SectionHeading(source: QuestionSource) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+        if (source == QuestionSource.AI && onSuggestNew != null) {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onSuggestNew, modifier = Modifier.size(24.dp)) {
+                Icon(Icons.Filled.Add, contentDescription = "Suggest New", tint = Color(0xFF2563EB))
+            }
+        }
     }
 }
 
@@ -617,21 +630,62 @@ private fun BottomDevBanner() {
 }
 
 @Composable
+private fun SuggestTopicDialog(
+    onDismiss: () -> Unit,
+    onSubmit: (String) -> Unit
+) {
+    var text by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Suggest a Topic", fontWeight = FontWeight.Bold) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text("Topic name") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            Button(onClick = { if (text.isNotBlank()) onSubmit(text) }) {
+                Text("Generate")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
+}
+
+@Composable
 private fun MCQContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit
 ) {
-    val aiItems = listOf(
+    val aiItems = remember { mutableStateListOf(
         MCQItem("OOP Concepts", "10 questions", QuestionSource.AI),
         MCQItem("Arrays & Lists", "15 questions", QuestionSource.AI),
         MCQItem("Sorting", "12 questions", QuestionSource.AI),
         MCQItem("File Handling", "8 questions", QuestionSource.AI)
-    )
-    val sirItems = listOf(
+    )}
+    val sirItems = remember { listOf(
         MCQItem("Java Fundamentals", "20 questions", QuestionSource.SIR),
         MCQItem("OOP Deep-Dive", "18 questions", QuestionSource.SIR),
         MCQItem("Exception Handling", "12 questions", QuestionSource.SIR)
-    )
+    )}
+
+    var showDialog by remember { mutableStateOf(false) }
+    if (showDialog) {
+        SuggestTopicDialog(
+            onDismiss = { showDialog = false },
+            onSubmit = { topic ->
+                aiItems.add(0, MCQItem(topic, "10 questions", QuestionSource.AI))
+                if (aiItems.size > 4) aiItems.removeLast()
+                showDialog = false
+            }
+        )
+    }
 
     val displayedItems = if (selectedSource == QuestionSource.AI) aiItems else sirItems
 
@@ -639,7 +693,7 @@ private fun MCQContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        item { SectionHeading(selectedSource) }
+        item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
         items(displayedItems) { item -> MCQCard(item, onNavigate) }
     }
 }
@@ -650,17 +704,29 @@ private fun CodingContent(
     onNavigate: (String) -> Unit,
     onOpenMistralAi: (CodingItem) -> Unit
 ) {
-    val aiItems = listOf(
+    val aiItems = remember { mutableStateListOf(
         CodingItem("Reverse a String", "Easy", "Strings", QuestionSource.AI),
         CodingItem("Two Sum", "Medium", "Arrays", QuestionSource.AI),
         CodingItem("Merge Intervals", "Hard", "Intervals", QuestionSource.AI)
-    )
-    val sirItems = listOf(
+    )}
+    val sirItems = remember { listOf(
         CodingItem("Array Rotation", "Easy", "Arrays", QuestionSource.SIR),
         CodingItem("Palindrome Check", "Easy", "Strings", QuestionSource.SIR),
         CodingItem("Custom Sort", "Medium", "Sorting", QuestionSource.SIR),
         CodingItem("Constructor Chaining", "Medium", "OOP", QuestionSource.SIR)
-    )
+    )}
+
+    var showDialog by remember { mutableStateOf(false) }
+    if (showDialog) {
+        SuggestTopicDialog(
+            onDismiss = { showDialog = false },
+            onSubmit = { topic ->
+                aiItems.add(0, CodingItem(topic, "Medium", "Custom", QuestionSource.AI))
+                if (aiItems.size > 4) aiItems.removeLast()
+                showDialog = false
+            }
+        )
+    }
 
     val displayedItems = if (selectedSource == QuestionSource.AI) aiItems else sirItems
 
@@ -668,7 +734,7 @@ private fun CodingContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        item { SectionHeading(selectedSource) }
+        item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
         items(displayedItems) { item ->
             CodingCard(
                 item = item,
@@ -684,15 +750,27 @@ private fun PYQContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit
 ) {
-    val aiItems = listOf(
+    val aiItems = remember { mutableStateListOf(
         PYQItem("ICSE 2023", "45 questions", QuestionSource.AI),
         PYQItem("CBSE 2022", "50 questions", QuestionSource.AI),
         PYQItem("ICSE 2022", "40 questions", QuestionSource.AI)
-    )
-    val sirItems = listOf(
+    )}
+    val sirItems = remember { listOf(
         PYQItem("Sir's Picks — Java", "30 questions", QuestionSource.SIR),
         PYQItem("Sir's Picks — OOP", "25 questions", QuestionSource.SIR)
-    )
+    )}
+
+    var showDialog by remember { mutableStateOf(false) }
+    if (showDialog) {
+        SuggestTopicDialog(
+            onDismiss = { showDialog = false },
+            onSubmit = { topic ->
+                aiItems.add(0, PYQItem(topic, "30 questions", QuestionSource.AI))
+                if (aiItems.size > 4) aiItems.removeLast()
+                showDialog = false
+            }
+        )
+    }
 
     val displayedItems = if (selectedSource == QuestionSource.AI) aiItems else sirItems
 
@@ -700,7 +778,7 @@ private fun PYQContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        item { SectionHeading(selectedSource) }
+        item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
         items(displayedItems) { item -> PYQCard(item, onNavigate) }
     }
 }
@@ -866,7 +944,7 @@ private fun CodingCard(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Mistral Code", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    Text("Problem Overview", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
                                 }
                             }
                         }

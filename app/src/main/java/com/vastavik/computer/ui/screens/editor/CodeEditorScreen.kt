@@ -248,29 +248,35 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
             if (showQuestion && question.isNotBlank()) {
-                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
-                    Text(
-                        text = "Question",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        letterSpacing = 0.6.sp
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(12.dp))
-                            .padding(12.dp)
-                    ) {
+                ModalBottomSheet(
+                    onDismissRequest = { showQuestion = false },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.fillMaxHeight(0.5f)
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)) {
                         Text(
-                            text = question,
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            lineHeight = 18.sp
+                            text = "Question",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 0.6.sp
                         )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(12.dp))
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = question,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                lineHeight = 20.sp
+                            )
+                        }
                     }
                 }
             }
@@ -279,24 +285,34 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                 val lineCount = lines.size
                 val highlighted = remember(code, language) { highlightCode(code, language) }
 
-                LazyColumn(modifier = Modifier.width(48.dp).fillMaxHeight().background(Color(0xFF252526)).padding(vertical=12.dp), horizontalAlignment = Alignment.End) {
+                LazyColumn(modifier = Modifier.width(36.dp).fillMaxHeight().background(Color(0xFF252526)).padding(vertical=12.dp), horizontalAlignment = Alignment.End) {
                     items(lineCount) { idx ->
                         Text(
                             text = "${idx + 1}",
                             color = Color(0xFF858585),
                             fontFamily = mono,
                             fontSize = 13.sp,
-                            modifier = Modifier.padding(end=8.dp, top=1.dp, bottom=1.dp)
+                            modifier = Modifier.padding(end=6.dp, top=1.dp, bottom=1.dp)
                         )
                     }
                 }
 
-                Box(modifier = Modifier.weight(1f).fillMaxHeight().horizontalScroll(rememberScrollState()).padding(12.dp)) {
-                    Text(
-                        text = highlighted,
-                        fontFamily = mono,
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp,
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(12.dp)) {
+                    androidx.compose.foundation.text.BasicTextField(
+                        value = code,
+                        onValueChange = { code = it },
+                        textStyle = TextStyle(
+                            fontFamily = mono,
+                            fontSize = 13.sp,
+                            lineHeight = 18.sp,
+                            color = SyntaxColors.normal
+                        ),
+                        visualTransformation = { text ->
+                            androidx.compose.ui.text.input.TransformedText(
+                                highlightCode(text.text, language),
+                                androidx.compose.ui.text.input.OffsetMapping.Identity
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
