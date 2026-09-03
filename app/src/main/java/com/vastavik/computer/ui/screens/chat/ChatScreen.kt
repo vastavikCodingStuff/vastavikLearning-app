@@ -716,31 +716,59 @@ fun WaveformVisualizer(
     }
 }
 
+private enum class SegmentType {
+    TEXT,
+    CODE,
+    DIVIDER
+}
+
 private data class MarkdownSegment(
-    val isCode: Boolean,
+    val type: SegmentType,
     val content: String,
     val language: String = ""
 )
 
 private fun parseMarkdownSegments(text: String): List<MarkdownSegment> {
     val segments = mutableListOf<MarkdownSegment>()
-    // Match fenced code blocks: ```lang\n ... \n```  (or ```\n ... \n```)
-    val regex = Regex("```(\\w*)\\n([\\s\\S]*?)```", RegexOption.IGNORE_CASE)
+    val codeRegex = Regex("```(\\w*)\\n([\\s\\S]*?)```", RegexOption.IGNORE_CASE)
+    val dividerRegex = Regex("(?m)^\\s*[-*_]{2,}\\s*$")
     var lastIndex = 0
-    regex.findAll(text).forEach { match ->
+
+    fun addTextAndDividers(rawText: String) {
+        val lines = rawText.split("\n")
+        val buffer = StringBuilder()
+        for (line in lines) {
+            if (dividerRegex.matches(line.trim())) {
+                if (buffer.isNotBlank()) {
+                    segments.add(MarkdownSegment(SegmentType.TEXT, buffer.toString()))
+                    buffer.clear()
+                }
+                if (segments.isEmpty() || segments.last().type != SegmentType.DIVIDER) {
+                    segments.add(MarkdownSegment(SegmentType.DIVIDER, ""))
+                }
+            } else {
+                buffer.append(line).append("\n")
+            }
+        }
+        if (buffer.isNotBlank()) {
+            segments.add(MarkdownSegment(SegmentType.TEXT, buffer.toString()))
+        }
+    }
+
+    codeRegex.findAll(text).forEach { match ->
         val start = match.range.first
         if (start > lastIndex) {
-            segments.add(MarkdownSegment(false, text.substring(lastIndex, start)))
+            addTextAndDividers(text.substring(lastIndex, start))
         }
         val lang = match.groupValues[1].trim()
         val code = match.groupValues[2].trimEnd()
         if (code.isNotBlank()) {
-            segments.add(MarkdownSegment(true, code, lang))
+            segments.add(MarkdownSegment(SegmentType.CODE, code, lang))
         }
         lastIndex = match.range.last + 1
     }
     if (lastIndex < text.length) {
-        segments.add(MarkdownSegment(false, text.substring(lastIndex)))
+        addTextAndDividers(text.substring(lastIndex))
     }
     return segments
 }
@@ -749,91 +777,111 @@ private fun parseMarkdownSegments(text: String): List<MarkdownSegment> {
 fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: ((String) -> Unit)? = null) {
     val bb = brutalBorderColor()
     val segments = parseMarkdownSegments(text)
-    val codeBlocks = segments.filter { it.isCode }
+    val codeBlocks = segments.filter { it.type == SegmentType.CODE }
 
     Column(modifier = modifier) {
         segments.forEach { seg ->
-            if (seg.isCode) {
-                val isFirstCode = codeBlocks.firstOrNull() == seg
-                if (onNavigate != null && isFirstCode) {
-                    val ext = when (seg.language.lowercase()) {
-                        "python", "py" -> "py"
-                        "javascript", "js" -> "js"
-                        "sql" -> "sql"
-                        else -> "java"
-                    }
-                    val filename = "code.$ext"
-                    Surface(
-                        onClick = {
-                            val encoded = Uri.encode(seg.content, "UTF-8")
-                            onNavigate("code_editor?initialCode=$encoded&language=${seg.language}")
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.primary,
-                        border = BorderStroke(1.5.dp, bb),
+            when (seg.type) {
+                SegmentType.DIVIDER -> {
+                    // Small ending line: 20% of the screen size in the middle instead of "--"
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 4.dp, vertical = 4.dp)
+                            .padding(vertical = 14.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.20f)
+                                .height(3.dp)
+                                .clip(RoundedCornerShape(50.dp))
+                                .background(bb.copy(alpha = 0.45f))
+                        )
+                    }
+                }
+                SegmentType.CODE -> {
+                    val isFirstCode = codeBlocks.firstOrNull() == seg
+                    if (onNavigate != null && isFirstCode) {
+                        val ext = when (seg.language.lowercase()) {
+                            "python", "py" -> "py"
+                            "javascript", "js" -> "js"
+                            "sql" -> "sql"
+                            else -> "java"
+                        }
+                        val filename = "code.$ext"
+                        Surface(
+                            onClick = {
+                                val encoded = Uri.encode(seg.content, "UTF-8")
+                                onNavigate("code_editor?initialCode=$encoded&language=${seg.language}")
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            border = BorderStroke(1.5.dp, bb),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 4.dp)
                         ) {
-                            Icon(Icons.Filled.OpenInFull, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Column {
-                                Text("View in Editor", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                                Text(filename, color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp)
+                            Row(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.OpenInFull, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Column {
+                                    Text("View in Editor", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                    Text(filename, color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp)
+                                }
                             }
                         }
-                    }
-                } else if (seg.content.isNotBlank()) {
-                    val codeLines = seg.content.lines()
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFF1E1E2E),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            if (seg.language.isNotEmpty()) {
-                                Text(seg.language, fontSize = 10.sp, color = Color.Gray)
-                                Spacer(Modifier.height(8.dp))
-                            }
-                            codeLines.forEachIndexed { i, line ->
-                                Row(modifier = Modifier.fillMaxWidth()) {
-                                    Text(
-                                        text = "${i + 1}",
-                                        color = Color(0xFF858585),
-                                        fontFamily = FontFamily.Monospace,
-                                        fontSize = 11.sp,
-                                        textAlign = androidx.compose.ui.text.style.TextAlign.End,
-                                        modifier = Modifier
-                                            .width(24.dp)
-                                            .padding(end = 8.dp)
-                                    )
-                                    Text(
-                                        text = highlightCode(if (line.isEmpty()) " " else line, seg.language),
-                                        color = Color(0xFFD4D4D4),
-                                        fontFamily = FontFamily.Monospace,
-                                        fontSize = 11.sp,
-                                        modifier = Modifier.weight(1f)
-                                    )
+                    } else if (seg.content.isNotBlank()) {
+                        val codeLines = seg.content.lines()
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF1E1E2E),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                if (seg.language.isNotEmpty()) {
+                                    Text(seg.language, fontSize = 10.sp, color = Color.Gray)
+                                    Spacer(Modifier.height(8.dp))
+                                }
+                                codeLines.forEachIndexed { i, line ->
+                                    Row(modifier = Modifier.fillMaxWidth()) {
+                                        Text(
+                                            text = "${i + 1}",
+                                            color = Color(0xFF858585),
+                                            fontFamily = FontFamily.Monospace,
+                                            fontSize = 11.sp,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                                            modifier = Modifier
+                                                .width(24.dp)
+                                                .padding(end = 8.dp)
+                                        )
+                                        Text(
+                                            text = highlightCode(if (line.isEmpty()) " " else line, seg.language),
+                                            color = Color(0xFFD4D4D4),
+                                            fontFamily = FontFamily.Monospace,
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            } else {
-                if (seg.content.trim().isNotEmpty()) {
-                    Text(
-                        text = parseBasicMarkdown(seg.content.trim()),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                    )
+                SegmentType.TEXT -> {
+                    if (seg.content.trim().isNotEmpty()) {
+                        Text(
+                            text = parseBasicMarkdown(seg.content.trim()),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }
@@ -844,6 +892,8 @@ private fun parseBasicMarkdown(text: String) = buildAnnotatedString {
     val lines = text.split("\n")
     for (i in lines.indices) {
         val line = lines[i]
+        // Never render raw dashes
+        if (line.trim().matches(Regex("^[-*_]{2,}$"))) continue
         val isHeader3 = line.startsWith("### ")
         val isHeader2 = line.startsWith("## ")
         val isHeader1 = line.startsWith("# ")

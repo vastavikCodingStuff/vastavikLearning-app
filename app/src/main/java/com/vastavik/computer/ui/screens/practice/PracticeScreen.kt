@@ -414,31 +414,82 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         .fillMaxWidth()
                 ) {
                     if (isGeneratingCode) {
+                        // Clean Loading Screen (replaces wordy informational text)
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(16.dp),
+                                .padding(horizontal = 24.dp, vertical = 32.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator(
-                                    color = Color(0xFF2563EB),
-                                    strokeWidth = 3.dp,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                                Spacer(modifier = Modifier.height(14.dp))
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(72.dp)
+                                        .clip(RoundedCornerShape(18.dp))
+                                        .background(MaterialTheme.colorScheme.surface)
+                                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(18.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = Color(0xFF2563EB),
+                                        strokeWidth = 3.5.dp,
+                                        modifier = Modifier.size(36.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(18.dp))
+
                                 Text(
-                                    text = "Mistral AI is generating code with line-by-line comments...",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    text = "Generating Solution...",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.onBackground
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Formatting output in proper Markdown",
-                                    fontSize = 11.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                // Skeleton placeholder cards
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.9f)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(BorderStroke(1.5.dp, bb.copy(alpha = 0.15f)), RoundedCornerShape(14.dp))
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.55f)
+                                            .height(14.dp)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(bb.copy(alpha = 0.15f))
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.95f)
+                                            .height(10.dp)
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(bb.copy(alpha = 0.08f))
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.8f)
+                                            .height(10.dp)
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(bb.copy(alpha = 0.08f))
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(0.65f)
+                                            .height(10.dp)
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(bb.copy(alpha = 0.08f))
+                                    )
+                                }
                             }
                         }
                     } else {
