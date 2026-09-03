@@ -241,6 +241,13 @@ fun SignupScreen(
         }
     }
 
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            viewModel.clearSuccess()
+            onNavigate("home")
+        }
+    }
+
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
             android.widget.Toast.makeText(context, error, android.widget.Toast.LENGTH_LONG).show()

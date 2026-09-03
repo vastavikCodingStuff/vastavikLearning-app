@@ -1,5 +1,6 @@
 package com.vastavik.computer.ui.screens.auth
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -35,28 +36,44 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signIn(email: String, password: String) {
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+    fun signIn(email: String, password: String, context: Context? = null) {
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null, isSuccess = false)
         viewModelScope.launch {
             try {
-                // Auto-provision the admin account on first ever login (Firebase throws
-                // "no user record" until it exists); students hit normal sign-in.
                 if (AdminSession.isAdminCredentials(email, password)) {
+                    // Instantly set admin session locally so admin NEVER gets blocked by Firebase issues
+                    context?.let { AdminSession.setAdminLoggedIn(it, true) }
+                    AdminSession.update(null)
+
+                    // Attempt background Firebase sync for admin without blocking if it errors
                     try {
-                        authRepository.signInWithEmail(email, password)
+                        try {
+                            authRepository.signInWithEmail(email, password)
+                        } catch (_: Exception) {
+                            authRepository.signUpWithEmail(email, password)
+                        }
                     } catch (_: Exception) {
-                        authRepository.signUpWithEmail(email, password)
+                        // Ignore Firebase failures for admin; local session guarantees direct access
                     }
-                } else if (email.trim().equals(AdminSession.ADMIN_EMAIL, ignoreCase = true)) {
-                    throw IllegalStateException("This email is reserved. Students must use their own account.")
-                } else {
-                    authRepository.signInWithEmail(email, password)
+
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                    return@launch
                 }
-                _uiState.value = _uiState.value.copy(isLoading = false)
+
+                if (email.trim().equals(AdminSession.ADMIN_EMAIL, ignoreCase = true)) {
+                    throw IllegalStateException("Incorrect password for admin.")
+                }
+
+                authRepository.signInWithEmail(email, password)
+                _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign in failed")
             }
         }
+    }
+
+    fun loginAsAdmin(context: Context) {
+        signIn(AdminSession.ADMIN_EMAIL, AdminSession.ADMIN_PASSWORD, context)
     }
 
     fun signUp(email: String, password: String) {
@@ -64,11 +81,11 @@ class AuthViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(error = "This email is reserved. Students must use their own account.")
             return
         }
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null, isSuccess = false)
         viewModelScope.launch {
             try {
                 authRepository.signUpWithEmail(email, password)
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign up failed")
             }
@@ -80,19 +97,22 @@ class AuthViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = false, error = "Google sign-in was cancelled")
             return
         }
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        _uiState.value = _uiState.value.copy(isLoading = true, error = null, isSuccess = false)
         viewModelScope.launch {
             try {
                 authRepository.signInWithGoogle(idToken)
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Google sign in failed")
             }
         }
     }
 
-    fun signOut() {
-        authRepository.signOut()
+    fun signOut(context: Context? = null) {
+        context?.let { AdminSession.setAdminLoggedIn(it, false) }
+        try {
+            authRepository.signOut()
+        } catch (_: Exception) {}
         AdminSession.update(null)
     }
 
@@ -111,10 +131,15 @@ class AuthViewModel @Inject constructor(
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
+
+    fun clearSuccess() {
+        _uiState.value = _uiState.value.copy(isSuccess = false)
+    }
 }
 
 data class AuthUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
+    val isSuccess: Boolean = false,
     val showResetSent: Boolean = false
 )

@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
             val isNeo by themePreferences.isNeoBrutalish.collectAsState(initial = true)
             val neoAccentIndex by themePreferences.neoBrutalAccentIndex.collectAsState(initial = 0)
 
+            AdminSession.init(this@MainActivity)
             AdminSession.update(FirebaseAuth.getInstance().currentUser)
             val isAdmin by AdminSession.isAdmin.collectAsState()
             DisposableEffect(isAdmin) {
@@ -74,14 +75,18 @@ class MainActivity : ComponentActivity() {
                 @Suppress("DEPRECATION")
                 windowManager.defaultDisplay
             }
-            val modes = display?.supportedModes ?: return
-            val current = display.mode
-            // Pick the mode with the highest refresh rate at the current resolution
-            val best = modes
-                .filter { it.physicalWidth == current.physicalWidth && it.physicalHeight == current.physicalHeight }
-                .maxByOrNull { it.refreshRate } ?: return
-            if (best.refreshRate > current.refreshRate) {
-                window.attributes = window.attributes.apply { preferredDisplayModeId = best.modeId }
+            val modes = display?.supportedModes
+            if (modes != null && modes.isNotEmpty()) {
+                val current = display.mode
+                // Pick the mode with the highest refresh rate at the current resolution (or highest overall)
+                val best = modes
+                    .filter { it.physicalWidth == current.physicalWidth && it.physicalHeight == current.physicalHeight }
+                    .maxByOrNull { it.refreshRate } ?: modes.maxByOrNull { it.refreshRate }
+                if (best != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val params = window.attributes
+                    params.preferredDisplayModeId = best.modeId
+                    window.attributes = params
+                }
             }
         } catch (e: Exception) {
             Log.w("MainActivity", "High refresh rate request failed: ${e.message}")

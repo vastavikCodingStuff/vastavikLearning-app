@@ -30,12 +30,14 @@ private val PrimaryIndigo = Color(0xFF2563EB)
 
 @Composable
 fun SplashScreen(onNavigate: (String) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val scale = remember { Animatable(0.5f) }
     val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
+        com.vastavik.computer.utils.AdminSession.init(context)
         scale.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
@@ -54,7 +56,7 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             onNavigate("security_check")
         } else {
             val user = FirebaseAuth.getInstance().currentUser
-            if (user != null) {
+            if (user != null || com.vastavik.computer.utils.AdminSession.isAdmin.value) {
                 onNavigate("home")
             } else {
                 onNavigate("login")

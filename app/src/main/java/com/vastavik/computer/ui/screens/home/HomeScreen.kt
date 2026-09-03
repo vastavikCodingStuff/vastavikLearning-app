@@ -19,8 +19,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -52,21 +50,21 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 private var promoShown = false
 private var devBannerShown = false
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
-    val pagerState = rememberPagerState(initialPage = 0) { 4 }
     var selectedIndex by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
     var showPromo by remember { mutableStateOf(!promoShown) }
     var showDevBanner by remember { mutableStateOf(!devBannerShown) }
 
-    val sampleCourses = listOf(
-        Triple("Java Programming", Color(0xFF8B5CF6) to Color(0xFF6366F1), "42 lessons"),
-        Triple("Python Basics", Color(0xFF10B981) to Color(0xFF14B8A6), "36 lessons"),
-        Triple("Data Structures", Color(0xFFF59E0B) to Color(0xFFF97316), "28 lessons"),
-        Triple("Web Development", Color(0xFF06B6D4) to Color(0xFF3B82F6), "51 lessons")
-    )
+    val sampleCourses = remember {
+        listOf(
+            Triple("Java Programming", Color(0xFF8B5CF6) to Color(0xFF6366F1), "42 lessons"),
+            Triple("Python Basics", Color(0xFF10B981) to Color(0xFF14B8A6), "36 lessons"),
+            Triple("Data Structures", Color(0xFFF59E0B) to Color(0xFFF97316), "28 lessons"),
+            Triple("Web Development", Color(0xFF06B6D4) to Color(0xFF3B82F6), "51 lessons")
+        )
+    }
 
     if (showPromo) {
         promoShown = true
@@ -84,24 +82,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         )
     }
 
-    // Keep selectedIndex in sync with horizontal swipes.
-    LaunchedEffect(pagerState.currentPage) {
-        selectedIndex = pagerState.currentPage
-    }
-    // Keep pager in sync when the bottom nav is tapped — smooth scroll
-    // with a spring so multi-page jumps glide instead of stuttering.
-    LaunchedEffect(selectedIndex) {
-        if (pagerState.currentPage != selectedIndex && !pagerState.isScrollInProgress) {
-            pagerState.animateScrollToPage(
-                page = selectedIndex,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
-        }
-    }
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
@@ -111,27 +91,41 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             )
         }
     ) { padding ->
-        HorizontalPager(
-            state = pagerState,
+        val tabNav: (String) -> Unit = remember(onNavigate) {
+            { route ->
+                when (route) {
+                    "home" -> selectedIndex = 0
+                    "learning_path" -> selectedIndex = 1
+                    "practice" -> selectedIndex = 2
+                    "chat" -> selectedIndex = 3
+                    else -> onNavigate(route)
+                }
+            }
+        }
+
+        AnimatedContent(
+            targetState = selectedIndex,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(120, easing = FastOutSlowInEasing)) togetherWith
+                fadeOut(animationSpec = tween(80, easing = FastOutSlowInEasing))
+            },
+            label = "BottomNavTabTransition",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .consumeWindowInsets(padding),
-            // Keep the current page (and its scroll state) in memory so the
-            // bottom nav still works smoothly and the top bar is not lost.
-            beyondViewportPageCount = 1
+                .consumeWindowInsets(padding)
         ) { page ->
             when (page) {
                 0 -> HomeTab(
                     modifier = Modifier.fillMaxSize(),
-                    onNavigate = onNavigate,
+                    onNavigate = tabNav,
                     searchQuery = searchQuery,
                     onSearchChange = { searchQuery = it },
                     courses = sampleCourses
                 )
-                1 -> com.vastavik.computer.ui.screens.learning.LearningPathScreen(onNavigate = onNavigate)
-                2 -> com.vastavik.computer.ui.screens.practice.PracticeScreen(onNavigate = onNavigate)
-                3 -> com.vastavik.computer.ui.screens.chat.ChatScreen(onNavigate = onNavigate)
+                1 -> com.vastavik.computer.ui.screens.learning.LearningPathScreen(onNavigate = tabNav)
+                2 -> com.vastavik.computer.ui.screens.practice.PracticeScreen(onNavigate = tabNav)
+                3 -> com.vastavik.computer.ui.screens.chat.ChatScreen(onNavigate = tabNav)
             }
         }
     }
@@ -829,12 +823,9 @@ private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
                                 AnimatedVisibility(
                                     visible = isSelected,
                                     enter = expandHorizontally(
-                                        animationSpec = spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMediumLow
-                                        )
-                                    ) + fadeIn(tween(150)),
-                                    exit = shrinkHorizontally(tween(140)) + fadeOut(tween(90))
+                                        animationSpec = tween(140, easing = FastOutSlowInEasing)
+                                    ) + fadeIn(tween(120)),
+                                    exit = shrinkHorizontally(tween(100)) + fadeOut(tween(80))
                                 ) {
                                     Row {
                                         Spacer(modifier = Modifier.width(6.dp))

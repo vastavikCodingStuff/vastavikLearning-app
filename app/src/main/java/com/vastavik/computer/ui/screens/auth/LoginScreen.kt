@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
+import com.vastavik.computer.utils.AdminSession
 
 private val PrimaryIndigo = Color(0xFF2563EB)
 
@@ -160,7 +161,7 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         if (email.isNotBlank() && password.isNotBlank()) {
-                            viewModel.signIn(email.trim(), password.trim())
+                            viewModel.signIn(email.trim(), password.trim(), context)
                         } else {
                             android.widget.Toast.makeText(context, "Please enter your email and password", android.widget.Toast.LENGTH_SHORT).show()
                         }
@@ -186,7 +187,53 @@ fun LoginScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(28.dp))
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Direct Admin Login button - immediately opens the app as Admin
+            Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 5.dp, y = 5.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bs)
+                )
+                OutlinedButton(
+                    onClick = {
+                        email = AdminSession.ADMIN_EMAIL
+                        password = AdminSession.ADMIN_PASSWORD
+                        viewModel.loginAsAdmin(context)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+                    enabled = !uiState.isLoading
+                ) {
+                    Icon(
+                        Icons.Filled.AdminPanelSettings,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "Direct Admin Login",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -203,6 +250,13 @@ fun LoginScreen(
                     modifier = Modifier.clickable { onNavigate("signup") }
                 )
             }
+        }
+    }
+
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            viewModel.clearSuccess()
+            onNavigate("home")
         }
     }
 

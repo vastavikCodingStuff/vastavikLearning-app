@@ -28,6 +28,7 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 fun ProfileScreen(onNavigate: (String) -> Unit) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
+    val context = androidx.compose.ui.platform.LocalContext.current
     val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
@@ -377,7 +378,13 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onNavigate("login") }
+                                .clickable {
+                                    com.vastavik.computer.utils.AdminSession.setAdminLoggedIn(context, false)
+                                    try {
+                                        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                                    } catch (_: Exception) {}
+                                    onNavigate("login")
+                                }
                                 .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
