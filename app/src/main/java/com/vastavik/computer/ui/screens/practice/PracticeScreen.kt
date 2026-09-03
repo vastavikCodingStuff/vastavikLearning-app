@@ -219,25 +219,57 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 }
 
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                    // Profile Avatar Button
-                    Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .offset(x = 2.dp, y = 2.dp)
-                                .clip(CircleShape)
-                                .background(bs)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF2563EB))
-                                .border(BorderStroke(2.dp, bb), CircleShape)
-                                .clickable { onNavigate("profile") },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Profile Avatar Button
+                        Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 2.dp, y = 2.dp)
+                                    .clip(CircleShape)
+                                    .background(bs)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF2563EB))
+                                    .border(BorderStroke(2.dp, bb), CircleShape)
+                                    .clickable { onNavigate("profile") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
+                            }
+                        }
+
+                        // Notification Button
+                        Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 2.dp, y = 2.dp)
+                                    .clip(CircleShape)
+                                    .background(bs)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF2563EB))
+                                    .border(BorderStroke(2.dp, bb), CircleShape)
+                                    .clickable { onNavigate("notifications") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.Notifications,
+                                    contentDescription = "Notifications",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -404,12 +436,6 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onBackground,
                             lineHeight = 22.sp
-                        )
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Text(
-                            text = "Line-by-line commented code & markdown explanation",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -1093,37 +1119,29 @@ private fun MCQPromptDialog(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Row(
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        quickTopics.take(3).forEach { tag ->
+                        quickTopics.forEach { tag ->
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
                                     .clickable { promptText = tag }
-                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                                    .padding(horizontal = 8.dp, vertical = 5.dp)
                             ) {
-                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        quickTopics.drop(3).forEach { tag ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
-                                    .clickable { promptText = tag }
-                                    .padding(horizontal = 7.dp, vertical = 4.dp)
-                            ) {
-                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                                Text(
+                                    text = tag,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    softWrap = false
+                                )
                             }
                         }
                     }
@@ -1491,37 +1509,29 @@ private fun PredictOutputPromptDialog(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Row(
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        quickTopics.take(3).forEach { tag ->
+                        quickTopics.forEach { tag ->
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
                                     .clickable { promptText = tag }
-                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                                    .padding(horizontal = 8.dp, vertical = 5.dp)
                             ) {
-                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        quickTopics.drop(3).forEach { tag ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
-                                    .clickable { promptText = tag }
-                                    .padding(horizontal = 7.dp, vertical = 4.dp)
-                            ) {
-                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                                Text(
+                                    text = tag,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    softWrap = false
+                                )
                             }
                         }
                     }
@@ -2532,27 +2542,23 @@ private fun MCQCard(
                     Text(item.sub, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (onDelete != null) {
-                    IconButton(
-                        onClick = { onDelete(item) },
-                        modifier = Modifier.size(36.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                            .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
+                            .clickable { onDelete(item) },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFFEF4444).copy(alpha = 0.12f))
-                                .border(BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.4f)), RoundedCornerShape(8.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.Delete,
-                                contentDescription = "Delete MCQ topic",
-                                tint = Color(0xFFEF4444),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
+                        Icon(
+                            Icons.Filled.DeleteOutline,
+                            contentDescription = "Delete MCQ topic",
+                            tint = Color(0xFFDC2626),
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
                 Icon(
                     Icons.Filled.ChevronRight,
