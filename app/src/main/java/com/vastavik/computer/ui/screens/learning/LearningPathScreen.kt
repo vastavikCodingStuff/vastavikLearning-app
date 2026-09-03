@@ -20,6 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,7 +54,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(bottom = 16.dp)
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             // Top bar: "Learn Path" + profile
             item {
@@ -194,108 +199,20 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // Zigzag path
-            itemsIndexed(nodes) { index, node ->
-                val isDone = false
-                val isCurrent = index == 0
-                val xOffset = offsets[index % offsets.size]
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(92.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (index < nodes.lastIndex) {
-                            val nextXOffset = offsets[(index + 1) % offsets.size]
-                            val pathColor = if (isDone || isCurrent) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
-                            Canvas(modifier = Modifier.fillMaxSize()) {
-                                val startX = size.width / 2 + (xOffset * 80.dp.toPx())
-                                val endX = size.width / 2 + (nextXOffset * 80.dp.toPx())
-                                drawLine(
-                                    color = pathColor,
-                                    start = Offset(startX, size.height * 0.75f),
-                                    end = Offset(endX, size.height * 0.25f + size.height / 2),
-                                    strokeWidth = 6.dp.toPx()
-                                )
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier.offset(x = (xOffset * 80).dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(68.dp)
-                                    .offset(x = 4.dp, y = 4.dp)
-                                    .clip(CircleShape)
-                                    .background(bs)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(68.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        when {
-                                            isDone -> MaterialTheme.colorScheme.primary
-                                            isCurrent -> MaterialTheme.colorScheme.surface
-                                            else -> MaterialTheme.colorScheme.outline
-                                        }
-                                    )
-                                    .border(BorderStroke(2.5.dp, bb), CircleShape)
-                                    .clickable {
-                                        if (index != nodes.lastIndex) {
-                                            selectedPart = node
-                                            showPartSheet = true
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (index == nodes.lastIndex) {
-                                    Icon(
-                                        Icons.Filled.EmojiEvents,
-                                        contentDescription = "Trophy",
-                                        tint = Color(0xFFF59E0B),
-                                        modifier = Modifier.size(30.dp)
-                                    )
-                                } else {
-                                    Icon(
-                                        Icons.Filled.Star,
-                                        contentDescription = "Star",
-                                        tint = when {
-                                            isDone -> Color(0xFFFBBF24)
-                                            isCurrent -> Color(0xFFF59E0B)
-                                            else -> Color(0xFF94A3B8)
-                                        },
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                }
-                            }
-                            if (isCurrent) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(76.dp)
-                                        .offset(x = (-4).dp, y = (-4).dp)
-                                        .clip(CircleShape)
-                                        .border(BorderStroke(3.dp, MaterialTheme.colorScheme.primary), CircleShape)
-                                )
-                            }
+            // Continuous winding path with oval curved connecting lines
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+                LearningPathWindingView(
+                    nodes = nodes,
+                    offsets = offsets,
+                    onNodeClick = { node, index ->
+                        if (index != nodes.lastIndex) {
+                            selectedPart = node
+                            showPartSheet = true
                         }
                     }
-                    Text(
-                        text = node,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
@@ -370,3 +287,179 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
         }
     }
 }
+
+@Composable
+private fun LearningPathWindingView(
+    nodes: List<String>,
+    offsets: List<Float>,
+    onNodeClick: (String, Int) -> Unit
+) {
+    val bb = brutalBorderColor()
+    val bs = brutalShadowColor()
+    val density = LocalDensity.current
+
+    val nodeCount = nodes.size
+    val stepHeightDp = 126.dp
+    val circleSizeDp = 68.dp
+    val circleRadiusDp = circleSizeDp / 2
+    val topPaddingDp = 12.dp
+    val totalHeightDp = topPaddingDp + (stepHeightDp * (nodeCount - 1)) + circleSizeDp + 40.dp
+
+    val stepHeightPx = with(density) { stepHeightDp.toPx() }
+    val circleRadiusPx = with(density) { circleRadiusDp.toPx() }
+    val topPaddingPx = with(density) { topPaddingDp.toPx() }
+    val xSpreadPx = with(density) { 80.dp.toPx() }
+    val bowWidthPx = with(density) { 46.dp.toPx() }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(totalHeightDp)
+    ) {
+        // 1. Curved Connecting Lines Canvas behind the nodes
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val midX = size.width / 2
+
+            // Center coordinates for each circle
+            val centers = (0 until nodeCount).map { i ->
+                val xOff = offsets[i % offsets.size]
+                val cx = midX + (xOff * xSpreadPx)
+                val cy = topPaddingPx + (i * stepHeightPx) + circleRadiusPx
+                Offset(cx, cy)
+            }
+
+            // Draw connecting curved segments between consecutive nodes
+            for (i in 0 until nodeCount - 1) {
+                val p1 = centers[i]
+                val p2 = centers[i + 1]
+                val dy = p2.y - p1.y
+
+                // Alternating oval-like bends: right on even index, left on odd index
+                val isRightBend = (i % 2 == 0)
+
+                val cp1: Offset
+                val cp2: Offset
+                if (isRightBend) {
+                    val maxX = maxOf(p1.x, p2.x)
+                    cp1 = Offset(maxX + bowWidthPx, p1.y + dy * 0.18f)
+                    cp2 = Offset(maxX + bowWidthPx, p2.y - dy * 0.18f)
+                } else {
+                    val minX = minOf(p1.x, p2.x)
+                    cp1 = Offset(minX - bowWidthPx, p1.y + dy * 0.18f)
+                    cp2 = Offset(minX - bowWidthPx, p2.y - dy * 0.18f)
+                }
+
+                val path = Path().apply {
+                    moveTo(p1.x, p1.y)
+                    cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y)
+                }
+
+                // Neo-brutalist border / outline under the curve
+                drawPath(
+                    path = path,
+                    color = bb,
+                    style = Stroke(
+                        width = with(density) { 9.dp.toPx() },
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+
+                // Main vibrant blue connecting curve
+                drawPath(
+                    path = path,
+                    color = Color(0xFF2563EB),
+                    style = Stroke(
+                        width = with(density) { 5.dp.toPx() },
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+            }
+        }
+
+        // 2. Nodes placed on top of the canvas
+        nodes.forEachIndexed { index, node ->
+            val isDone = false
+            val isCurrent = index == 0
+            val xOff = offsets[index % offsets.size]
+            val nodeTopDp = topPaddingDp + (stepHeightDp * index)
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = nodeTopDp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier.offset(x = (xOff * 80).dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Neo-brutalist drop shadow
+                    Box(
+                        modifier = Modifier
+                            .size(68.dp)
+                            .offset(x = 4.dp, y = 4.dp)
+                            .clip(CircleShape)
+                            .background(bs)
+                    )
+                    // Circle node
+                    Box(
+                        modifier = Modifier
+                            .size(68.dp)
+                            .clip(CircleShape)
+                            .background(
+                                when {
+                                    isDone -> MaterialTheme.colorScheme.primary
+                                    isCurrent -> MaterialTheme.colorScheme.surface
+                                    else -> MaterialTheme.colorScheme.surface
+                                }
+                            )
+                            .border(BorderStroke(2.5.dp, bb), CircleShape)
+                            .clickable { onNodeClick(node, index) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (index == nodes.lastIndex) {
+                            Icon(
+                                Icons.Filled.EmojiEvents,
+                                contentDescription = "Trophy",
+                                tint = Color(0xFFF59E0B),
+                                modifier = Modifier.size(30.dp)
+                            )
+                        } else {
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = "Star",
+                                tint = when {
+                                    isDone -> Color(0xFFFBBF24)
+                                    isCurrent -> Color(0xFFF59E0B)
+                                    else -> Color(0xFF94A3B8)
+                                },
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
+                    if (isCurrent) {
+                        Box(
+                            modifier = Modifier
+                                .size(76.dp)
+                                .clip(CircleShape)
+                                .border(BorderStroke(3.dp, MaterialTheme.colorScheme.primary), CircleShape)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = node,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
