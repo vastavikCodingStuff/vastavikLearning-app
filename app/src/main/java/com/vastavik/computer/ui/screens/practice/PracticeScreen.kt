@@ -787,6 +787,403 @@ private fun SuggestTopicDialog(
 }
 
 @Composable
+private fun MCQPromptDialog(
+    onDismiss: () -> Unit,
+    onTopicsGenerated: (List<MCQItem>) -> Unit
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val bb = brutalBorderColor()
+
+    var promptText by remember { mutableStateOf("") }
+    var isVoiceMode by remember { mutableStateOf(false) }
+    var isListening by remember { mutableStateOf(false) }
+    var partialTranscript by remember { mutableStateOf("") }
+    var isGeneratingTopics by remember { mutableStateOf(false) }
+    var speechRecognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
+
+    val quickTopics = listOf(
+        "OOP Concepts", "Arrays & Lists", "String Methods",
+        "Operators & Expressions", "Loops & Control Flow", "Exception Handling"
+    )
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizer?.destroy()
+        }
+    }
+
+    fun triggerGenerate(query: String) {
+        val cleanQuery = query.trim()
+        if (cleanQuery.isBlank() || isGeneratingTopics) return
+
+        isGeneratingTopics = true
+        coroutineScope.launch {
+            try {
+                val topics = callMistralGenerateMCQTopics(cleanQuery)
+                onTopicsGenerated(topics)
+                Toast.makeText(context, "Generated ${topics.size} MCQ topics!", Toast.LENGTH_SHORT).show()
+                onDismiss()
+            } catch (_: Exception) {
+                val fallback = getFallbackMCQTopics(cleanQuery)
+                onTopicsGenerated(fallback)
+                Toast.makeText(context, "Generated ${fallback.size} MCQ topics!", Toast.LENGTH_SHORT).show()
+                onDismiss()
+            } finally {
+                isGeneratingTopics = false
+            }
+        }
+    }
+
+    fun startListening() {
+        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+            Toast.makeText(context, "Speech recognition is not available on this device", Toast.LENGTH_SHORT).show()
+            isVoiceMode = false
+            return
+        }
+        speechRecognizer?.destroy()
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
+            setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(params: Bundle?) {
+                    isListening = true
+                }
+                override fun onBeginningOfSpeech() {}
+                override fun onRmsChanged(rmsdB: Float) {}
+                override fun onBufferReceived(buffer: ByteArray?) {}
+                override fun onEndOfSpeech() {
+                    isListening = false
+                }
+                override fun onError(error: Int) {
+                    isListening = false
+                    isVoiceMode = false
+                }
+                override fun onResults(results: Bundle?) {
+                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    val text = matches?.firstOrNull() ?: ""
+                    isVoiceMode = false
+                    isListening = false
+                    partialTranscript = ""
+                    if (text.isNotBlank()) {
+                        promptText = text
+                        triggerGenerate(text)
+                    }
+                }
+                override fun onPartialResults(partialResults: Bundle?) {
+                    val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    val text = matches?.firstOrNull() ?: ""
+                    if (text.isNotEmpty()) {
+                        partialTranscript = text
+                    }
+                }
+                override fun onEvent(eventType: Int, params: Bundle?) {}
+            })
+        }
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-IN")
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        }
+        speechRecognizer?.startListening(intent)
+        isListening = true
+        isVoiceMode = true
+        partialTranscript = ""
+    }
+
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            promptText = ""
+            startListening()
+        } else {
+            Toast.makeText(context, "Microphone permission is required for voice input", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = {
+            if (!isGeneratingTopics) {
+                speechRecognizer?.cancel()
+                onDismiss()
+            }
+        },
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Text(
+                text = "What kind of MCQ questions do you want?",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 22.sp
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (isVoiceMode || isListening) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "listeningAnimMCQ")
+                    val pulseAlpha by infiniteTransition.animateFloat(
+                        initialValue = 0.35f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(650, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "pulseAlphaMCQ"
+                    )
+
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        border = BorderStroke(1.5.dp, bb),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFEF4444).copy(alpha = pulseAlpha))
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Listening...",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 15.sp,
+                                    color = Color(0xFF2563EB).copy(alpha = pulseAlpha)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            WaveformVisualizer(
+                                isListening = true,
+                                amplitude = 0.6f + 0.4f * kotlin.math.sin(System.currentTimeMillis() / 120.0).toFloat(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = if (partialTranscript.isNotBlank()) partialTranscript else "Speak your question prompt now...",
+                                fontSize = 13.sp,
+                                fontWeight = if (partialTranscript.isNotBlank()) FontWeight.SemiBold else FontWeight.Normal,
+                                color = if (partialTranscript.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextButton(
+                                    onClick = {
+                                        speechRecognizer?.cancel()
+                                        isListening = false
+                                        isVoiceMode = false
+                                    }
+                                ) {
+                                    Text("Cancel Voice", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+
+                                if (partialTranscript.isNotBlank()) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = {
+                                            speechRecognizer?.stopListening()
+                                            val captured = partialTranscript
+                                            isListening = false
+                                            isVoiceMode = false
+                                            promptText = captured
+                                            triggerGenerate(captured)
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text("Generate", fontSize = 12.sp, color = Color.White)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    OutlinedTextField(
+                        value = promptText,
+                        onValueChange = { promptText = it },
+                        placeholder = {
+                            Text(
+                                text = "e.g., OOP Concepts, Arrays & Matrix, Exception Handling...",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        minLines = 2,
+                        maxLines = 3,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 72.dp, max = 110.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = bb,
+                            unfocusedBorderColor = bb.copy(alpha = 0.6f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        trailingIcon = {
+                            if (promptText.isEmpty() && !isListening && !isGeneratingTopics) {
+                                IconButton(
+                                    onClick = {
+                                        promptText = ""
+                                        if (ContextCompat.checkSelfPermission(
+                                                context,
+                                                android.Manifest.permission.RECORD_AUDIO
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            startListening()
+                                        } else {
+                                            permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                        }
+                                    },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFF2563EB))
+                                            .border(BorderStroke(1.5.dp, bb), CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Mic,
+                                            contentDescription = "Voice Input",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
+
+                    Text(
+                        text = "Quick topics:",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        quickTopics.take(3).forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
+                                    .clickable { promptText = tag }
+                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                            ) {
+                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        quickTopics.drop(3).forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
+                                    .clickable { promptText = tag }
+                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                            ) {
+                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                            }
+                        }
+                    }
+                }
+
+                if (isGeneratingTopics) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = Color(0xFF2563EB)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Crafting MCQ practice topics...",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF2563EB)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (promptText.isNotBlank() && !isGeneratingTopics) {
+                        triggerGenerate(promptText)
+                    }
+                },
+                enabled = promptText.isNotBlank() && !isGeneratingTopics,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+            ) {
+                Text("Generate", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    if (!isGeneratingTopics) {
+                        speechRecognizer?.cancel()
+                        onDismiss()
+                    }
+                },
+                enabled = !isGeneratingTopics
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
 private fun PredictOutputPromptDialog(
     onDismiss: () -> Unit,
     startSetNumber: Int,
@@ -1567,12 +1964,11 @@ private fun MCQContent(
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        SuggestTopicDialog(
+        MCQPromptDialog(
             onDismiss = { showDialog = false },
-            onSubmit = { topic ->
-                aiItems.add(0, MCQItem(topic, "10 questions", QuestionSource.AI))
+            onTopicsGenerated = { newTopics ->
+                aiItems.addAll(0, newTopics)
                 MistralDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
-                showDialog = false
             }
         )
     }
@@ -1584,7 +1980,19 @@ private fun MCQContent(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
-        items(displayedItems) { item -> MCQCard(item, onNavigate) }
+        items(displayedItems, key = { it.title + it.sub }) { item ->
+            MCQCard(
+                item = item,
+                onNavigate = onNavigate,
+                onDelete = if (item.source == QuestionSource.AI) {
+                    { toDelete ->
+                        aiItems.remove(toDelete)
+                        MistralDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
+                        Toast.makeText(context, "Quiz topic removed", Toast.LENGTH_SHORT).show()
+                    }
+                } else null
+            )
+        }
     }
 }
 
@@ -2074,7 +2482,11 @@ private fun PYQContent(
 }
 
 @Composable
-private fun MCQCard(item: MCQItem, onNavigate: (String) -> Unit) {
+private fun MCQCard(
+    item: MCQItem,
+    onNavigate: (String) -> Unit,
+    onDelete: ((MCQItem) -> Unit)? = null
+) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     Box(modifier = Modifier.padding(end = 5.dp, bottom = 12.dp)) {
@@ -2118,6 +2530,29 @@ private fun MCQCard(item: MCQItem, onNavigate: (String) -> Unit) {
                     Text(item.title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(item.sub, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (onDelete != null) {
+                    IconButton(
+                        onClick = { onDelete(item) },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                .border(BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.4f)), RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.Delete,
+                                contentDescription = "Delete MCQ topic",
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
                 Icon(
                     Icons.Filled.ChevronRight,
@@ -2471,6 +2906,111 @@ private fun getFallbackQuestions(prompt: String): List<CodingItem> {
             CodingItem("$clean: Practical Problem", "Medium", "Custom", QuestionSource.AI),
             CodingItem("$clean: Edge Cases & Optimization", "Medium", "Logic", QuestionSource.AI),
             CodingItem("$clean: Advanced Solution", "Hard", "Custom", QuestionSource.AI)
+        )
+    }
+}
+
+// AI MCQ TOPIC GENERATOR: Calls Mistral AI to produce 3-4 structured MCQ quiz topics as per user prompt
+private suspend fun callMistralGenerateMCQTopics(promptText: String): List<MCQItem> = withContext(Dispatchers.IO) {
+    val apiKey = BuildConfig.MISTRAL_API_KEY
+    if (apiKey.isBlank()) {
+        return@withContext getFallbackMCQTopics(promptText)
+    }
+
+    try {
+        val url = URL("https://api.mistral.ai/v1/chat/completions")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.requestMethod = "POST"
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.setRequestProperty("Authorization", "Bearer $apiKey")
+        conn.doOutput = true
+        conn.connectTimeout = 25000
+        conn.readTimeout = 25000
+
+        val systemPrompt = """
+            You are an expert computer science teacher generating Multiple Choice Quiz (MCQ) topics for students (ICSE Class 9-10 & CBSE Class 11-12).
+            Generate exactly 3 to 4 distinct MCQ quiz topics based on the user's prompt.
+            Return ONLY a valid JSON array of objects. No markdown backticks, no markdown fence, no commentary.
+            Each object in the array MUST have:
+            - "title": Short descriptive title of the quiz topic (e.g. "String Class & Methods")
+            - "questions": Question count string (e.g. "12 questions", "15 questions")
+        """.trimIndent()
+
+        val body = JSONObject().apply {
+            put("model", "mistral-small-latest")
+            put("messages", JSONArray().apply {
+                put(JSONObject().put("role", "system").put("content", systemPrompt))
+                put(JSONObject().put("role", "user").put("content", "Generate 3 to 4 MCQ topics for: $promptText"))
+            })
+            put("max_tokens", 600)
+            put("temperature", 0.3)
+        }
+
+        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+        val responseCode = conn.responseCode
+        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
+        val responseText = stream.bufferedReader().use { it.readText() }
+
+        if (responseCode in 200..299) {
+            val json = JSONObject(responseText)
+            val content = json.getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
+                .trim()
+
+            val cleanJson = content
+                .replace(Regex("^```(?:json)?\\s*"), "")
+                .replace(Regex("\\s*```$"), "")
+                .trim()
+
+            val arr = JSONArray(cleanJson)
+            val list = mutableListOf<MCQItem>()
+            for (i in 0 until arr.length()) {
+                val obj = arr.getJSONObject(i)
+                val title = obj.optString("title", "").trim()
+                val qCount = obj.optString("questions", "10 questions").trim()
+                if (title.isNotBlank()) {
+                    list.add(MCQItem(title, qCount, QuestionSource.AI))
+                }
+            }
+            if (list.isNotEmpty()) list else getFallbackMCQTopics(promptText)
+        } else {
+            getFallbackMCQTopics(promptText)
+        }
+    } catch (_: Exception) {
+        getFallbackMCQTopics(promptText)
+    }
+}
+
+private fun getFallbackMCQTopics(prompt: String): List<MCQItem> {
+    val clean = prompt.trim()
+    val lower = clean.lowercase()
+    return when {
+        lower.contains("loop") -> listOf(
+            MCQItem("For Loops & Iteration Control", "12 questions", QuestionSource.AI),
+            MCQItem("While & Do-While Conditions", "10 questions", QuestionSource.AI),
+            MCQItem("Nested Loops & Break / Continue", "15 questions", QuestionSource.AI)
+        )
+        lower.contains("string") -> listOf(
+            MCQItem("String Methods & Character Manipulation", "15 questions", QuestionSource.AI),
+            MCQItem("String Concatenation & Immutability", "10 questions", QuestionSource.AI),
+            MCQItem("Substring & IndexOf Operations", "12 questions", QuestionSource.AI)
+        )
+        lower.contains("oop") || lower.contains("class") -> listOf(
+            MCQItem("Classes, Objects & Constructors", "15 questions", QuestionSource.AI),
+            MCQItem("Encapsulation & Access Modifiers", "12 questions", QuestionSource.AI),
+            MCQItem("Polymorphism & Inheritance", "14 questions", QuestionSource.AI)
+        )
+        lower.contains("array") -> listOf(
+            MCQItem("1D Array Indexing & Bounds", "12 questions", QuestionSource.AI),
+            MCQItem("Linear & Binary Search MCQs", "10 questions", QuestionSource.AI),
+            MCQItem("2D Matrices & Multi-dimensional Arrays", "15 questions", QuestionSource.AI)
+        )
+        else -> listOf(
+            MCQItem("$clean: Fundamentals Quiz", "10 questions", QuestionSource.AI),
+            MCQItem("$clean: Intermediate Concepts", "15 questions", QuestionSource.AI),
+            MCQItem("$clean: Tricky Board MCQs", "12 questions", QuestionSource.AI)
         )
     }
 }

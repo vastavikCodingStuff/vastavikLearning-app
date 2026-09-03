@@ -20,16 +20,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import com.vastavik.computer.ui.screens.onboarding.SettingsViewModel
 import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @Composable
-fun ProfileScreen(onNavigate: (String) -> Unit) {
+fun ProfileScreen(
+    onNavigate: (String) -> Unit,
+    settingsViewModel: SettingsViewModel = hiltViewModel()
+) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val context = androidx.compose.ui.platform.LocalContext.current
     val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
+    val isDarkMode by settingsViewModel.isDarkMode.collectAsState(initial = false)
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
@@ -39,6 +47,69 @@ fun ProfileScreen(onNavigate: (String) -> Unit) {
                 .fillMaxSize(),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
+            // Top Bar with Back Button, VastavikComputer brand, and Sun/Moon Theme Toggle
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { onNavigate("home") },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Vastavik",
+                        color = Color(0xFF2563EB),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp
+                    )
+                    Text(
+                        text = "Computer",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Sun / Moon theme toggle button
+                    Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .offset(x = 2.dp, y = 2.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(bs)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.surface)
+                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp))
+                                .clickable { settingsViewModel.setDarkMode(!isDarkMode) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (isDarkMode) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                                contentDescription = if (isDarkMode) "Switch to Light Mode" else "Switch to Dark Mode",
+                                tint = if (isDarkMode) Color(0xFFFFD600) else Color(0xFF2563EB),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
             // Profile Header Brutal Card
             item {
                 Box(modifier = Modifier.padding(horizontal = 16.dp).padding(end = 5.dp, bottom = 5.dp)) {
