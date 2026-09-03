@@ -8,7 +8,11 @@ data class AppUpdateInfo(
     val latestVersion: String = "",
     val apkUrl: String = "",
     val forceUpdate: Boolean = false,
-    val changelog: String = ""
+    val changelog: String = "",
+    val releaseTitle: String = "",
+    val apkSize: Long = 0L,
+    val publishedAt: String = "",
+    val isUpdateAvailable: Boolean = false
 ) {
     companion object {
         fun fromSnapshot(doc: DocumentSnapshot): AppUpdateInfo {

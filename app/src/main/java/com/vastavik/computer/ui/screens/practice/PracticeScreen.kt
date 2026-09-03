@@ -77,7 +77,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
+    var selectedTab by remember { mutableIntStateOf(2) } // Default to Coding: 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
     var selectedSource by remember { mutableStateOf(QuestionSource.AI) } // 1. Top Toggle AI vs Sir
     val tabs = listOf("MCQs", "Predict the Output", "Coding", "PYQs")
 
@@ -223,29 +223,9 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Profile Avatar Button
-                        Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .offset(x = 2.dp, y = 2.dp)
-                                    .clip(CircleShape)
-                                    .background(bs)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFF2563EB))
-                                    .border(BorderStroke(2.dp, bb), CircleShape)
-                                    .clickable { onNavigate("profile") },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
-                            }
-                        }
-
                         // Notification Button
+                        val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+                        val hasUpdate = updateInfo?.isUpdateAvailable == true
                         Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
                             Box(
                                 modifier = Modifier
@@ -269,6 +249,39 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                     tint = Color.White,
                                     modifier = Modifier.size(18.dp)
                                 )
+                                if (hasUpdate) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(9.dp)
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = (-4).dp, y = 4.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFFFFD600))
+                                            .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                                    )
+                                }
+                            }
+                        }
+
+                        // Profile Avatar Button
+                        Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 2.dp, y = 2.dp)
+                                    .clip(CircleShape)
+                                    .background(bs)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF2563EB))
+                                    .border(BorderStroke(2.dp, bb), CircleShape)
+                                    .clickable { onNavigate("profile") },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White, modifier = Modifier.size(18.dp))
                             }
                         }
                     }

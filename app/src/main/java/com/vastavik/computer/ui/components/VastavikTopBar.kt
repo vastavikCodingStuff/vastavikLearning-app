@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +54,39 @@ fun VastavikTopBar(
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.weight(1f))
+            if (onNotificationClick != null) {
+                val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+                val hasUpdate = updateInfo?.isUpdateAvailable == true
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2563EB))
+                        .border(BorderStroke(1.5.dp, bb), CircleShape)
+                        .clickable { onNotificationClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Filled.Notifications,
+                        contentDescription = "Notifications",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    if (hasUpdate) {
+                        Box(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .align(Alignment.TopEnd)
+                                .offset(x = (-4).dp, y = 4.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFFD600))
+                                .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
             Box(
                 modifier = Modifier
                     .size(38.dp)
@@ -71,26 +106,6 @@ fun VastavikTopBar(
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
-            }
-
-            if (onNotificationClick != null) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF2563EB))
-                        .border(BorderStroke(1.5.dp, bb), CircleShape)
-                        .clickable { onNotificationClick() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Filled.Notifications,
-                        contentDescription = "Notifications",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
             }
         }
     }
