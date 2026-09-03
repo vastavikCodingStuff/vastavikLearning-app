@@ -782,7 +782,8 @@ private fun BottomNavBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 4.dp, bottom = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {

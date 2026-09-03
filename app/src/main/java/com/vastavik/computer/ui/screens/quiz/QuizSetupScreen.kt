@@ -111,29 +111,46 @@ fun QuizSetupScreen(
                 }
 
                 // Quick topic chips
+                Spacer(modifier = Modifier.height(14.dp))
+                Text(
+                    text = "Quick select:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text("Quick select:", fontWeight = FontWeight.SemiBold, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(modifier = Modifier.height(6.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    topicOptions.chunked(3).forEach { rowTopics ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            rowTopics.forEach { t ->
-                                val isSelected = selectedTopic == t
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(50.dp))
-                                        .background(if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surface)
-                                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(50.dp))
-                                        .clickable { selectedTopic = t }
-                                        .padding(horizontal = 14.dp, vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        t,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground
-                                    )
-                                }
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    topicOptions.forEach { t ->
+                        val isSelected = selectedTopic == t
+                        Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 3.dp, y = 3.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(bs)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isSelected) PrimaryBlue else MaterialTheme.colorScheme.surface)
+                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(10.dp))
+                                    .clickable { selectedTopic = t }
+                                    .padding(horizontal = 14.dp, vertical = 9.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = t,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground,
+                                    maxLines = 1
+                                )
                             }
                         }
                     }

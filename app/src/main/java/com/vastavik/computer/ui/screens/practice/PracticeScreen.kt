@@ -190,7 +190,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSir) Color(0xFF2563EB) else Color.Transparent)
+                                .background(if (isSir) Color(0xFFFFD600) else Color.Transparent)
                                 .border(
                                     if (isSir) BorderStroke(1.5.dp, bb) else BorderStroke(0.dp, Color.Transparent),
                                     RoundedCornerShape(8.dp)
@@ -203,7 +203,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                 Icon(
                                     Icons.Filled.School,
                                     contentDescription = null,
-                                    tint = if (isSir) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = if (isSir) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(13.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -211,7 +211,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                     text = "Sir",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isSir) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (isSir) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -359,8 +359,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
             // 2. UNDER DEVELOPMENT BANNER: Placed at the bottom of the page above the Bottom Navigation
             BottomDevBanner()
 
-            // Bottom spacer div so Under Development banner has clean breathing room above the bottom navigation bar
-            Spacer(modifier = Modifier.height(14.dp))
+            // Subtle spacer for small white margin above bottom navigation bar
+            Spacer(modifier = Modifier.height(2.dp))
         }
     }
 
@@ -390,36 +390,52 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 // Modal Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = item.title,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(50.dp))
-                                    .background(Color(0xFF2563EB).copy(alpha = 0.15f))
-                                    .border(BorderStroke(1.dp, Color(0xFF2563EB)), RoundedCornerShape(50.dp))
-                                    .padding(horizontal = 8.dp, vertical = 2.dp)
-                            ) {
-                                Text("Mistral AI", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
-                            }
-                        }
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp)
+                    ) {
+                        Text(
+                            text = item.title,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            lineHeight = 22.sp
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
                         Text(
                             text = "Line-by-line commented code & markdown explanation",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    IconButton(onClick = { activeCodingItem = null }) {
-                        Icon(Icons.Filled.Close, contentDescription = "Close")
+
+                    // Mistral AI badge positioned on the top right
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(Color(0xFF2563EB).copy(alpha = 0.12f))
+                            .border(BorderStroke(1.2.dp, Color(0xFF2563EB)), RoundedCornerShape(50.dp))
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.AutoAwesome,
+                                contentDescription = null,
+                                tint = Color(0xFF2563EB),
+                                modifier = Modifier.size(11.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Mistral AI",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF2563EB)
+                            )
+                        }
                     }
                 }
 
@@ -663,7 +679,8 @@ private fun BottomDevBanner() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 16.dp)
+            .padding(top = 4.dp, bottom = 2.dp)
             .padding(end = 4.dp, bottom = 4.dp)
     ) {
         Box(
@@ -765,6 +782,404 @@ private fun SuggestTopicDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
+}
+
+@Composable
+private fun PredictOutputPromptDialog(
+    onDismiss: () -> Unit,
+    startSetNumber: Int,
+    onSetsGenerated: (List<PredictOutputItem>) -> Unit
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val bb = brutalBorderColor()
+
+    var promptText by remember { mutableStateOf("") }
+    var isVoiceMode by remember { mutableStateOf(false) }
+    var isListening by remember { mutableStateOf(false) }
+    var partialTranscript by remember { mutableStateOf("") }
+    var isGeneratingQuestions by remember { mutableStateOf(false) }
+    var speechRecognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
+
+    val quickTopics = listOf(
+        "Nested Loops", "String Methods", "Increment/Decrement",
+        "Array Tracing", "Recursion", "Constructors & Static"
+    )
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechRecognizer?.destroy()
+        }
+    }
+
+    fun triggerGenerate(query: String) {
+        val cleanQuery = query.trim()
+        if (cleanQuery.isBlank() || isGeneratingQuestions) return
+
+        isGeneratingQuestions = true
+        coroutineScope.launch {
+            try {
+                val sets = callMistralGeneratePredictOutput(cleanQuery, startSetNumber)
+                onSetsGenerated(sets)
+                Toast.makeText(context, "Generated ${sets.size} Output Tracing sets!", Toast.LENGTH_SHORT).show()
+                onDismiss()
+            } catch (_: Exception) {
+                val fallback = getFallbackPredictOutput(cleanQuery, startSetNumber)
+                onSetsGenerated(fallback)
+                Toast.makeText(context, "Generated ${fallback.size} Output Tracing sets!", Toast.LENGTH_SHORT).show()
+                onDismiss()
+            } finally {
+                isGeneratingQuestions = false
+            }
+        }
+    }
+
+    fun startListening() {
+        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+            Toast.makeText(context, "Speech recognition is not available on this device", Toast.LENGTH_SHORT).show()
+            isVoiceMode = false
+            return
+        }
+        speechRecognizer?.destroy()
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
+            setRecognitionListener(object : RecognitionListener {
+                override fun onReadyForSpeech(params: Bundle?) {
+                    isListening = true
+                }
+                override fun onBeginningOfSpeech() {}
+                override fun onRmsChanged(rmsdB: Float) {}
+                override fun onBufferReceived(buffer: ByteArray?) {}
+                override fun onEndOfSpeech() {
+                    isListening = false
+                }
+                override fun onError(error: Int) {
+                    isListening = false
+                    isVoiceMode = false
+                }
+                override fun onResults(results: Bundle?) {
+                    val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    val text = matches?.firstOrNull() ?: ""
+                    isVoiceMode = false
+                    isListening = false
+                    partialTranscript = ""
+                    if (text.isNotBlank()) {
+                        promptText = text
+                        triggerGenerate(text)
+                    }
+                }
+                override fun onPartialResults(partialResults: Bundle?) {
+                    val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    val text = matches?.firstOrNull() ?: ""
+                    if (text.isNotEmpty()) {
+                        partialTranscript = text
+                    }
+                }
+                override fun onEvent(eventType: Int, params: Bundle?) {}
+            })
+        }
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-IN")
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        }
+        speechRecognizer?.startListening(intent)
+        isListening = true
+        isVoiceMode = true
+        partialTranscript = ""
+    }
+
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            promptText = ""
+            startListening()
+        } else {
+            Toast.makeText(context, "Microphone permission is required for voice input", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = {
+            if (!isGeneratingQuestions) {
+                speechRecognizer?.cancel()
+                onDismiss()
+            }
+        },
+        shape = RoundedCornerShape(20.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Text(
+                text = "What kind of Output Tracing questions do you want?",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 22.sp
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if (isVoiceMode || isListening) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "listeningAnimPredict")
+                    val pulseAlpha by infiniteTransition.animateFloat(
+                        initialValue = 0.35f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(650, easing = LinearEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "pulseAlphaPredict"
+                    )
+
+                    Surface(
+                        shape = RoundedCornerShape(14.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        border = BorderStroke(1.5.dp, bb),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(14.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFEF4444).copy(alpha = pulseAlpha))
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Listening...",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 15.sp,
+                                    color = Color(0xFF2563EB).copy(alpha = pulseAlpha)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            WaveformVisualizer(
+                                isListening = true,
+                                amplitude = 0.6f + 0.4f * kotlin.math.sin(System.currentTimeMillis() / 120.0).toFloat(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = if (partialTranscript.isNotBlank()) partialTranscript else "Speak your topic prompt now...",
+                                fontSize = 13.sp,
+                                fontWeight = if (partialTranscript.isNotBlank()) FontWeight.SemiBold else FontWeight.Normal,
+                                color = if (partialTranscript.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TextButton(
+                                    onClick = {
+                                        speechRecognizer?.cancel()
+                                        isListening = false
+                                        isVoiceMode = false
+                                    }
+                                ) {
+                                    Text("Cancel Voice", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+
+                                if (partialTranscript.isNotBlank()) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Button(
+                                        onClick = {
+                                            speechRecognizer?.stopListening()
+                                            val captured = partialTranscript
+                                            isListening = false
+                                            isVoiceMode = false
+                                            promptText = captured
+                                            triggerGenerate(captured)
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text("Generate", fontSize = 12.sp, color = Color.White)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    OutlinedTextField(
+                        value = promptText,
+                        onValueChange = { promptText = it },
+                        placeholder = {
+                            Text(
+                                text = "e.g., Nested loops, String methods, Post-increment & Pre-increment...",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        minLines = 2,
+                        maxLines = 3,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 72.dp, max = 110.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = bb,
+                            unfocusedBorderColor = bb.copy(alpha = 0.6f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        trailingIcon = {
+                            if (promptText.isEmpty() && !isListening && !isGeneratingQuestions) {
+                                IconButton(
+                                    onClick = {
+                                        promptText = ""
+                                        if (ContextCompat.checkSelfPermission(
+                                                context,
+                                                android.Manifest.permission.RECORD_AUDIO
+                                            ) == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            startListening()
+                                        } else {
+                                            permLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                                        }
+                                    },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFF2563EB))
+                                            .border(BorderStroke(1.5.dp, bb), CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Mic,
+                                            contentDescription = "Voice Input",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
+
+                    Text(
+                        text = "Quick topics:",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        quickTopics.take(3).forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
+                                    .clickable { promptText = tag }
+                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                            ) {
+                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        quickTopics.drop(3).forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
+                                    .clickable { promptText = tag }
+                                    .padding(horizontal = 7.dp, vertical = 4.dp)
+                            ) {
+                                Text(tag, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                            }
+                        }
+                    }
+                }
+
+                if (isGeneratingQuestions) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = Color(0xFF2563EB)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Crafting Predict Output sets...",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF2563EB)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (promptText.isNotBlank() && !isGeneratingQuestions) {
+                        triggerGenerate(promptText)
+                    }
+                },
+                enabled = promptText.isNotBlank() && !isGeneratingQuestions,
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
+            ) {
+                Text("Generate", fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    if (!isGeneratingQuestions) {
+                        speechRecognizer?.cancel()
+                        onDismiss()
+                    }
+                },
+                enabled = !isGeneratingQuestions
+            ) {
+                Text("Cancel")
+            }
         }
     )
 }
@@ -1280,22 +1695,12 @@ private fun PredictOutputContent(
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
-        SuggestTopicDialog(
+        PredictOutputPromptDialog(
             onDismiss = { showDialog = false },
-            onSubmit = { topic ->
-                val newSetNum = aiItems.size + 1
-                val newItem = PredictOutputItem(
-                    setNumber = newSetNum,
-                    title = "$topic — Set $newSetNum",
-                    topic = "Custom Topic",
-                    questionCount = "10 Questions",
-                    difficulty = "Medium",
-                    codeSnippet = getSnippetForTopic(topic),
-                    source = QuestionSource.AI
-                )
-                aiItems.add(0, newItem)
+            startSetNumber = aiItems.size,
+            onSetsGenerated = { newSets ->
+                aiItems.addAll(0, newSets)
                 MistralDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
-                showDialog = false
             }
         )
     }
@@ -2066,6 +2471,128 @@ private fun getFallbackQuestions(prompt: String): List<CodingItem> {
             CodingItem("$clean: Practical Problem", "Medium", "Custom", QuestionSource.AI),
             CodingItem("$clean: Edge Cases & Optimization", "Medium", "Logic", QuestionSource.AI),
             CodingItem("$clean: Advanced Solution", "Hard", "Custom", QuestionSource.AI)
+        )
+    }
+}
+
+// AI PREDICT OUTPUT GENERATOR: Calls Mistral AI to produce 2-3 structured Predict the Output question sets as per user prompt
+private suspend fun callMistralGeneratePredictOutput(promptText: String, startSetIndex: Int): List<PredictOutputItem> = withContext(Dispatchers.IO) {
+    val apiKey = BuildConfig.MISTRAL_API_KEY
+    if (apiKey.isBlank()) {
+        return@withContext getFallbackPredictOutput(promptText, startSetIndex)
+    }
+
+    try {
+        val url = URL("https://api.mistral.ai/v1/chat/completions")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.requestMethod = "POST"
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.setRequestProperty("Authorization", "Bearer $apiKey")
+        conn.doOutput = true
+        conn.connectTimeout = 25000
+        conn.readTimeout = 25000
+
+        val systemPrompt = """
+            You are an expert computer science teacher generating Java "Predict the Output" code tracing practice question sets for students (ICSE Class 9-10 & CBSE Class 11-12).
+            Generate exactly 2 to 3 distinct output prediction question sets based on the user's topic prompt.
+            Return ONLY a valid JSON array of objects. No markdown backticks, no markdown fence, no commentary.
+            Each object in the array MUST have:
+            - "title": Title of the set (e.g. "Nested For-Loops & Break Tracing")
+            - "topic": Topic name (e.g. "Loops", "Strings", "Precedence", "Recursion")
+            - "questionCount": Number of questions string (e.g. "10 Questions", "12 Questions")
+            - "difficulty": Exactly one of "Easy", "Medium", or "Hard"
+            - "codeSnippet": A short 3 to 6 line valid Java snippet demonstrating the output problem (use System.out.println)
+        """.trimIndent()
+
+        val body = JSONObject().apply {
+            put("model", "mistral-small-latest")
+            put("messages", JSONArray().apply {
+                put(JSONObject().put("role", "system").put("content", systemPrompt))
+                put(JSONObject().put("role", "user").put("content", "Generate 2 to 3 Predict the Output sets for: $promptText"))
+            })
+            put("max_tokens", 800)
+            put("temperature", 0.3)
+        }
+
+        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+        val responseCode = conn.responseCode
+        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
+        val responseText = stream.bufferedReader().use { it.readText() }
+
+        if (responseCode in 200..299) {
+            val json = JSONObject(responseText)
+            val content = json.getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
+                .trim()
+
+            val cleanJson = content
+                .replace(Regex("^```(?:json)?\\s*"), "")
+                .replace(Regex("\\s*```$"), "")
+                .trim()
+
+            val arr = JSONArray(cleanJson)
+            val list = mutableListOf<PredictOutputItem>()
+            for (i in 0 until arr.length()) {
+                val obj = arr.getJSONObject(i)
+                val title = obj.optString("title", "").trim()
+                val topic = obj.optString("topic", "Output Tracing").trim()
+                val count = obj.optString("questionCount", "10 Questions").trim()
+                val diff = obj.optString("difficulty", "Medium").trim()
+                val snippet = obj.optString("codeSnippet", getSnippetForTopic(topic)).trim()
+                if (title.isNotBlank()) {
+                    list.add(
+                        PredictOutputItem(
+                            setNumber = startSetIndex + i + 1,
+                            title = title,
+                            topic = topic,
+                            questionCount = count,
+                            difficulty = diff,
+                            codeSnippet = snippet,
+                            source = QuestionSource.AI
+                        )
+                    )
+                }
+            }
+            if (list.isNotEmpty()) list else getFallbackPredictOutput(promptText, startSetIndex)
+        } else {
+            getFallbackPredictOutput(promptText, startSetIndex)
+        }
+    } catch (_: Exception) {
+        getFallbackPredictOutput(promptText, startSetIndex)
+    }
+}
+
+private fun getFallbackPredictOutput(prompt: String, startSetIndex: Int): List<PredictOutputItem> {
+    val clean = prompt.trim()
+    val lower = clean.lowercase()
+    val s1 = startSetIndex + 1
+    val s2 = startSetIndex + 2
+    return when {
+        lower.contains("loop") -> listOf(
+            PredictOutputItem(s1, "Accumulator & Modulo Loops", "Loops", "10 Questions", "Easy", "int s = 0;\nfor (int i = 1; i <= 5; i += 2) {\n    s += i * 2;\n}\nSystem.out.println(s);", QuestionSource.AI),
+            PredictOutputItem(s2, "Nested While-Loop Conditions", "Nested Loops", "12 Questions", "Medium", "int a = 1, b = 4;\nwhile (a < b) {\n    System.out.print(a + \":\" + b + \" \");\n    a++; b--;\n}", QuestionSource.AI)
+        )
+        lower.contains("string") -> listOf(
+            PredictOutputItem(s1, "String Substring & Character Tracing", "Strings", "12 Questions", "Easy", "String s = \"ANTIGRAVITY\";\nSystem.out.println(s.substring(4, 9));\nSystem.out.println(s.charAt(2));", QuestionSource.AI),
+            PredictOutputItem(s2, "String Concat & Index Search", "Strings", "15 Questions", "Medium", "String s = \"MISSISSIPPI\";\nint idx = s.indexOf(\"IS\");\nSystem.out.println(idx + \" \" + s.lastIndexOf('P'));", QuestionSource.AI)
+        )
+        lower.contains("op") || lower.contains("increment") || lower.contains("decrement") -> listOf(
+            PredictOutputItem(s1, "Prefix & Postfix Increment Arithmetic", "Operators", "10 Questions", "Easy", "int a = 4;\nint b = ++a * 3 + a--;\nSystem.out.println(\"a=\" + a + \", b=\" + b);", QuestionSource.AI),
+            PredictOutputItem(s2, "Ternary & Bitwise Evaluation", "Operators", "12 Questions", "Medium", "int x = 10, y = 20;\nint r = (x > 5 && y < 25) ? x ^ y : x & y;\nSystem.out.println(r);", QuestionSource.AI)
+        )
+        lower.contains("array") -> listOf(
+            PredictOutputItem(s1, "Array Traversal & Cumulative Sum", "Arrays", "10 Questions", "Easy", "int[] a = {3, 1, 4, 1, 5};\nint sum = 0;\nfor(int v : a) sum += v;\nSystem.out.println(sum);", QuestionSource.AI),
+            PredictOutputItem(s2, "2D Array Row-Major Scan", "Arrays", "12 Questions", "Medium", "int[][] m = {{1, 2}, {3, 4}};\nSystem.out.println(m[1][0] * m[0][1]);", QuestionSource.AI)
+        )
+        lower.contains("rec") -> listOf(
+            PredictOutputItem(s1, "Recursive Decrement Tracing", "Recursion", "8 Questions", "Medium", "int fun(int n) {\n    if (n <= 1) return 1;\n    return n * fun(n - 1);\n}\nSystem.out.println(fun(4));", QuestionSource.AI),
+            PredictOutputItem(s2, "Branching Recursion Output", "Recursion", "10 Questions", "Hard", "void p(int x) {\n    if (x <= 0) return;\n    p(x - 1);\n    System.out.print(x + \" \");\n}\np(3);", QuestionSource.AI)
+        )
+        else -> listOf(
+            PredictOutputItem(s1, "$clean: Basic Output Tracing", "Custom Logic", "10 Questions", "Medium", getSnippetForTopic(clean), QuestionSource.AI),
+            PredictOutputItem(s2, "$clean: Advanced Output Tracing", "Custom Logic", "12 Questions", "Hard", "// Output tracing for $clean\nint x = 7;\nSystem.out.println((x << 1) + (x >> 1));", QuestionSource.AI)
         )
     }
 }
