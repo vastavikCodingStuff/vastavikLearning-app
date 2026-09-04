@@ -206,29 +206,72 @@ fun ProfileScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    // Avatar with brutal border
-                                    Box(
-                                        modifier = Modifier
-                                            .size(84.dp)
-                                            .clip(RoundedCornerShape(20.dp))
-                                            .background(Color.White)
-                                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp))
-                                            .padding(4.dp),
-                                        contentAlignment = Alignment.Center
+                                    // Avatar with brutal border and Peer Chat button on the right
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
+                                        // Left spacer to keep avatar centered
+                                        Spacer(modifier = Modifier.size(54.dp))
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        // Student Icon (square avatar)
                                         Box(
                                             modifier = Modifier
-                                                .fillMaxSize()
-                                                .clip(RoundedCornerShape(16.dp))
-                                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                                .size(84.dp)
+                                                .clip(RoundedCornerShape(20.dp))
+                                                .background(Color.White)
+                                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp))
+                                                .padding(4.dp),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Icon(
-                                                Icons.Filled.Person,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.size(40.dp)
-                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(RoundedCornerShape(16.dp))
+                                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.Person,
+                                                    contentDescription = null,
+                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.size(40.dp)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        // Peer Chat button on the right
+                                        Box(
+                                            modifier = Modifier
+                                                .size(54.dp)
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(Color(0xFF2AABEE))
+                                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
+                                                .clickable { onNavigate("peer_chat") },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.Forum,
+                                                    contentDescription = "Peer Chat",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(22.dp)
+                                                )
+                                                Spacer(modifier = Modifier.height(2.dp))
+                                                Text(
+                                                    text = "Chat",
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = Color.White
+                                                )
+                                            }
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(12.dp))

@@ -13,6 +13,7 @@ import com.vastavik.computer.ui.screens.auth.SignupScreen
 import com.vastavik.computer.ui.screens.auth.SecurityCheckScreen
 import com.vastavik.computer.ui.screens.auth.SplashScreen
 import com.vastavik.computer.ui.screens.chat.ChatScreen
+import com.vastavik.computer.ui.screens.chat.PeerChatScreen
 import com.vastavik.computer.ui.screens.home.ComingSoonScreen
 import com.vastavik.computer.ui.screens.home.HomeScreen
 import com.vastavik.computer.ui.screens.learning.LearningPathScreen
@@ -128,6 +129,9 @@ fun AppNavHost(
             ChatScreen(onNavigate = { route ->
                 navController.navigate(route)
             })
+        }
+        composable("peer_chat") {
+            PeerChatScreen(onBack = { navController.popBackStack() })
         }
         composable("profile") {
             ProfileScreen(onNavigate = { route ->

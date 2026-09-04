@@ -189,6 +189,20 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.19",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.19/app-v1.0.19-debug.apk",
+                releaseTitle = "v1.0.19 - Swipe-to-Dismiss Update Banner & Peer Chat in Student Info",
+                changelog = """
+### What's New in this Release:
+- **Swipe-to-Dismiss Update Banner**: In-app floating update notification banner can now be swiped away left or right, mimicking system notification behavior with smooth physics.
+- **Peer Chat on Student Info Page**: Added a dedicated square Peer Chat button directly to the right of the square Student Icon avatar on the Student Info page.
+- **Dedicated Peer Chat Screen**: Tapping the Peer Chat button opens a dedicated Peer Community Chat view with full Socket.IO messaging and reply capabilities.
+                """.trimIndent(),
+                apkSize = 71413641L,
+                publishedAt = "2026-09-04T03:20:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.19", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.18",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.18/app-v1.0.18-debug.apk",
                 releaseTitle = "v1.0.18 - AI Chat Image Attachments & Clean Header",

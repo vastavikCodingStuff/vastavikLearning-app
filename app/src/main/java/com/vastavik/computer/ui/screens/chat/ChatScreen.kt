@@ -1143,10 +1143,10 @@ private fun highlightCode(code: String, language: String) = buildAnnotatedString
 }
 
 @Composable
-private fun StudentPeerChatView(
+fun StudentPeerChatView(
     modifier: Modifier = Modifier,
-    bb: Color,
-    bs: Color
+    bb: Color = brutalBorderColor(),
+    bs: Color = brutalShadowColor()
 ) {
     val messages by StudentConversationManager.messages.collectAsState()
     val typingStudents by StudentConversationManager.typingStudents.collectAsState()
@@ -1347,7 +1347,7 @@ private fun StudentPeerChatView(
 }
 
 @Composable
-private fun StudentPeerChatBubble(
+fun StudentPeerChatBubble(
     msg: StudentChatMessage,
     isMe: Boolean,
     bb: Color,

@@ -1,7 +1,9 @@
 package com.vastavik.computer.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -10,6 +12,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,10 +24,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.brutalBorderColor
@@ -32,7 +39,10 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 import com.vastavik.computer.utils.TelegramBannerData
 import com.vastavik.computer.utils.TelegramBannerType
 import com.vastavik.computer.utils.TelegramNotificationManager
+import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val TelegramBlue = Color(0xFF2AABEE)
 
@@ -80,12 +90,46 @@ fun TelegramNotificationCard(
 ) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
+    val offsetX = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val dismissThreshold = with(density) { 90.dp.toPx() }
+
+    LaunchedEffect(banner.id) {
+        offsetX.snapTo(0f)
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp)
             .padding(end = 4.dp, bottom = 4.dp)
+            .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+            .alpha((1f - (abs(offsetX.value) / (dismissThreshold * 2.2f))).coerceIn(0f, 1f))
+            .pointerInput(banner.id) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        coroutineScope.launch {
+                            if (abs(offsetX.value) > dismissThreshold) {
+                                val target = if (offsetX.value > 0) size.width.toFloat() else -size.width.toFloat()
+                                offsetX.animateTo(target, tween(200))
+                                onDismiss()
+                            } else {
+                                offsetX.animateTo(0f, spring(dampingRatio = 0.8f, stiffness = 400f))
+                            }
+                        }
+                    },
+                    onDragCancel = {
+                        coroutineScope.launch { offsetX.animateTo(0f) }
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        coroutineScope.launch {
+                            offsetX.snapTo(offsetX.value + dragAmount)
+                        }
+                    }
+                )
+            }
     ) {
         // Neo-brutalist shadow offset
         Box(
