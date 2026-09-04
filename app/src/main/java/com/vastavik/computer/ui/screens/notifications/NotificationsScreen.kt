@@ -105,6 +105,47 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
             ) {
                 items(displayItems, key = { it.id }) { n ->
                     val isUpdate = n.type == "update"
+                    val isPaymentDue = n.type == "expiry" || n.title.contains("Payment due", ignoreCase = true)
+
+                    val cardColor = when {
+                        isUpdate -> Color(0xFF2563EB) // Blue for update
+                        isPaymentDue -> Color(0xFFDC2626) // Red for payment due
+                        else -> MaterialTheme.colorScheme.surface
+                    }
+
+                    val titleColor = when {
+                        isUpdate || isPaymentDue -> Color.White
+                        else -> MaterialTheme.colorScheme.onSurface
+                    }
+
+                    val bodyColor = when {
+                        isUpdate || isPaymentDue -> Color.White.copy(alpha = 0.92f)
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+
+                    val timeColor = when {
+                        isUpdate || isPaymentDue -> Color.White.copy(alpha = 0.75f)
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    }
+
+                    val iconBg = when {
+                        isUpdate || isPaymentDue -> Color.White
+                        n.unread -> MaterialTheme.colorScheme.primary
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    }
+
+                    val iconTint = when {
+                        isUpdate -> Color(0xFF2563EB)
+                        isPaymentDue -> Color(0xFFDC2626)
+                        else -> Color.White
+                    }
+
+                    val cardBorder = when {
+                        isUpdate || isPaymentDue -> BorderStroke(2.dp, bb)
+                        n.unread -> BorderStroke(1.5.dp, bb)
+                        else -> BorderStroke(1.5.dp, bb.copy(alpha = 0.3f))
+                    }
+
                     Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
                         Box(
                             modifier = Modifier
@@ -116,19 +157,16 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                         Surface(
                             onClick = {
                                 items = items.map { if (it.id == n.id) it.copy(unread = false) else it }
-                                when (n.type) {
-                                    "promo" -> onNavigate("payment")
-                                    "update" -> onNavigate("app_update")
-                                    "new_lesson" -> onNavigate("video_lesson/1/1/1/1")
+                                when {
+                                    isUpdate -> onNavigate("app_update")
+                                    isPaymentDue || n.type == "promo" -> onNavigate("payment")
+                                    n.type == "new_lesson" -> onNavigate("video_lesson/1/1/1/1")
                                     else -> {}
                                 }
                             },
                             shape = RoundedCornerShape(16.dp),
-                            color = if (isUpdate) Color(0xFF2563EB).copy(alpha = 0.06f) else MaterialTheme.colorScheme.surface,
-                            border = BorderStroke(
-                                if (isUpdate) 2.dp else 1.5.dp,
-                                if (isUpdate) Color(0xFF2563EB) else if (n.unread) bb else bb.copy(alpha = 0.3f)
-                            )
+                            color = cardColor,
+                            border = cardBorder
                         ) {
                             Row(
                                 Modifier
@@ -140,18 +178,18 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                     Modifier
                                         .size(42.dp)
                                         .clip(CircleShape)
-                                        .background(
-                                            if (isUpdate) Color(0xFF2563EB)
-                                            else if (n.unread) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
+                                        .background(iconBg)
                                         .border(BorderStroke(1.5.dp, bb), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        if (isUpdate) Icons.Filled.SystemUpdate else Icons.Filled.Notifications,
+                                        when {
+                                            isUpdate -> Icons.Filled.SystemUpdate
+                                            isPaymentDue -> Icons.Filled.Payment
+                                            else -> Icons.Filled.Notifications
+                                        },
                                         contentDescription = null,
-                                        tint = Color.White,
+                                        tint = iconTint,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -163,16 +201,25 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                             fontWeight = FontWeight.ExtraBold,
                                             fontSize = 14.sp,
                                             modifier = Modifier.weight(1f),
-                                            color = MaterialTheme.colorScheme.onSurface
+                                            color = titleColor
                                         )
                                         if (isUpdate) {
                                             Box(
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(4.dp))
-                                                    .background(Color(0xFF2563EB))
+                                                    .background(Color.White)
                                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                                             ) {
-                                                Text("UPDATE", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                                                Text("UPDATE", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF2563EB))
+                                            }
+                                        } else if (isPaymentDue) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(4.dp))
+                                                    .background(Color.White)
+                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                            ) {
+                                                Text("DUE SOON", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFFDC2626))
                                             }
                                         } else if (n.unread) {
                                             Box(
@@ -188,14 +235,14 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                         n.body,
                                         fontSize = 13.sp,
                                         lineHeight = 18.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = bodyColor
                                     )
                                     Spacer(Modifier.height(6.dp))
                                     Text(
                                         n.time,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                        color = timeColor
                                     )
                                 }
                             }
