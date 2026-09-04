@@ -6,6 +6,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -13,12 +14,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +36,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontFamily
@@ -43,6 +47,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
 import com.vastavik.computer.ui.theme.neoShape
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
@@ -59,7 +64,7 @@ import com.vastavik.computer.data.realtime.StudentConversationManager
 import com.vastavik.computer.data.realtime.StudentChatMessage
 import com.vastavik.computer.data.realtime.ConnectionState
 
-data class ChatMessage(val text: String, val isUser: Boolean)
+data class ChatMessage(val text: String, val isUser: Boolean, val images: List<Uri> = emptyList())
 
 private const val SYSTEM_PROMPT = """You are Vastavik AI, a friendly programming tutor for Indian school students (Class 5-12, CBSE/ICSE boards). You help students learn Java, Python, JavaScript, and SQL.
 
@@ -123,6 +128,14 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     val messages by viewModel.messages.collectAsState()
     var inputText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var attachedImages by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            attachedImages = attachedImages + uris
+        }
+    }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -250,59 +263,6 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 .padding(padding)
                 .imePadding()
         ) {
-            var selectedChatTab by remember { mutableStateOf(0) }
-
-            // Mode Selector: AI Tutor vs Student Peer Chat (Socket.IO)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (selectedChatTab == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
-                        .clickable { selectedChatTab = 0 }
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.SmartToy, contentDescription = null, tint = if (selectedChatTab == 0) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text("AI Tutor", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = if (selectedChatTab == 0) Color.White else MaterialTheme.colorScheme.onSurface)
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (selectedChatTab == 1) Color(0xFF2AABEE) else MaterialTheme.colorScheme.surface)
-                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
-                        .clickable { selectedChatTab = 1 }
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Group, contentDescription = null, tint = if (selectedChatTab == 1) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text("Peer Chat (Socket.IO)", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = if (selectedChatTab == 1) Color.White else MaterialTheme.colorScheme.onSurface)
-                    }
-                }
-            }
-
-            if (selectedChatTab == 1) {
-                StudentPeerChatView(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    bb = bb,
-                    bs = bs
-                )
-            } else {
             // Top bar with "Vastavik AI Mistral Small" + New button
             Row(
                 modifier = Modifier
@@ -454,77 +414,160 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     shadowElevation = 0.dp,
                     border = BorderStroke(2.dp, bb)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 12.dp, vertical = 14.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = inputText,
-                            onValueChange = { inputText = it },
-                            placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                            trailingIcon = {
-                                if (inputText.isEmpty()) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Attached Images Preview Row
+                        if (attachedImages.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                attachedImages.forEach { uri ->
                                     Box(
                                         modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(CircleShape)
-                                            .background(MaterialTheme.colorScheme.primary)
-                                            .border(BorderStroke(1.5.dp, bb), CircleShape)
-                                            .clickable { isVoiceMode = true },
-                                        contentAlignment = Alignment.Center
+                                            .size(60.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
                                     ) {
-                                        Icon(
-                                            Icons.Filled.Mic,
-                                            contentDescription = "Voice input",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(18.dp)
+                                        AsyncImage(
+                                            model = uri,
+                                            contentDescription = "Attached image",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
                                         )
+                                        Box(
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .size(20.dp)
+                                                .clip(CircleShape)
+                                                .background(Color.Black.copy(alpha = 0.7f))
+                                                .clickable {
+                                                    attachedImages = attachedImages - uri
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.Close,
+                                                contentDescription = "Remove",
+                                                tint = Color.White,
+                                                modifier = Modifier.size(12.dp)
+                                            )
+                                        }
                                     }
                                 }
-                            },
+                            }
+                        }
+
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .heightIn(min = 42.dp, max = 130.dp),
-                            shape = RoundedCornerShape(50.dp),
-                            singleLine = false,
-                            maxLines = 4,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = bb,
-                                unfocusedBorderColor = bb,
-                                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                            )
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        FilledIconButton(
-                            onClick = {
-                                if (inputText.isNotBlank() && !isLoading) {
-                                    val userText = inputText.trim()
-                                    viewModel.addMessage(ChatMessage(userText, isUser = true))
-                                    inputText = ""
-                                    isLoading = true
-                                    coroutineScope.launch {
-                                        try {
-                                            listState.animateScrollToItem(messages.lastIndex + 1)
-                                            val resp = askMistral(userText)
-                                            viewModel.addMessage(ChatMessage(resp, isUser = false))
-                                            listState.animateScrollToItem(messages.lastIndex)
-                                        } finally { isLoading = false }
-                                    }
-                                }
-                            },
-                            enabled = inputText.isNotBlank() && !isLoading,
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
+                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White)
+                            OutlinedTextField(
+                                value = inputText,
+                                onValueChange = { inputText = it },
+                                placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                                trailingIcon = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(end = 4.dp)
+                                    ) {
+                                        // While typing the Mic icon is removed!
+                                        if (inputText.isEmpty()) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(34.dp)
+                                                    .clip(CircleShape)
+                                                    .background(MaterialTheme.colorScheme.primary)
+                                                    .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                                    .clickable { isVoiceMode = true },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.Mic,
+                                                    contentDescription = "Voice input",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(17.dp)
+                                                )
+                                            }
+                                            Spacer(Modifier.width(6.dp))
+                                        }
+
+                                        // Attachment icon stays on the right of the mic button
+                                        Box(
+                                            modifier = Modifier
+                                                .size(34.dp)
+                                                .clip(CircleShape)
+                                                .background(if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                                .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                                .clickable {
+                                                    imagePickerLauncher.launch(
+                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                                    )
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.AttachFile,
+                                                contentDescription = "Attach image",
+                                                tint = if (attachedImages.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .heightIn(min = 42.dp, max = 130.dp),
+                                shape = RoundedCornerShape(50.dp),
+                                singleLine = false,
+                                maxLines = 4,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = bb,
+                                    unfocusedBorderColor = bb,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                                )
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            FilledIconButton(
+                                onClick = {
+                                    if ((inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading) {
+                                        val userText = inputText.trim()
+                                        val sendingImages = attachedImages.toList()
+                                        viewModel.addMessage(ChatMessage(userText, isUser = true, images = sendingImages))
+                                        inputText = ""
+                                        attachedImages = emptyList()
+                                        isLoading = true
+                                        coroutineScope.launch {
+                                            try {
+                                                listState.animateScrollToItem(messages.lastIndex + 1)
+                                                val promptWithContext = if (sendingImages.isNotEmpty()) {
+                                                    if (userText.isNotBlank()) "$userText\n[User attached ${sendingImages.size} image(s)]"
+                                                    else "Please analyze the attached image(s)."
+                                                } else {
+                                                    userText
+                                                }
+                                                val resp = askMistral(promptWithContext)
+                                                viewModel.addMessage(ChatMessage(resp, isUser = false))
+                                                listState.animateScrollToItem(messages.lastIndex)
+                                            } finally { isLoading = false }
+                                        }
+                                    }
+                                },
+                                enabled = (inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading,
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White)
+                            }
                         }
                     }
                 }
-            }
             }
         }
     }
@@ -563,16 +606,36 @@ private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
             shadowElevation = 0.dp,
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            if (message.isUser) {
-                Text(
-                    text = message.text,
-                    modifier = Modifier.padding(12.dp),
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
-            } else {
-                ParsedMarkdownText(text = message.text, modifier = Modifier, onNavigate = onNavigate)
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                if (message.images.isNotEmpty()) {
+                    message.images.forEach { uri ->
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Attached image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(8.dp))
+                                .padding(bottom = if (message.text.isNotBlank()) 6.dp else 0.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+                if (message.isUser) {
+                    if (message.text.isNotBlank()) {
+                        Text(
+                            text = message.text,
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp
+                        )
+                    }
+                } else {
+                    ParsedMarkdownText(text = message.text, modifier = Modifier, onNavigate = onNavigate)
+                }
             }
         }
         if (message.isUser) {

@@ -189,6 +189,21 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.18",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.18/app-v1.0.18-debug.apk",
+                releaseTitle = "v1.0.18 - AI Chat Image Attachments & Clean Header",
+                changelog = """
+### What's New in this Release:
+- **Clean AI Chat Header**: Removed the bulky AI Tutor / Peer Chat mode selector bar from the top for a sleek, streamlined chat interface.
+- **Image Attachment in Prompt Box**: Added an attachment icon to the right of the mic button that launches the Google Photo Picker to attach images to questions.
+- **Dynamic Typing Controls**: The mic icon is automatically hidden while typing, while the attachment icon remains persistently accessible.
+- **Attached Images Preview & Rendering**: Display thumbnail previews with remove buttons above the input field, and render images within user chat bubbles.
+                """.trimIndent(),
+                apkSize = 71397257L,
+                publishedAt = "2026-09-04T03:10:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.18", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.17",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.17/app-v1.0.17-debug.apk",
                 releaseTitle = "v1.0.17 - Notification Icon Visibility in Expanded View",
