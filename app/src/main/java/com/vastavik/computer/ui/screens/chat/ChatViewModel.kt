@@ -23,6 +23,16 @@ class ChatViewModel : ViewModel() {
         )
     }
 
+    fun setMessages(list: List<ChatMessage>) {
+        _messages.value = if (list.isEmpty()) {
+            listOf(
+                ChatMessage("Hello! I am Vastavik AI. Ask me anything about Java, Python, JavaScript, or SQL for Class 5-12!", isUser = false)
+            )
+        } else {
+            list
+        }
+    }
+
     companion object {
         private var instance: ChatViewModel? = null
         fun getInstance(): ChatViewModel {

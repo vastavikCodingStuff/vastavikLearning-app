@@ -8,7 +8,14 @@ import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import com.vastavik.computer.ui.theme.RobotoSlabFontFamily
+import java.util.UUID
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -146,6 +153,11 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     var partialTranscript by remember { mutableStateOf("") }
     var speechRecognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
 
+    // Sidebar state
+    var showSidebar by remember { mutableStateOf(false) }
+    var conversations by remember { mutableStateOf(AiConversationCache.loadConversations(context)) }
+    var activeConversationId by remember { mutableStateOf(AiConversationCache.getActiveConversationId(context) ?: UUID.randomUUID().toString()) }
+
     DisposableEffect(Unit) {
         onDispose {
             speechRecognizer?.destroy()
@@ -257,321 +269,488 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .imePadding()
         ) {
-            // Top bar with "Vastavik AI Mistral Small" + New button
-            Row(
+            // Main chat content with swipe gesture to open sidebar
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Filled.SmartToy, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Vastavik", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                Text("AI", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                Spacer(Modifier.width(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(50.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(1.dp, bb)
-                ) {
-                    Text(
-                        "Mistral Small",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primary)
-                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
-                        .clickable { viewModel.clearMessages() }
-                        .padding(horizontal = 14.dp, vertical = 8.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("New", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    .fillMaxSize()
+                    .imePadding()
+                    .pointerInput(showSidebar) {
+                        detectHorizontalDragGestures { _, dragAmount ->
+                            if (dragAmount < -40f) showSidebar = true
+                            if (dragAmount > 40f) showSidebar = false
+                        }
                     }
-                }
-            }
-
-            // Suggestion chips
-            LazyRow(
-                modifier = Modifier.padding(vertical = 8.dp),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listOf(
-                    "Explain Code" to "Explain this Java code for Class 8: public class Hello { public static void main(String[] args){ System.out.println(\"hi\"); } }",
-                    "Generate Quiz" to "Generate 3 MCQs about Python loops for Class 7 with 4 options each.",
-                    "Find Bug" to "Help me find bug in this Python: for i in range(5) print(i)"
-                )) { (label, prompt) ->
+                // Top bar with "Vastavik AI Mistral Small" + New button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Filled.SmartToy, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Vastavik", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                    Text("AI", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                    Spacer(Modifier.width(8.dp))
                     Surface(
-                        onClick = {
-                            if (!isLoading) {
-                                viewModel.addMessage(ChatMessage(prompt, isUser = true))
-                                isLoading = true
-                                coroutineScope.launch {
-                                    listState.animateScrollToItem(messages.lastIndex + 1)
-                                    val resp = askMistral(prompt)
-                                    viewModel.addMessage(ChatMessage(resp, isUser = false))
-                                    isLoading = false
-                                    listState.animateScrollToItem(messages.lastIndex)
-                                }
-                            }
-                        },
                         shape = RoundedCornerShape(50.dp),
-                        color = MaterialTheme.colorScheme.surface,
-                        border = BorderStroke(2.dp, bb),
-                        shadowElevation = 0.dp
+                        color = Color(0xFF2563EB),
+                        border = BorderStroke(1.dp, bb)
                     ) {
                         Text(
-                            label,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                            "Mistral Small",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
                         )
                     }
-                }
-            }
-
-            // Messages
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                items(messages) { message -> ChatBubbleRow(message, onNavigate) }
-                if (isLoading) {
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.primary),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Filled.SmartToy, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                            }
-                            Spacer(Modifier.width(8.dp))
-                            Surface(
-                                shape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 4.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            ) {
-                                Row(modifier = Modifier.padding(14.dp)) {
-                                    CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("Thinking\u2026", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.weight(1f))
+                    // History icon to open sidebar
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .border(BorderStroke(1.5.dp, bb), CircleShape)
+                            .clickable { showSidebar = !showSidebar }
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Filled.History, contentDescription = "Conversations", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.primary)
+                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
+                            .clickable {
+                                // Save current conversation before clearing
+                                if (messages.isNotEmpty()) {
+                                    val conv = AiConversation(
+                                        id = activeConversationId,
+                                        title = messages.firstOrNull { it.isUser }?.text?.take(40) ?: "New Chat",
+                                        messages = messages.map { ChatMessageData(it.text, it.isUser) },
+                                        updatedAt = System.currentTimeMillis()
+                                    )
+                                    AiConversationCache.saveConversation(context, conv)
+                                    conversations = AiConversationCache.loadConversations(context)
                                 }
+                                activeConversationId = UUID.randomUUID().toString()
+                                viewModel.clearMessages()
                             }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("New", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
                 }
-            }
 
-            // Voice Input Overlay
-            if (isVoiceMode) {
-                VoiceInputOverlay(
-                    isListening = isListening,
-                    partialTranscript = partialTranscript,
-                    amplitude = if (isListening) 0.5f + 0.5f * kotlin.math.sin(System.currentTimeMillis() / 100.0).toFloat() else 0f,
-                    onConfirm = {
-                        if (partialTranscript.isNotEmpty()) {
-                            sendToAI(partialTranscript)
-                        }
-                        isVoiceMode = false
-                    },
-                    onCancel = {
-                        isVoiceMode = false
-                    }
-                )
-            }
-
-            // Input area - hidden when voice mode is active
-            if (!isVoiceMode) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 0.dp,
-                    border = BorderStroke(2.dp, bb)
+                // Suggestion chips
+                LazyRow(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        // Attached Images Preview Row
-                        if (attachedImages.isNotEmpty()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 14.dp, vertical = 8.dp)
-                                    .horizontalScroll(rememberScrollState()),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                attachedImages.forEach { uri ->
-                                    Box(
-                                        modifier = Modifier
-                                            .size(60.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
-                                    ) {
-                                        AsyncImage(
-                                            model = uri,
-                                            contentDescription = "Attached image",
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
+                    items(listOf(
+                        "Explain Code" to "Explain this Java code for Class 8: public class Hello { public static void main(String[] args){ System.out.println(\"hi\"); } }",
+                        "Generate Quiz" to "Generate 3 MCQs about Python loops for Class 7 with 4 options each.",
+                        "Find Bug" to "Help me find bug in this Python: for i in range(5) print(i)"
+                    )) { (label, prompt) ->
+                        Surface(
+                            onClick = {
+                                if (!isLoading) {
+                                    viewModel.addMessage(ChatMessage(prompt, isUser = true))
+                                    isLoading = true
+                                    coroutineScope.launch {
+                                        listState.animateScrollToItem(messages.lastIndex + 1)
+                                        val resp = askMistral(prompt)
+                                        viewModel.addMessage(ChatMessage(resp, isUser = false))
+                                        isLoading = false
+                                        listState.animateScrollToItem(messages.lastIndex)
+                                        // Save after AI response
+                                        val updatedMsgs = messages + ChatMessage(resp, isUser = false)
+                                        val conv = AiConversation(
+                                            id = activeConversationId,
+                                            title = updatedMsgs.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
+                                            messages = updatedMsgs.map { ChatMessageData(it.text, it.isUser) },
+                                            updatedAt = System.currentTimeMillis()
                                         )
-                                        Box(
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .size(20.dp)
-                                                .clip(CircleShape)
-                                                .background(Color.Black.copy(alpha = 0.7f))
-                                                .clickable {
-                                                    attachedImages = attachedImages - uri
-                                                },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                Icons.Filled.Close,
-                                                contentDescription = "Remove",
-                                                tint = Color.White,
-                                                modifier = Modifier.size(12.dp)
-                                            )
-                                        }
+                                        AiConversationCache.saveConversation(context, conv)
+                                        AiConversationSyncManager.syncConversationToServer(conv)
+                                        conversations = AiConversationCache.loadConversations(context)
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(50.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(2.dp, bb),
+                            shadowElevation = 0.dp
+                        ) {
+                            Text(
+                                label,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                }
+
+                // Messages
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(messages) { message -> ChatBubbleRow(message, onNavigate) }
+                    if (isLoading) {
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.SmartToy, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 4.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Row(modifier = Modifier.padding(14.dp)) {
+                                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
+                                        Spacer(Modifier.width(8.dp))
+                                        Text("Thinking…", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                 }
                             }
                         }
+                    }
+                }
 
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp, vertical = 10.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = inputText,
-                                onValueChange = { inputText = it },
-                                placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                                trailingIcon = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(end = 4.dp)
-                                    ) {
-                                        // While typing the Mic icon is removed!
-                                        if (inputText.isEmpty()) {
+                // Voice Input Overlay
+                if (isVoiceMode) {
+                    VoiceInputOverlay(
+                        isListening = isListening,
+                        partialTranscript = partialTranscript,
+                        amplitude = if (isListening) 0.5f + 0.5f * kotlin.math.sin(System.currentTimeMillis() / 100.0).toFloat() else 0f,
+                        onConfirm = {
+                            if (partialTranscript.isNotEmpty()) {
+                                sendToAI(partialTranscript)
+                            }
+                            isVoiceMode = false
+                        },
+                        onCancel = {
+                            isVoiceMode = false
+                        }
+                    )
+                }
+
+                // Input area - hidden when voice mode is active
+                if (!isVoiceMode) {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.surface,
+                        shadowElevation = 0.dp,
+                        border = BorderStroke(2.dp, bb)
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            // Attached Images Preview Row
+                            if (attachedImages.isNotEmpty()) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                                        .horizontalScroll(rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    attachedImages.forEach { uri ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(60.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
+                                        ) {
+                                            AsyncImage(
+                                                model = uri,
+                                                contentDescription = "Attached image",
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .size(20.dp)
+                                                    .clip(CircleShape)
+                                                    .background(Color.Black.copy(alpha = 0.7f))
+                                                    .clickable {
+                                                        attachedImages = attachedImages - uri
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.Close,
+                                                    contentDescription = "Remove",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                OutlinedTextField(
+                                    value = inputText,
+                                    onValueChange = { inputText = it },
+                                    placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                                    trailingIcon = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(end = 4.dp)
+                                        ) {
+                                            // While typing the Mic icon is removed!
+                                            if (inputText.isEmpty()) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(34.dp)
+                                                        .clip(CircleShape)
+                                                        .background(MaterialTheme.colorScheme.primary)
+                                                        .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                                        .clickable { isVoiceMode = true },
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.Mic,
+                                                        contentDescription = "Voice input",
+                                                        tint = Color.White,
+                                                        modifier = Modifier.size(17.dp)
+                                                    )
+                                                }
+                                                Spacer(Modifier.width(6.dp))
+                                            }
+
+                                            // Attachment icon stays on the right of the mic button
                                             Box(
                                                 modifier = Modifier
                                                     .size(34.dp)
                                                     .clip(CircleShape)
-                                                    .background(MaterialTheme.colorScheme.primary)
+                                                    .background(if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                                                     .border(BorderStroke(1.5.dp, bb), CircleShape)
-                                                    .clickable { isVoiceMode = true },
+                                                    .clickable {
+                                                        imagePickerLauncher.launch(
+                                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                                        )
+                                                    },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
-                                                    Icons.Filled.Mic,
-                                                    contentDescription = "Voice input",
-                                                    tint = Color.White,
-                                                    modifier = Modifier.size(17.dp)
+                                                    Icons.Filled.AttachFile,
+                                                    contentDescription = "Attach image",
+                                                    tint = if (attachedImages.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.size(18.dp)
                                                 )
                                             }
-                                            Spacer(Modifier.width(6.dp))
                                         }
-
-                                        // Attachment icon stays on the right of the mic button
-                                        Box(
-                                            modifier = Modifier
-                                                .size(34.dp)
-                                                .clip(CircleShape)
-                                                .background(if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-                                                .border(BorderStroke(1.5.dp, bb), CircleShape)
-                                                .clickable {
-                                                    imagePickerLauncher.launch(
-                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(min = 42.dp, max = 130.dp),
+                                    shape = RoundedCornerShape(50.dp),
+                                    singleLine = false,
+                                    maxLines = 4,
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = bb,
+                                        unfocusedBorderColor = bb,
+                                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                                    )
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                FilledIconButton(
+                                    onClick = {
+                                        if ((inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading) {
+                                            val userText = inputText.trim()
+                                            val sendingImages = attachedImages.toList()
+                                            viewModel.addMessage(ChatMessage(userText, isUser = true, images = sendingImages))
+                                            inputText = ""
+                                            attachedImages = emptyList()
+                                            isLoading = true
+                                            coroutineScope.launch {
+                                                try {
+                                                    listState.animateScrollToItem(messages.lastIndex + 1)
+                                                    val promptWithContext = if (sendingImages.isNotEmpty()) {
+                                                        if (userText.isNotBlank()) "$userText\n[User attached ${sendingImages.size} image(s)]"
+                                                        else "Please analyze the attached image(s)."
+                                                    } else {
+                                                        userText
+                                                    }
+                                                    val resp = askMistral(promptWithContext)
+                                                    viewModel.addMessage(ChatMessage(resp, isUser = false))
+                                                    listState.animateScrollToItem(messages.lastIndex)
+                                                    // Save conversation after AI response
+                                                    val conv = AiConversation(
+                                                        id = activeConversationId,
+                                                        title = messages.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
+                                                        messages = messages.map { ChatMessageData(it.text, it.isUser) },
+                                                        updatedAt = System.currentTimeMillis()
                                                     )
-                                                },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                Icons.Filled.AttachFile,
-                                                contentDescription = "Attach image",
-                                                tint = if (attachedImages.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.size(18.dp)
-                                            )
+                                                    AiConversationCache.saveConversation(context, conv)
+                                                    AiConversationSyncManager.syncConversationToServer(conv)
+                                                    conversations = AiConversationCache.loadConversations(context)
+                                                } finally { isLoading = false }
+                                            }
                                         }
-                                    }
-                                },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .heightIn(min = 42.dp, max = 130.dp),
-                                shape = RoundedCornerShape(50.dp),
-                                singleLine = false,
-                                maxLines = 4,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = bb,
-                                    unfocusedBorderColor = bb,
-                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                                )
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            FilledIconButton(
-                                onClick = {
-                                    if ((inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading) {
-                                        val userText = inputText.trim()
-                                        val sendingImages = attachedImages.toList()
-                                        viewModel.addMessage(ChatMessage(userText, isUser = true, images = sendingImages))
-                                        inputText = ""
-                                        attachedImages = emptyList()
-                                        isLoading = true
-                                        coroutineScope.launch {
-                                            try {
-                                                listState.animateScrollToItem(messages.lastIndex + 1)
-                                                val promptWithContext = if (sendingImages.isNotEmpty()) {
-                                                    if (userText.isNotBlank()) "$userText\n[User attached ${sendingImages.size} image(s)]"
-                                                    else "Please analyze the attached image(s)."
-                                                } else {
-                                                    userText
-                                                }
-                                                val resp = askMistral(promptWithContext)
-                                                viewModel.addMessage(ChatMessage(resp, isUser = false))
-                                                listState.animateScrollToItem(messages.lastIndex)
-                                            } finally { isLoading = false }
-                                        }
-                                    }
-                                },
-                                enabled = (inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading,
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White)
+                                    },
+                                    enabled = (inputText.isNotBlank() || attachedImages.isNotEmpty()) && !isLoading,
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary
+                                    )
+                                ) {
+                                    Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White)
+                                }
                             }
                         }
                     }
                 }
             }
+
+            // Sidebar overlay — 40% width, slides in from right
+            AnimatedVisibility(
+                visible = showSidebar,
+                modifier = Modifier.align(Alignment.CenterEnd),
+                enter = slideInHorizontally { it },
+                exit = slideOutHorizontally { it }
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.4f),
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 8.dp,
+                    border = BorderStroke(2.dp, bb)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Sidebar header
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Chats",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                Icons.Filled.Close,
+                                contentDescription = "Close",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clickable { showSidebar = false }
+                            )
+                        }
+                        // Conversation list
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(vertical = 4.dp)
+                        ) {
+                            items(conversations) { conv ->
+                                val isActive = conv.id == activeConversationId
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                            else Color.Transparent
+                                        )
+                                        .clickable {
+                                            // Save current before switching
+                                            if (messages.isNotEmpty() && activeConversationId != conv.id) {
+                                                val cur = AiConversation(
+                                                    id = activeConversationId,
+                                                    title = messages.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
+                                                    messages = messages.map { ChatMessageData(it.text, it.isUser) },
+                                                    updatedAt = System.currentTimeMillis()
+                                                )
+                                                AiConversationCache.saveConversation(context, cur)
+                                            }
+                                            // Load selected conversation
+                                            activeConversationId = conv.id
+                                            AiConversationCache.setActiveConversationId(context, conv.id)
+                                            viewModel.setMessages(conv.messages.map { ChatMessage(it.text, it.isUser) })
+                                            conversations = AiConversationCache.loadConversations(context)
+                                            showSidebar = false
+                                        }
+                                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = conv.title.ifBlank { "Chat" },
+                                        fontSize = 11.sp,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                                HorizontalDivider(thickness = 0.5.dp, color = bb.copy(alpha = 0.3f))
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Dim overlay when sidebar open
+            if (showSidebar) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.25f))
+                        .clickable { showSidebar = false }
+                        .align(Alignment.CenterStart)
+                        // Only cover the left 60%
+                        .fillMaxWidth(0.6f)
+                )
+            }
         }
     }
 }
+
 
 @Composable
 private fun ChatBubbleRow(message: ChatMessage, onNavigate: (String) -> Unit) {
@@ -1000,6 +1179,7 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 14.sp,
                             lineHeight = 20.sp,
+                            fontFamily = RobotoSlabFontFamily,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                         )
                     }
