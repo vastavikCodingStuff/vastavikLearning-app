@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.zIndex
 import com.vastavik.computer.ui.screens.onboarding.SettingsViewModel
 import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.brutalBorderColor
@@ -130,7 +131,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF059669))
+                                .background(Color(0xFF2563EB))
                                 .border(BorderStroke(1.5.dp, bb), CircleShape)
                                 .clickable { onNavigate("notifications") },
                             contentAlignment = Alignment.Center
@@ -150,6 +151,7 @@ fun ProfileScreen(
                                         .clip(CircleShape)
                                         .background(Color(0xFFFFD600))
                                         .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                                        .zIndex(2f)
                                 )
                             }
                         }
@@ -184,7 +186,7 @@ fun ProfileScreen(
                                     )
                                 )
                         ) {
-                            // Small chat chip pinned to the top-right of the gradient header in deep green
+                            // Small chat chip pinned to the top-right of the gradient header in blue
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -205,7 +207,7 @@ fun ProfileScreen(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(RoundedCornerShape(50.dp))
-                                            .background(Color(0xFF059669))
+                                            .background(Color(0xFF2563EB))
                                             .border(BorderStroke(1.5.dp, Color.White), RoundedCornerShape(50.dp))
                                             .clickable { onNavigate("peer_chat") },
                                         contentAlignment = Alignment.Center

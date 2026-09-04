@@ -70,6 +70,7 @@ class MainActivity : ComponentActivity() {
             AdminSession.init(this@MainActivity)
             AdminSession.update(FirebaseAuth.getInstance().currentUser)
             val isAdmin by AdminSession.isAdmin.collectAsState()
+            val isEngineLogsEnabled by AdminSession.isEngineLogsEnabled.collectAsState()
             DisposableEffect(isAdmin) {
                 if (isAdmin) {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -99,8 +100,8 @@ class MainActivity : ComponentActivity() {
                         onNavigate = { route -> navController.navigate(route) }
                     )
 
-                    // Admin-only floating debug banner showing Vastavik AI call logs
-                    if (isAdmin) {
+                    // Admin-only floating debug banner showing Vastavik AI call logs (can be toggled in Admin Dashboard)
+                    if (isAdmin && isEngineLogsEnabled) {
                         com.vastavik.computer.ui.components.DebugLogBoxOverlay(
                             modifier = Modifier
                                 .align(androidx.compose.ui.Alignment.BottomCenter)

@@ -136,6 +136,20 @@ object AiConversationCache {
         }
     }
 
+    fun deleteConversation(context: Context, id: String) {
+        try {
+            val existing = loadConversations(context).toMutableList()
+            existing.removeAll { it.id == id }
+            saveConversations(context, existing)
+            if (getActiveConversationId(context) == id) {
+                val newActive = existing.firstOrNull()?.id ?: UUID.randomUUID().toString()
+                setActiveConversationId(context, newActive)
+            }
+        } catch (e: Exception) {
+            Log.e("AiConversationCache", "Error deleting conversation: ${e.message}")
+        }
+    }
+
     fun getActiveConversationId(context: Context): String? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString(KEY_ACTIVE_ID, null)

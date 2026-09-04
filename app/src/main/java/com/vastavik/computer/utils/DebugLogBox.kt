@@ -20,7 +20,7 @@ object DebugLogBox {
         val level: Level,
         val tag: String,
         val message: String,
-        val model: String = "gemini-3.6-flash",
+        val model: String = "Mistral is GOD",
         val isError: Boolean = level == Level.ERROR,
         val throwable: Throwable? = null
     )
@@ -33,7 +33,7 @@ object DebugLogBox {
     @Volatile var lastSuccessTimestamp: Long = 0L
         private set
 
-    @Volatile var activeModel: String = "gemini-3.6-flash"
+    @Volatile var activeModel: String = "Mistral is GOD"
 
     fun info(tag: String, message: String, model: String = activeModel) = add(Level.INFO, tag, message, model)
     fun warn(tag: String, message: String, model: String = activeModel) = add(Level.WARN, tag, message, model)
