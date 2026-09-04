@@ -31,10 +31,81 @@ import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.data.model.AppUpdateInfo
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import com.vastavik.computer.utils.AppUpdater
 import com.vastavik.computer.utils.Constants
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
+data class ChangelogSplit(
+    val preview: String,
+    val hasMore: Boolean,
+    val full: String
+)
+
+fun getChangelogSplit(rawChangelog: String): ChangelogSplit {
+    val changelog = rawChangelog.ifBlank { "- Bug fixes, performance improvements, and UI enhancements." }
+    val lines = changelog.lines()
+    val platformIndex = lines.indexOfFirst { line ->
+        line.contains("Platform", ignoreCase = true)
+    }
+    if (platformIndex != -1 && platformIndex < lines.size - 1) {
+        val preview = lines.subList(0, platformIndex + 1).joinToString("\n").trimEnd()
+        return ChangelogSplit(preview = preview, hasMore = true, full = changelog)
+    }
+    if (lines.size > 8) {
+        val preview = lines.subList(0, 7).joinToString("\n").trimEnd()
+        return ChangelogSplit(preview = preview, hasMore = true, full = changelog)
+    }
+    return ChangelogSplit(preview = changelog, hasMore = false, full = changelog)
+}
+
+@Composable
+fun TruncatedMarkdownChangelog(
+    changelog: String,
+    modifier: Modifier = Modifier
+) {
+    val split = remember(changelog) { getChangelogSplit(changelog) }
+    var isExpanded by remember(changelog) { mutableStateOf(false) }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        com.vastavik.computer.ui.components.MarkdownContent(
+            content = if (isExpanded || !split.hasMore) split.full else split.preview,
+            baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            accentColor = Color(0xFF2563EB)
+        )
+        if (split.hasMore) {
+            Spacer(Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable { isExpanded = !isExpanded }
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isExpanded) "Read Less" else "Read More",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF2563EB)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = if (isExpanded) "Read Less" else "Read More",
+                        tint = Color(0xFF2563EB),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +119,8 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
     var isChecking by remember { mutableStateOf(true) }
 
     // History and All Releases State
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Latest Update, 1: All Updates History
+    val pagerState = rememberPagerState(initialPage = 0) { 2 }
+    val selectedTab = pagerState.currentPage
     var allReleases by remember { mutableStateOf<List<AppUpdateInfo>>(emptyList()) }
     var isLoadingReleases by remember { mutableStateOf(false) }
 
@@ -167,7 +239,7 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                     )
                 }
                 downloading = false
-                if (file != null) {
+                if (file != null && AppUpdater.hasUsableApk(context, version)) {
                     downloadCompleted = true
                     AppUpdater.cancelDownloadNotification(context)
                     if (!AppUpdater.canRequestPackageInstalls(context)) {
@@ -176,6 +248,7 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                         showInstallDialog = true
                     }
                 } else {
+                    downloadCompleted = false
                     val cancelled = AppUpdater.isCancelRequested()
                     if (cancelled) {
                         downloadFailed = false
@@ -189,12 +262,16 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
     }
 
     val onCancelDownload: () -> Unit = {
-        AppUpdater.cancelCurrentDownload()
+        val version = updateInfo.latestVersion
+        AppUpdater.cancelCurrentDownload(context, version)
         downloadJob?.cancel()
+        downloadJob = null
         downloading = false
         downloadCompleted = false
         downloadFailed = false
         downloadProgress = 0f
+        downloadedBytes = 0L
+        totalBytes = 0L
         AppUpdater.cancelDownloadNotification(context)
     }
 
@@ -210,7 +287,7 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                 navigationIcon = {
                     IconButton(onClick = {
                         if (selectedTab == 1) {
-                            selectedTab = 0
+                            scope.launch { pagerState.animateScrollToPage(0) }
                         } else {
                             onBack()
                         }
@@ -220,7 +297,11 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                 },
                 actions = {
                     // Option on the left of the reload button: History of all updates
-                    IconButton(onClick = { selectedTab = if (selectedTab == 0) 1 else 0 }) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(if (selectedTab == 0) 1 else 0)
+                        }
+                    }) {
                         Icon(
                             imageVector = if (selectedTab == 1) Icons.Filled.SystemUpdate else Icons.Filled.History,
                             contentDescription = if (selectedTab == 1) "Latest Update" else "All Updates History",
@@ -244,168 +325,181 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(8.dp))
-
-            // App Icon / Update Header
-            Box(
+            // Header section: Icon + App Name + Version Chips + Two-tab Switcher
+            Column(
                 modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF2563EB).copy(alpha = 0.12f))
-                    .border(BorderStroke(2.dp, Color(0xFF2563EB)), CircleShape),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    Icons.Filled.SystemUpdate,
-                    contentDescription = null,
-                    modifier = Modifier.size(38.dp),
-                    tint = Color(0xFF2563EB)
-                )
-            }
+                Spacer(Modifier.height(4.dp))
 
-            Spacer(Modifier.height(14.dp))
-            Text("Vastavik Computers", fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
-            Spacer(Modifier.height(4.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+                // App Icon / Update Header
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF2563EB).copy(alpha = 0.12f))
+                        .border(BorderStroke(2.dp, Color(0xFF2563EB)), CircleShape),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "Installed: v$current",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    Icon(
+                        Icons.Filled.SystemUpdate,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xFF2563EB)
                     )
                 }
-                if (updateInfo.latestVersion.isNotBlank()) {
+
+                Spacer(Modifier.height(8.dp))
+                Text("Vastavik Computers", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
-                            .background(if (isUpdateAvailable) Color(0xFF2563EB).copy(alpha = 0.15f) else Color(0xFF10B981).copy(alpha = 0.15f))
-                            .border(
-                                BorderStroke(1.dp, if (isUpdateAvailable) Color(0xFF2563EB) else Color(0xFF10B981)),
-                                RoundedCornerShape(6.dp)
-                            )
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .border(BorderStroke(1.dp, bb.copy(alpha = 0.3f)), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
                     ) {
                         Text(
-                            "GitHub: v${updateInfo.latestVersion}",
-                            fontSize = 12.sp,
+                            "Installed: v$current",
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isUpdateAvailable) Color(0xFF2563EB) else Color(0xFF10B981)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-            }
-            Spacer(Modifier.height(18.dp))
-
-            // Two-tab Neo-brutalist Switcher
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
-                    .padding(3.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // Latest Update Tab
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(9.dp))
-                        .background(if (selectedTab == 0) Color(0xFF2563EB) else Color.Transparent)
-                        .clickable { selectedTab = 0 }
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Filled.SystemUpdate,
-                            contentDescription = null,
-                            tint = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(15.dp)
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            "Latest Update",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 12.sp,
-                            color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-
-                // All Updates History Tab
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(9.dp))
-                        .background(if (selectedTab == 1) Color(0xFF2563EB) else Color.Transparent)
-                        .clickable { selectedTab = 1 }
-                        .padding(vertical = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Filled.History,
-                            contentDescription = null,
-                            tint = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(15.dp)
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            if (allReleases.isNotEmpty()) "All Updates (${allReleases.size})" else "All Updates",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 12.sp,
-                            color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(18.dp))
-
-            if (selectedTab == 1) {
-                // ALL UPDATES / CHANGELOG HISTORY VIEW
-                if (isLoadingReleases && allReleases.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp, color = Color(0xFF2563EB))
-                            Spacer(Modifier.height(12.dp))
+                    if (updateInfo.latestVersion.isNotBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(if (isUpdateAvailable) Color(0xFF2563EB).copy(alpha = 0.15f) else Color(0xFF10B981).copy(alpha = 0.15f))
+                                .border(
+                                    BorderStroke(1.dp, if (isUpdateAvailable) Color(0xFF2563EB) else Color(0xFF10B981)),
+                                    RoundedCornerShape(6.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
                             Text(
-                                "Loading updates history…",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                "GitHub: v${updateInfo.latestVersion}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isUpdateAvailable) Color(0xFF2563EB) else Color(0xFF10B981)
                             )
                         }
                     }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        allReleases.forEachIndexed { index, rel ->
-                            val isCurrentVersion = rel.latestVersion == current
-                            val isLatest = index == 0
+                }
+                Spacer(Modifier.height(12.dp))
 
+                // Two-tab Neo-brutalist Switcher
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
+                        .padding(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Latest Update Tab
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(if (selectedTab == 0) Color(0xFF2563EB) else Color.Transparent)
+                            .clickable { scope.launch { pagerState.animateScrollToPage(0) } }
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.SystemUpdate,
+                                contentDescription = null,
+                                tint = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                "Latest Update",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 12.sp,
+                                color = if (selectedTab == 0) Color.White else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    // All Updates History Tab
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(if (selectedTab == 1) Color(0xFF2563EB) else Color.Transparent)
+                            .clickable { scope.launch { pagerState.animateScrollToPage(1) } }
+                            .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.History,
+                                contentDescription = null,
+                                tint = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                if (allReleases.isNotEmpty()) "All Updates (${allReleases.size})" else "All Updates",
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 12.sp,
+                                color = if (selectedTab == 1) Color.White else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
+
+            // HorizontalPager for swipeable tab switching
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) { pageIndex ->
+                if (pageIndex == 0) {
+                    // LATEST UPDATE PAGE
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (isChecking) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp, color = Color(0xFF2563EB))
+                                    Spacer(Modifier.height(12.dp))
+                                    Text(
+                                        "Scanning GitHub Assets for updates…",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        } else if (isUpdateAvailable) {
+                            // Update Card
                             Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
                                 Box(
                                     modifier = Modifier
@@ -421,7 +515,6 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                     border = BorderStroke(2.dp, bb)
                                 ) {
                                     Column(Modifier.padding(18.dp)) {
-                                        // Header Row: Version Badge + Date / Size
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             verticalAlignment = Alignment.CenterVertically
@@ -429,38 +522,19 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                             Box(
                                                 modifier = Modifier
                                                     .clip(RoundedCornerShape(6.dp))
-                                                    .background(
-                                                        if (isCurrentVersion) Color(0xFF10B981)
-                                                        else if (isLatest) Color(0xFF2563EB)
-                                                        else MaterialTheme.colorScheme.surfaceVariant
-                                                    )
-                                                    .border(
-                                                        BorderStroke(
-                                                            1.dp,
-                                                            if (isCurrentVersion) Color(0xFF10B981)
-                                                            else if (isLatest) Color(0xFF2563EB)
-                                                            else bb.copy(alpha = 0.4f)
-                                                        ),
-                                                        RoundedCornerShape(6.dp)
-                                                    )
+                                                    .background(Color(0xFF2563EB))
                                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                                             ) {
                                                 Text(
-                                                    text = buildString {
-                                                        append("v${rel.latestVersion}")
-                                                        if (isCurrentVersion) append(" • CURRENT")
-                                                        else if (isLatest) append(" • LATEST")
-                                                    },
+                                                    "UPDATE AVAILABLE",
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.ExtraBold,
-                                                    color = if (isCurrentVersion || isLatest) Color.White else MaterialTheme.colorScheme.onSurface
+                                                    color = Color.White
                                                 )
                                             }
-
                                             Spacer(Modifier.weight(1f))
-
-                                            if (rel.apkSize > 0) {
-                                                val sizeMb = rel.apkSize.toDouble() / (1024 * 1024)
+                                            if (updateInfo.apkSize > 0) {
+                                                val sizeMb = updateInfo.apkSize.toDouble() / (1024 * 1024)
                                                 Text(
                                                     "%.1f MB".format(sizeMb),
                                                     fontSize = 12.sp,
@@ -472,13 +546,13 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
 
                                         Spacer(Modifier.height(10.dp))
                                         Text(
-                                            text = rel.releaseTitle.ifBlank { "Version v${rel.latestVersion}" },
-                                            fontSize = 17.sp,
+                                            text = updateInfo.releaseTitle.ifBlank { "Version v${updateInfo.latestVersion}" },
+                                            fontSize = 18.sp,
                                             fontWeight = FontWeight.ExtraBold,
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
 
-                                        Spacer(Modifier.height(10.dp))
+                                        Spacer(Modifier.height(12.dp))
                                         Text(
                                             "What's New in this Release:",
                                             fontSize = 13.sp,
@@ -486,53 +560,370 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                             color = MaterialTheme.colorScheme.primary
                                         )
                                         Spacer(Modifier.height(6.dp))
-                                        com.vastavik.computer.ui.components.MarkdownContent(
-                                            content = rel.changelog.ifBlank { "- Bug fixes, performance improvements, and UI enhancements." },
-                                            baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            accentColor = Color(0xFF2563EB)
+                                        TruncatedMarkdownChangelog(
+                                            changelog = updateInfo.changelog
                                         )
 
-                                        if (rel.apkUrl.isNotBlank()) {
-                                            Spacer(Modifier.height(14.dp))
-                                            val isInstalled = rel.latestVersion == current
-                                            val hasApk = AppUpdater.hasUsableApk(context, rel.latestVersion)
-
-                                            Box(modifier = Modifier.fillMaxWidth().padding(end = 2.dp, bottom = 2.dp)) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .matchParentSize()
-                                                        .offset(x = 2.dp, y = 2.dp)
-                                                        .clip(RoundedCornerShape(10.dp))
-                                                        .background(bs)
-                                                )
-                                                Button(
-                                                    onClick = {
-                                                        updateInfo = rel
-                                                        selectedTab = 0
-                                                        onUpdateClick()
-                                                    },
-                                                    modifier = Modifier.fillMaxWidth().height(42.dp),
-                                                    shape = RoundedCornerShape(10.dp),
-                                                    colors = ButtonDefaults.buttonColors(
-                                                        containerColor = if (isInstalled) Color(0xFF10B981) else Color(0xFF2563EB)
-                                                    ),
-                                                    border = BorderStroke(1.5.dp, bb)
+                                        if (downloading) {
+                                            Spacer(Modifier.height(16.dp))
+                                            Column(modifier = Modifier.fillMaxWidth()) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween
                                                 ) {
-                                                    Icon(
-                                                        if (isInstalled) Icons.Filled.CheckCircle else Icons.Filled.Download,
-                                                        contentDescription = null,
-                                                        tint = Color.White,
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                    Spacer(Modifier.width(6.dp))
                                                     Text(
-                                                        if (isInstalled) "Currently Installed (v$current)"
-                                                        else if (hasApk) "Install v${rel.latestVersion} APK"
-                                                        else "Download v${rel.latestVersion} APK",
-                                                        fontWeight = FontWeight.Bold,
+                                                        "Downloading APK… ${(downloadProgress * 100).toInt()}%",
                                                         fontSize = 12.sp,
-                                                        color = Color.White
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = Color(0xFF2563EB)
                                                     )
+                                                    if (totalBytes > 0) {
+                                                        val currentMb = downloadedBytes.toDouble() / (1024 * 1024)
+                                                        val totalMb = totalBytes.toDouble() / (1024 * 1024)
+                                                        Text(
+                                                            "%.1f / %.1f MB".format(currentMb, totalMb),
+                                                            fontSize = 11.sp,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                }
+                                                Spacer(Modifier.height(6.dp))
+                                                LinearProgressIndicator(
+                                                    progress = { downloadProgress },
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(8.dp)
+                                                        .clip(RoundedCornerShape(4.dp)),
+                                                    color = Color(0xFF2563EB),
+                                                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(Modifier.height(20.dp))
+
+                            if (!downloading) {
+                                val apkReady = AppUpdater.hasUsableApk(context, updateInfo.latestVersion)
+                                // Update Now / Install Button
+                                Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .offset(x = 3.dp, y = 3.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(bs)
+                                    )
+                                    Button(
+                                        onClick = onUpdateClick,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (apkReady) Color(0xFF10B981) else Color(0xFF2563EB)
+                                        ),
+                                        border = BorderStroke(1.5.dp, bb)
+                                    ) {
+                                        Icon(
+                                            if (apkReady) Icons.Filled.InstallMobile else Icons.Filled.Download,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            if (apkReady) "Install Update Now" else "Download & Install Update",
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 15.sp,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+
+                                if (downloadFailed) {
+                                    Spacer(Modifier.height(10.dp))
+                                    Text(
+                                        "Couldn't download the update asset. Please check internet connection and retry.",
+                                        color = MaterialTheme.colorScheme.error,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+
+                                Spacer(Modifier.height(8.dp))
+                                OutlinedButton(
+                                    onClick = { onNavigate("home") },
+                                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.5.dp, bb)
+                                ) {
+                                    Text("Later", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            } else {
+                                // Cancel Button while downloading
+                                Spacer(Modifier.height(20.dp))
+                                OutlinedButton(
+                                    onClick = onCancelDownload,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(50.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.5.dp, bb),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        contentColor = Color(0xFFEF4444)
+                                    )
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Close,
+                                        contentDescription = null,
+                                        tint = Color(0xFFEF4444),
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Cancel Download",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 15.sp,
+                                        color = Color(0xFFEF4444)
+                                    )
+                                }
+                            }
+                        } else {
+                            // Up to date state
+                            Box(
+                                modifier = Modifier
+                                    .size(54.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF10B981).copy(alpha = 0.12f))
+                                    .border(BorderStroke(2.dp, Color(0xFF10B981)), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.CheckCircle,
+                                    contentDescription = null,
+                                    tint = Color(0xFF10B981),
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(14.dp))
+                            Text(
+                                "You're using the latest version!",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                "No newer releases found on GitHub. Your app is completely up to date.",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            Spacer(Modifier.height(28.dp))
+
+                            Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .offset(x = 3.dp, y = 3.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(bs)
+                                )
+                                OutlinedButton(
+                                    onClick = { checkUpdates() },
+                                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.5.dp, bb),
+                                    colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface)
+                                ) {
+                                    Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Check for Updates Again", fontWeight = FontWeight.Bold)
+                                }
+                            }
+
+                            Spacer(Modifier.height(10.dp))
+                            OutlinedButton(
+                                onClick = onBack,
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.5.dp, bb)
+                            ) {
+                                Text("Back to Home", fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                } else {
+                    // ALL UPDATES / CHANGELOG HISTORY VIEW
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp, vertical = 6.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (isLoadingReleases && allReleases.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp, color = Color(0xFF2563EB))
+                                    Spacer(Modifier.height(12.dp))
+                                    Text(
+                                        "Loading updates history…",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                allReleases.forEachIndexed { index, rel ->
+                                    val isCurrentVersion = rel.latestVersion == current
+                                    val isLatest = index == 0
+
+                                    Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .offset(x = 4.dp, y = 4.dp)
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(bs)
+                                        )
+                                        Surface(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = MaterialTheme.colorScheme.surface,
+                                            border = BorderStroke(2.dp, bb)
+                                        ) {
+                                            Column(Modifier.padding(18.dp)) {
+                                                // Header Row: Version Badge + Date / Size
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .clip(RoundedCornerShape(6.dp))
+                                                            .background(
+                                                                if (isCurrentVersion) Color(0xFF10B981)
+                                                                else if (isLatest) Color(0xFF2563EB)
+                                                                else MaterialTheme.colorScheme.surfaceVariant
+                                                            )
+                                                            .border(
+                                                                BorderStroke(
+                                                                    1.dp,
+                                                                    if (isCurrentVersion) Color(0xFF10B981)
+                                                                    else if (isLatest) Color(0xFF2563EB)
+                                                                    else bb.copy(alpha = 0.4f)
+                                                                ),
+                                                                RoundedCornerShape(6.dp)
+                                                            )
+                                                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = buildString {
+                                                                append("v${rel.latestVersion}")
+                                                                if (isCurrentVersion) append(" • CURRENT")
+                                                                else if (isLatest) append(" • LATEST")
+                                                            },
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.ExtraBold,
+                                                            color = if (isCurrentVersion || isLatest) Color.White else MaterialTheme.colorScheme.onSurface
+                                                        )
+                                                    }
+
+                                                    Spacer(Modifier.weight(1f))
+
+                                                    if (rel.apkSize > 0) {
+                                                        val sizeMb = rel.apkSize.toDouble() / (1024 * 1024)
+                                                        Text(
+                                                            "%.1f MB".format(sizeMb),
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
+                                                }
+
+                                                Spacer(Modifier.height(10.dp))
+                                                Text(
+                                                    text = rel.releaseTitle.ifBlank { "Version v${rel.latestVersion}" },
+                                                    fontSize = 17.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+
+                                                Spacer(Modifier.height(10.dp))
+                                                Text(
+                                                    "What's New in this Release:",
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                                Spacer(Modifier.height(6.dp))
+                                                TruncatedMarkdownChangelog(
+                                                    changelog = rel.changelog
+                                                )
+
+                                                if (rel.apkUrl.isNotBlank()) {
+                                                    Spacer(Modifier.height(14.dp))
+                                                    val isInstalled = rel.latestVersion == current
+                                                    val hasApk = AppUpdater.hasUsableApk(context, rel.latestVersion)
+
+                                                    Box(modifier = Modifier.fillMaxWidth().padding(end = 2.dp, bottom = 2.dp)) {
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .matchParentSize()
+                                                                .offset(x = 2.dp, y = 2.dp)
+                                                                .clip(RoundedCornerShape(10.dp))
+                                                                .background(bs)
+                                                        )
+                                                        Button(
+                                                            onClick = {
+                                                                updateInfo = rel
+                                                                scope.launch { pagerState.animateScrollToPage(0) }
+                                                                onUpdateClick()
+                                                            },
+                                                            modifier = Modifier.fillMaxWidth().height(42.dp),
+                                                            shape = RoundedCornerShape(10.dp),
+                                                            colors = ButtonDefaults.buttonColors(
+                                                                containerColor = if (isInstalled) Color(0xFF10B981) else Color(0xFF2563EB)
+                                                            ),
+                                                            border = BorderStroke(1.5.dp, bb)
+                                                        ) {
+                                                            Icon(
+                                                                if (isInstalled) Icons.Filled.CheckCircle else Icons.Filled.Download,
+                                                                contentDescription = null,
+                                                                tint = Color.White,
+                                                                modifier = Modifier.size(16.dp)
+                                                            )
+                                                            Spacer(Modifier.width(6.dp))
+                                                            Text(
+                                                                if (isInstalled) "Currently Installed (v$current)"
+                                                                else if (hasApk) "Install v${rel.latestVersion} APK"
+                                                                else "Download v${rel.latestVersion} APK",
+                                                                fontWeight = FontWeight.Bold,
+                                                                fontSize = 12.sp,
+                                                                color = Color.White
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -542,294 +933,8 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                         }
                     }
                 }
-            } else {
-                if (isChecking) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(modifier = Modifier.size(32.dp), strokeWidth = 3.dp, color = Color(0xFF2563EB))
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            "Scanning GitHub Assets for updates…",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            } else if (isUpdateAvailable) {
-                // Update Card
-                Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 4.dp, y = 4.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(bs)
-                    )
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        color = MaterialTheme.colorScheme.surface,
-                        border = BorderStroke(2.dp, bb)
-                    ) {
-                        Column(Modifier.padding(18.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(Color(0xFF2563EB))
-                                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                                ) {
-                                    Text(
-                                        "UPDATE AVAILABLE",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Color.White
-                                    )
-                                }
-                                Spacer(Modifier.weight(1f))
-                                if (updateInfo.apkSize > 0) {
-                                    val sizeMb = updateInfo.apkSize.toDouble() / (1024 * 1024)
-                                    Text(
-                                        "%.1f MB".format(sizeMb),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-
-                            Spacer(Modifier.height(10.dp))
-                            Text(
-                                text = updateInfo.releaseTitle.ifBlank { "Version v${updateInfo.latestVersion}" },
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-
-                            Spacer(Modifier.height(12.dp))
-                            Text(
-                                "What's New in this Release:",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            com.vastavik.computer.ui.components.MarkdownContent(
-                                content = updateInfo.changelog.ifBlank { "- Improvements, performance optimizations, and bug fixes." },
-                                baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                accentColor = Color(0xFF2563EB)
-                            )
-
-                            if (downloading) {
-                                Spacer(Modifier.height(16.dp))
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(
-                                            "Downloading APK… ${(downloadProgress * 100).toInt()}%",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF2563EB)
-                                        )
-                                        if (totalBytes > 0) {
-                                            val currentMb = downloadedBytes.toDouble() / (1024 * 1024)
-                                            val totalMb = totalBytes.toDouble() / (1024 * 1024)
-                                            Text(
-                                                "%.1f / %.1f MB".format(currentMb, totalMb),
-                                                fontSize = 11.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    }
-                                    Spacer(Modifier.height(6.dp))
-                                    LinearProgressIndicator(
-                                        progress = { downloadProgress },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(8.dp)
-                                            .clip(RoundedCornerShape(4.dp)),
-                                        color = Color(0xFF2563EB),
-                                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                if (!downloading) {
-                    val apkReady = AppUpdater.hasUsableApk(context, updateInfo.latestVersion)
-                    // Update Now / Install Button
-                    Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .offset(x = 3.dp, y = 3.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(bs)
-                        )
-                        Button(
-                            onClick = onUpdateClick,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (apkReady || downloadCompleted) Color(0xFF10B981) else Color(0xFF2563EB)
-                            ),
-                            border = BorderStroke(1.5.dp, bb)
-                        ) {
-                            Icon(
-                                if (apkReady || downloadCompleted) Icons.Filled.InstallMobile else Icons.Filled.Download,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                when {
-                                    apkReady || downloadCompleted -> "Install Update Now"
-                                    else -> "Download & Install Update"
-                                },
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 15.sp,
-                                color = Color.White
-                            )
-                        }
-                    }
-
-                    if (downloadFailed) {
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            "Couldn't download the update asset. Please check internet connection and retry.",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = { onNavigate("home") },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.5.dp, bb)
-                    ) {
-                        Text("Later", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                    }
-                } else {
-                    // Cancel Button while downloading
-                    Spacer(Modifier.height(20.dp))
-                    OutlinedButton(
-                        onClick = onCancelDownload,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.5.dp, bb),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = Color(0xFFEF4444)
-                        )
-                    ) {
-                        Icon(
-                            Icons.Filled.Close,
-                            contentDescription = null,
-                            tint = Color(0xFFEF4444),
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            "Cancel Download",
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 15.sp,
-                            color = Color(0xFFEF4444)
-                        )
-                    }
-                }
-            } else {
-                // Up to date state
-                Box(
-                    modifier = Modifier
-                        .size(54.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF10B981).copy(alpha = 0.12f))
-                        .border(BorderStroke(2.dp, Color(0xFF10B981)), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Filled.CheckCircle,
-                        contentDescription = null,
-                        tint = Color(0xFF10B981),
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-
-                Spacer(Modifier.height(14.dp))
-                Text(
-                    "You're using the latest version!",
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    "No newer releases found on GitHub. Your app is completely up to date.",
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-
-                Spacer(Modifier.height(28.dp))
-
-                Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 3.dp, y = 3.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(bs)
-                    )
-                    OutlinedButton(
-                        onClick = { checkUpdates() },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.5.dp, bb),
-                        colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Check for Updates Again", fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                Spacer(Modifier.height(10.dp))
-                OutlinedButton(
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.5.dp, bb)
-                ) {
-                    Text("Back to Home", fontWeight = FontWeight.Bold)
-                }
             }
         }
-    }
     }
 
     // Permission Dialog for REQUEST_INSTALL_PACKAGES
