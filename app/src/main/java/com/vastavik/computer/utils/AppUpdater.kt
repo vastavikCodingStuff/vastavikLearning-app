@@ -186,6 +186,20 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.16",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.16/app-v1.0.16-debug.apk",
+                releaseTitle = "v1.0.16 - Notification Cards Color Polish (Blue Update & Red Payment Due)",
+                changelog = """
+### What's New in this Release:
+- **Blue Update Notification**: Updated the New Update notification card in the Notifications screen to solid blue with white text and white badge.
+- **Red Payment Due Notification**: Updated the "Payment due in 3 days" notification card to vibrant red with white text and "DUE SOON" badge.
+- **Direct Navigation**: Tapping the payment due card navigates immediately to the Pro membership renewal screen.
+                """.trimIndent(),
+                apkSize = 71380769L,
+                publishedAt = "2026-09-04T02:45:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.16", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.15",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.15/app-v1.0.15-debug.apk",
                 releaseTitle = "v1.0.15 - App Update History & All Updates Changelog Viewer",
