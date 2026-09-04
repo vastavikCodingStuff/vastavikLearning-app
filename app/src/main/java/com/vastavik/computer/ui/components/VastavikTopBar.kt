@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.brutalBorderColor
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.*
 
 @Composable
 fun VastavikTopBar(
@@ -60,8 +59,8 @@ fun VastavikTopBar(
             val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
             val hasUpdate = updateInfo?.isUpdateAvailable == true
 
-            // App Update Icon on Left of Notification Button in Green color
-            if (onUpdateClick != null) {
+            // Green download button shown ONLY when a new update is sensed in Assets
+            if (hasUpdate && onUpdateClick != null) {
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -72,29 +71,16 @@ fun VastavikTopBar(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        Icons.Filled.SystemUpdate,
-                        contentDescription = "App Updates",
+                        Icons.Filled.Download,
+                        contentDescription = "Download Update",
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
-                    if (hasUpdate) {
-                        Box(
-                            modifier = Modifier
-                                .size(9.dp)
-                                .align(Alignment.TopEnd)
-                                .offset(x = (-4).dp, y = 4.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFFFD600))
-                                .border(BorderStroke(1.dp, Color.Black), CircleShape)
-                        )
-                    }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
             if (onNotificationClick != null) {
-                val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
-                val hasUpdate = updateInfo?.isUpdateAvailable == true
                 Box(
                     modifier = Modifier
                         .size(38.dp)

@@ -73,34 +73,25 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                     Spacer(modifier = Modifier.weight(1f))
                     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
                     val hasUpdate = updateInfo?.isUpdateAvailable == true
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFF10B981))
-                            .border(BorderStroke(1.5.dp, bb), CircleShape)
-                            .clickable { onNavigate("app_update") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            Icons.Filled.SystemUpdate,
-                            contentDescription = "App Updates",
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        if (hasUpdate) {
-                            Box(
-                                modifier = Modifier
-                                    .size(9.dp)
-                                    .align(Alignment.TopEnd)
-                                    .offset(x = (-4).dp, y = 4.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFFFD600))
-                                    .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                    if (hasUpdate) {
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF10B981))
+                                .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                .clickable { onNavigate("app_update") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.Download,
+                                contentDescription = "App Updates",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
                             )
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
                     Box(
                         modifier = Modifier
                             .size(38.dp)
