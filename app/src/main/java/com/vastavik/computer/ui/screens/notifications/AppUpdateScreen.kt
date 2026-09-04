@@ -62,6 +62,8 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
     var downloadFailed by remember { mutableStateOf(false) }
     var showInstallDialog by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
+    var downloadCompleted by remember { mutableStateOf(false) }
+    var downloadJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
     val isUpdateAvailable = updateInfo.isUpdateAvailable ||
         (updateInfo.latestVersion.isNotBlank() && AppUpdater.isNewerVersion(updateInfo.latestVersion, current))
@@ -135,26 +137,65 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
             }
         } else {
             downloading = true
+            downloadCompleted = false
             downloadFailed = false
             downloadProgress = 0f
-            scope.launch {
+            downloadedBytes = 0L
+            totalBytes = 0L
+            // Post initial progress notification so the system shows it immediately
+            AppUpdater.ensureDownloadChannel(context)
+            AppUpdater.postDownloadProgress(
+                context,
+                version,
+                updateInfo.releaseTitle.ifBlank { "Vastavik Computers" },
+                0L,
+                updateInfo.apkSize,
+                0f
+            )
+            downloadJob = scope.launch {
                 val file = AppUpdater.downloadApkWithProgress(context, updateInfo) { bytesRead, total, progress ->
                     downloadedBytes = bytesRead
                     totalBytes = total
                     downloadProgress = progress
+                    AppUpdater.postDownloadProgress(
+                        context,
+                        version,
+                        updateInfo.releaseTitle.ifBlank { "Vastavik Computers" },
+                        bytesRead,
+                        total,
+                        progress
+                    )
                 }
                 downloading = false
                 if (file != null) {
+                    downloadCompleted = true
+                    AppUpdater.cancelDownloadNotification(context)
                     if (!AppUpdater.canRequestPackageInstalls(context)) {
                         showPermissionDialog = true
                     } else {
                         showInstallDialog = true
                     }
                 } else {
-                    downloadFailed = true
+                    val cancelled = AppUpdater.isCancelRequested()
+                    if (cancelled) {
+                        downloadFailed = false
+                    } else {
+                        downloadFailed = true
+                    }
+                    AppUpdater.cancelDownloadNotification(context)
                 }
             }
         }
+    }
+
+    val onCancelDownload: () -> Unit = {
+        AppUpdater.cancelCurrentDownload()
+        downloadJob?.cancel()
+        downloading = false
+        downloadCompleted = false
+        downloadFailed = false
+        downloadProgress = 0f
+        AppUpdater.cancelDownloadNotification(context)
     }
 
     Scaffold(
@@ -630,7 +671,8 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                 Spacer(Modifier.height(20.dp))
 
                 if (!downloading) {
-                    // Update Now Button
+                    val apkReady = AppUpdater.hasUsableApk(context, updateInfo.latestVersion)
+                    // Update Now / Install Button
                     Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
                         Box(
                             modifier = Modifier
@@ -645,13 +687,23 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                 .fillMaxWidth()
                                 .height(50.dp),
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (apkReady || downloadCompleted) Color(0xFF10B981) else Color(0xFF2563EB)
+                            ),
                             border = BorderStroke(1.5.dp, bb)
                         ) {
-                            Icon(Icons.Filled.Download, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Icon(
+                                if (apkReady || downloadCompleted) Icons.Filled.InstallMobile else Icons.Filled.Download,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                if (AppUpdater.hasUsableApk(context, updateInfo.latestVersion)) "Install Update Now" else "Download & Install Update",
+                                when {
+                                    apkReady || downloadCompleted -> "Install Update Now"
+                                    else -> "Download & Install Update"
+                                },
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 15.sp,
                                 color = Color.White
@@ -672,12 +724,41 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
 
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(
-                        onClick = onBack,
+                        onClick = { onNavigate("home") },
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         border = BorderStroke(1.5.dp, bb)
                     ) {
                         Text("Later", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    }
+                } else {
+                    // Cancel Button while downloading
+                    Spacer(Modifier.height(20.dp))
+                    OutlinedButton(
+                        onClick = onCancelDownload,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.5.dp, bb),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = Color(0xFFEF4444)
+                        )
+                    ) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = null,
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Cancel Download",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 15.sp,
+                            color = Color(0xFFEF4444)
+                        )
                     }
                 }
             } else {

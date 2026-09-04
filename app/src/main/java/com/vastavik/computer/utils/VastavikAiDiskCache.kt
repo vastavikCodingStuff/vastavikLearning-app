@@ -5,11 +5,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Persistent disk cache for Mistral AI problem overviews, solutions, and dynamic questions.
+ * Persistent disk cache for Vastavik AI problem overviews, solutions, and dynamic questions.
  * Uses Android SharedPreferences to guarantee persistence across app restarts and phone reboots.
  */
-object MistralDiskCache {
-    private const val PREFS_NAME = "mistral_disk_cache_v2"
+object VastavikAiDiskCache {
+    private const val PREFS_NAME = "vastavik_ai_disk_cache_v1"
     private const val PREFIX_SOL = "sol_"
     private const val KEY_AI_MCQS = "ai_custom_mcqs"
     private const val KEY_AI_PREDICT_OUTPUT = "ai_custom_predict_output"

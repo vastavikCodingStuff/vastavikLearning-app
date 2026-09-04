@@ -34,14 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.VastavikColors
 import com.vastavik.computer.ui.theme.brutalBorderColor
-import kotlinx.coroutines.Dispatchers
+import com.vastavik.computer.utils.Judge0Service
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.vastavik.computer.BuildConfig
-import org.json.JSONArray
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 
 private val mono = FontFamily.Monospace
 
@@ -150,7 +144,10 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
     var language by remember { mutableStateOf(initialLanguage.ifBlank { "Python" }) }
     var code by remember { mutableStateOf(initialCode.ifBlank { defaultCode(language) }) }
     var output by remember { mutableStateOf("") }
+    var stdin by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
+    var isSuccess by remember { mutableStateOf(true) }
+    var executionMeta by remember { mutableStateOf("") }
     var question by remember { mutableStateOf(initialQuestion) }
     var showQuestion by remember { mutableStateOf(initialQuestion.isNotBlank()) }
     var isWordWrap by remember { mutableStateOf(false) }
@@ -201,21 +198,27 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
             )
         },
         bottomBar = {
-            if (output.isNotEmpty() || isRunning) {
+            if (output.isNotEmpty() || isRunning || executionMeta.isNotEmpty()) {
                 Surface(shadowElevation = 8.dp, shape = if (MaterialTheme.shapes.medium.toString().contains("0.0")) RoundedCornerShape(0.dp) else RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp), color = MaterialTheme.colorScheme.surface) {
-                    Column(modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 260.dp).padding(16.dp)) {
+                    Column(modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 280.dp).padding(16.dp).verticalScroll(rememberScrollState())) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                             Text("Output", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            IconButton(onClick = { output = "" }, modifier = Modifier.size(32.dp)) { Icon(Icons.Filled.Clear, contentDescription = "Clear") }
+                            if (executionMeta.isNotEmpty() && !isRunning) {
+                                Surface(shape = RoundedCornerShape(8.dp), color = if (isSuccess) Color(0xFFDCFCE7) else Color(0xFFFEE2E2)) {
+                                    Text(executionMeta, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = if (isSuccess) Color(0xFF15803D) else Color(0xFFB91C1C), fontFamily = mono, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                                }
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            IconButton(onClick = { output = ""; executionMeta = "" }, modifier = Modifier.size(32.dp)) { Icon(Icons.Filled.Clear, contentDescription = "Clear") }
                         }
                         if (isRunning) {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top=8.dp)) {
                                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Running...", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("Running on Judge0...", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         } else {
-                            Text(output, fontFamily = mono, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.fillMaxWidth().padding(top=8.dp))
+                            Text(output.ifEmpty { if (executionMeta.isNotEmpty()) "(no output)" else "" }, fontFamily = mono, fontSize = 13.sp, color = if (isSuccess) MaterialTheme.colorScheme.onSurface else Color(0xFFB91C1C), modifier = Modifier.fillMaxWidth().padding(top=8.dp))
                         }
                     }
                 }
@@ -224,37 +227,30 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    isRunning = true; output = ""
+                    if (isRunning) return@ExtendedFloatingActionButton
+                    val languageId = Judge0Service.languageIdFor(language)
+                    if (languageId == null) {
+                        output = "Judge0 execution is not supported for $language. Please select Java, Python, or JavaScript."
+                        isSuccess = false
+                        executionMeta = "Unsupported language"
+                        return@ExtendedFloatingActionButton
+                    }
+                    if (code.isBlank()) {
+                        output = "No source code to run."
+                        isSuccess = false
+                        executionMeta = "Failed"
+                        return@ExtendedFloatingActionButton
+                    }
+                    isRunning = true; output = ""; executionMeta = ""; isSuccess = true
                     coroutineScope.launch {
-                        output = withContext(Dispatchers.IO) {
-                            try {
-                                val apiKey = BuildConfig.MISTRAL_API_KEY
-                                if (apiKey.isBlank()) return@withContext "MISTRAL_API_KEY not configured."
-                                val url = URL("https://api.mistral.ai/v1/chat/completions")
-                                val conn = url.openConnection() as HttpURLConnection
-                                conn.requestMethod = "POST"
-                                conn.setRequestProperty("Content-Type", "application/json")
-                                conn.setRequestProperty("Authorization", "Bearer $apiKey")
-                                conn.doOutput = true
-                                conn.connectTimeout = 30000
-                                conn.readTimeout = 30000
-                                val body = JSONObject().apply {
-                                    put("model", "mistral-small-latest")
-                                    put("messages", JSONArray().put(JSONObject().put("role", "user").put("content",
-                                        "You are a code runner for Class 5-12 students. This is $language code. Explain what the output would be when this code runs. Be concise — just show the expected output, then 1 line explanation.\n\nCode:\n$code")))
-                                    put("max_tokens", 512)
-                                    put("temperature", 0.1)
-                                }
-                                conn.outputStream.use { it.write(body.toString().toByteArray()) }
-                                val responseCode = conn.responseCode
-                                val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-                                val response = stream.bufferedReader().use { it.readText() }
-                                if (responseCode in 200..299) {
-                                    val json = JSONObject(response)
-                                    stripMarkdown(json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content"))
-                                } else { "Error ($responseCode)" }
-                            } catch (e: Exception) { "Error: ${e.message}" }
-                        }
+                        val result = Judge0Service.runCode(languageId, code, stdin)
+                        output = result.output.ifBlank { if (result.success) "(program ran with no output)" else result.statusDescription }
+                        isSuccess = result.success
+                        val parts = mutableListOf<String>()
+                        if (result.statusDescription.isNotBlank()) parts.add(result.statusDescription)
+                        result.executionTime?.let { if (it.isNotBlank() && it != "null") parts.add("${it}s") }
+                        result.memoryKb?.let { parts.add("${it} KB") }
+                        executionMeta = parts.joinToString(" • ")
                         isRunning = false
                     }
                 },
@@ -347,6 +343,15 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                             }
                         }
                     }
+                }
+            }
+
+            // Stdin input — bound to Judge0 stdin field
+            Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f), tonalElevation = 0.dp) {
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Input (stdin):", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 8.dp))
+                    OutlinedTextField(value = stdin, onValueChange = { stdin = it }, placeholder = { Text("e.g. 12 28 for Scanner input", fontSize = 12.sp, color = Color.Gray) }, singleLine = false, maxLines = 3, textStyle = TextStyle(fontFamily = mono, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface), modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = brutalBorderColor().copy(alpha = 0.3f), focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface))
+                    if (stdin.isNotEmpty()) { Spacer(Modifier.width(6.dp)); IconButton(onClick = { stdin = "" }, modifier = Modifier.size(28.dp)) { Icon(Icons.Filled.Clear, contentDescription = "Clear stdin", modifier = Modifier.size(16.dp)) } }
                 }
             }
 
@@ -507,17 +512,4 @@ private fun defaultCode(lang: String) = when(lang) {
     else -> ""
 }
 
-private fun stripMarkdown(text: String): String {
-    return text
-        .replace(Regex("```[a-zA-Z]*\\n?"), "")
-        .replace(Regex("```"), "")
-        .replace(Regex("(?m)^#{1,6}\\s*"), "")
-        .replace(Regex("\\*\\*(.+?)\\*\\*"), "$1")
-        .replace(Regex("__(.+?)__"), "$1")
-        .replace(Regex("(?m)^\\*\\s+"), "")
-        .replace(Regex("(?m)^-\\s+"), "")
-        .replace(Regex("(?m)^\\d+\\.\\s+"), "")
-        .replace(Regex("`(.+?)`"), "$1")
-        .replace(Regex("(?m)^>\\s?"), "")
-        .trim()
-}
+

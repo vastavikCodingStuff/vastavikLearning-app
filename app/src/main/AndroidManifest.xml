@@ -96,6 +96,14 @@
 
         <receiver android:name=".utils.NotificationDismissReceiver" android:exported="false" />
 
+        <receiver
+            android:name=".utils.DownloadProgressReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.vastavik.computer.action.CANCEL_DOWNLOAD" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
