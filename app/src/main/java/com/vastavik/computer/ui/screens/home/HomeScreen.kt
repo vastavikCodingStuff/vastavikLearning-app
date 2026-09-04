@@ -434,6 +434,7 @@ private fun HomeTab(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
+                    .padding(top = 10.dp)
                     .padding(end = 4.dp, bottom = 4.dp)
             ) {
                 Box(
