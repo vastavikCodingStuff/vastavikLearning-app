@@ -122,32 +122,6 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                     }
                 }
 
-                Spacer(Modifier.height(18.dp))
-
-                // Gateway toggle — two brutal selectable cards
-                Text("Payment Gateway", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.fillMaxWidth())
-                Spacer(Modifier.height(8.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    listOf("Razorpay", "PhonePe").forEach { g ->
-                        val sel = gateway == g
-                        BrutalBoxCard(
-                            modifier = Modifier.weight(1f).height(56.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            backgroundColor = if (sel) NeoBrutalistColors.Yellow else MaterialTheme.colorScheme.surface,
-                            onClick = { gateway = g }
-                        ) {
-                            Row(Modifier.fillMaxSize().padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                                Icon(if (g == "Razorpay") Icons.Filled.CreditCard else Icons.Filled.PhoneAndroid, contentDescription = null, modifier = Modifier.size(18.dp), tint = if (sel) Color.Black else MaterialTheme.colorScheme.onSurface)
-                                Spacer(Modifier.width(8.dp))
-                                Text(g, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = if (sel) Color.Black else MaterialTheme.colorScheme.onSurface)
-                                if (sel) { Spacer(Modifier.width(6.dp)); Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = Color.Black, modifier = Modifier.size(16.dp)) }
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(14.dp))
-
                 if (promoActive) {
                     BrutalCard(
                         modifier = Modifier.fillMaxWidth(),
@@ -155,8 +129,20 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                         backgroundColor = MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(NeoBrutalistColors.Yellow).border(BorderStroke(1.5.dp, bb), CircleShape), contentAlignment = Alignment.Center) {
-                                Icon(Icons.Filled.LocalOffer, contentDescription = null, tint = Color.Black, modifier = Modifier.size(14.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF2563EB).copy(alpha = 0.15f))
+                                    .border(BorderStroke(1.5.dp, Color(0xFF2563EB)), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.LocalOffer,
+                                    contentDescription = null,
+                                    tint = Color(0xFF2563EB),
+                                    modifier = Modifier.size(14.dp)
+                                )
                             }
                             Spacer(Modifier.width(10.dp))
                             Text("50% OFF applied!", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
@@ -419,34 +405,35 @@ private fun BrutalPlanCard(
     onClick: () -> Unit
 ) {
     val bb = brutalBorderColor()
+    val selectedBlue = Color(0xFF2563EB)
     BrutalBoxCard(
         modifier = Modifier.fillMaxWidth().height(78.dp),
         shape = RoundedCornerShape(BrutalDefaults.Radius),
-        backgroundColor = if (isSelected) NeoBrutalistColors.Yellow else MaterialTheme.colorScheme.surface,
+        backgroundColor = if (isSelected) selectedBlue else MaterialTheme.colorScheme.surface,
         onClick = onClick
     ) {
         Row(modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier.size(22.dp).clip(CircleShape)
-                    .background(if (isSelected) Color.Black else MaterialTheme.colorScheme.surfaceVariant)
-                    .border(BorderStroke(1.5.dp, bb), CircleShape),
+                    .background(if (isSelected) Color.White else MaterialTheme.colorScheme.surfaceVariant)
+                    .border(BorderStroke(1.5.dp, if (isSelected) Color.White else bb), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                if (isSelected) Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
+                if (isSelected) Icon(Icons.Filled.Check, contentDescription = null, tint = selectedBlue, modifier = Modifier.size(12.dp))
             }
             Spacer(Modifier.width(10.dp))
-            Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+            Text(title, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.End) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (originalPrice != null) Text(originalPrice, fontSize = 12.sp, color = if (isSelected) Color.Black.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant, textDecoration = TextDecoration.LineThrough, modifier = Modifier.padding(end = 6.dp))
-                    Text(price, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = if (isSelected) Color.Black else MaterialTheme.colorScheme.onSurface)
+                    if (originalPrice != null) Text(originalPrice, fontSize = 12.sp, color = if (isSelected) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant, textDecoration = TextDecoration.LineThrough, modifier = Modifier.padding(end = 6.dp))
+                    Text(price, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface)
                 }
-                Text(period, fontSize = 11.sp, color = if (isSelected) Color.Black.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
+                Text(period, fontSize = 11.sp, color = if (isSelected) Color.White.copy(alpha = 0.85f) else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
             }
             if (badge != null) {
                 Spacer(Modifier.width(8.dp))
-                Box(modifier = Modifier.clip(RoundedCornerShape(50.dp)).background(Color.Black).padding(horizontal = 8.dp, vertical = 4.dp)) {
-                    Text(badge, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
+                Box(modifier = Modifier.clip(RoundedCornerShape(50.dp)).background(if (isSelected) Color.White else Color.Black).padding(horizontal = 8.dp, vertical = 4.dp)) {
+                    Text(badge, fontSize = 10.sp, color = if (isSelected) selectedBlue else Color.White, fontWeight = FontWeight.ExtraBold)
                 }
             }
         }
