@@ -117,14 +117,16 @@ com.vastavik.computer
 3. **Configure `local.properties`:**
    Add backend connection and API keys to `local.properties` in the project root:
    ```properties
-   # API Keys
-   GEMINI_API_KEY=your_gemini_api_key_here
-   MISTRAL_API_KEY=your_mistral_api_key_here
+    # API Keys
+    GEMINI_API_KEY=your_gemini_api_key_here
+    # MISTRAL_API_KEY no longer used (Vastavik AI is powered by Google Gemini)
+    # Judge0 self-hosted instance (Code Editor → "Run" button)
+    JUDGE0_AUTH_TOKEN=your_judge0_auth_token_here
 
-   # Backend Endpoint Configuration
-   BACKEND_BASE_URL=https://vastavik-admin-backend.onrender.com
-   API_KEY_ID=android-prod
-   API_KEY_SECRET=your_hmac_secret_here
+    # Backend Endpoint Configuration
+    BACKEND_BASE_URL=https://vastavik-admin-backend.onrender.com
+    API_KEY_ID=android-prod
+    API_KEY_SECRET=your_hmac_secret_here
    ```
 
 4. **Build & Run:**

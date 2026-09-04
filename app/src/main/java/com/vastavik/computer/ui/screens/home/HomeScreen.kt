@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.ExperimentalFoundationApi
 import com.vastavik.computer.ui.components.VastavikTopBar
-import com.vastavik.computer.ui.components.PromoPopup
-import com.vastavik.computer.ui.components.PromoData
-import com.vastavik.computer.ui.components.UnderDevelopmentBanner
+import com.vastavik.computer.ui.components.BannersPagerOverlay
+import com.vastavik.computer.ui.components.BannerPage
+import com.vastavik.computer.ui.components.BannerAccent
 import com.vastavik.computer.ui.theme.NeoBrutalistColors
 import com.vastavik.computer.ui.theme.BrutalBoxCard
 import com.vastavik.computer.ui.theme.BrutalCard
@@ -50,8 +50,7 @@ import com.vastavik.computer.ui.theme.BrutalDefaults
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 
-private var promoShown = false
-private var devBannerShown = false
+private var bannersShown = false
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -59,8 +58,23 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 1) { 5 }
     val coroutineScope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
-    var showPromo by remember { mutableStateOf(!promoShown) }
-    var showDevBanner by remember { mutableStateOf(!devBannerShown) }
+    var showBanners by remember { mutableStateOf(!bannersShown) }
+    val bannerPages = remember {
+        listOf(
+            BannerPage(
+                title = "50% OFF Premium!",
+                body = "Get full access to Java/Python/JS/SQL + AI Chat & papers. UPI AutoPay Rs 149/mo.",
+                ctaText = "Grab Now",
+                accent = BannerAccent.PROMO
+            ),
+            BannerPage(
+                title = "App is Still Under Development",
+                body = "This app is being built and maintained by a single person — the same person who creates the video lessons you see in the app right now. A fuller, more polished version of Vastavik will be available eventually. Thank you for being here early.",
+                ctaText = "Got it",
+                accent = BannerAccent.DEV
+            )
+        )
+    }
 
     val sampleCourses = remember {
         listOf(
@@ -76,19 +90,19 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
     }
 
-    if (showPromo) {
-        promoShown = true
-        PromoPopup(
-            promo = PromoData(title="50% OFF Premium!", body="Get full access to Java/Python/JS/SQL + AI Chat & papers. UPI AutoPay Rs 149/mo.", ctaText="Grab Now"),
-            onDismiss = { showPromo = false },
-            onCta = { showPromo = false; onNavigate("payment") }
-        )
-    }
-
-    if (showDevBanner) {
-        devBannerShown = true
-        UnderDevelopmentBanner(
-            onDismiss = { showDevBanner = false }
+    if (showBanners) {
+        bannersShown = true
+        BannersPagerOverlay(
+            pages = bannerPages,
+            onDismiss = { showBanners = false },
+            onCta = { page ->
+                if (page.accent == BannerAccent.PROMO) {
+                    showBanners = false
+                    onNavigate("payment")
+                } else {
+                    showBanners = false
+                }
+            }
         )
     }
 

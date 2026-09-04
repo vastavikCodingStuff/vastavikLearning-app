@@ -184,6 +184,41 @@ fun ProfileScreen(
                                     )
                                 )
                         ) {
+                            // Small chat chip pinned to the top-right of the gradient header
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(top = 12.dp, end = 12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 3.dp, bottom = 3.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .offset(x = 3.dp, y = 3.dp)
+                                            .clip(RoundedCornerShape(50.dp))
+                                            .background(bs)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(RoundedCornerShape(50.dp))
+                                            .background(Color(0xFF2AABEE))
+                                            .border(BorderStroke(1.5.dp, Color.White), RoundedCornerShape(50.dp))
+                                            .clickable { onNavigate("peer_chat") },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Forum,
+                                            contentDescription = "Open Peer Chat",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            }
                             Box {
                                 Box(
                                     modifier = Modifier
@@ -202,10 +237,10 @@ fun ProfileScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(20.dp),
+                                        .padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 20.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Spacer(modifier = Modifier.height(18.dp))
                                     // Avatar with brutal border and Peer Chat button on the right
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),

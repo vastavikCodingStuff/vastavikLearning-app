@@ -56,7 +56,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-import com.vastavik.computer.utils.MistralDiskCache
+import com.vastavik.computer.utils.VastavikAiDiskCache
 
 private enum class QuestionSource(val label: String, val tagBg: Color, val tagText: Color) {
     AI("AI-Generated", Color(0xFF2563EB), Color.White),
@@ -81,18 +81,18 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
     var selectedSource by remember { mutableStateOf(QuestionSource.AI) } // 1. Top Toggle AI vs Sir
     val tabs = listOf("MCQs", "Predict the Output", "Coding", "PYQs")
 
-    // Active AI coding item for Mistral solution sheet
+    // Active AI coding item for Vastavik AI solution sheet
     var activeCodingItem by remember { mutableStateOf<CodingItem?>(null) }
     var selectedLanguage by remember { mutableStateOf("Java") }
     var aiSolutionMarkdown by remember { mutableStateOf("") }
     var isGeneratingCode by remember { mutableStateOf(false) }
 
-    fun loadMistralSolution(item: CodingItem, lang: String) {
+    fun loadVastavikAiSolution(item: CodingItem, lang: String) {
         val sanitizedTitle = item.title.trim().lowercase().replace(Regex("[^a-z0-9]"), "_")
         val cacheKey = "code_${sanitizedTitle}_${lang.lowercase()}"
         
         // 1. Check persistent disk cache first (persists even if phone restarted)
-        val cached = MistralDiskCache.getSolution(context, cacheKey)
+        val cached = VastavikAiDiskCache.getSolution(context, cacheKey)
         if (!cached.isNullOrBlank()) {
             aiSolutionMarkdown = cached
             isGeneratingCode = false
@@ -102,14 +102,14 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
         isGeneratingCode = true
         aiSolutionMarkdown = ""
         coroutineScope.launch {
-            val response = callMistralGenerateCode(
-                title = item.title,
-                topic = item.topic,
-                difficulty = item.difficulty,
-                language = lang
+            val response = callVastavikAiGenerateCode(
+                problemTitle = item.title,
+                problemDescription = item.topic,
+                language = lang,
+                contextCode = ""
             )
             // 2. Persist to disk cache permanently
-            MistralDiskCache.saveSolution(context, cacheKey, response)
+            VastavikAiDiskCache.saveSolution(context, cacheKey, response)
             aiSolutionMarkdown = response
             isGeneratingCode = false
         }
@@ -389,10 +389,10 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                     2 -> CodingContent(
                         selectedSource = selectedSource,
                         onNavigate = onNavigate,
-                        onOpenMistralAi = { item ->
+                        onOpenVastavikAi = { item ->
                             activeCodingItem = item
                             selectedLanguage = "Java"
-                            loadMistralSolution(item, "Java")
+                            loadVastavikAiSolution(item, "Java")
                         }
                     )
                     3 -> PYQContent(
@@ -410,7 +410,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
         }
     }
 
-    // 3. MISTRAL AI CODE GENERATION BOTTOM SHEET
+    // 3. VASTAVIK AI CODE GENERATION BOTTOM SHEET
     activeCodingItem?.let { item ->
         ModalBottomSheet(
             onDismissRequest = { activeCodingItem = null },
@@ -453,7 +453,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         )
                     }
 
-                    // Mistral AI badge positioned on the top right
+                    // Vastavik AI badge positioned on the top right
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50.dp))
@@ -470,7 +470,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Mistral AI",
+                                text = "Vastavik AI",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF2563EB)
@@ -496,7 +496,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                 .clickable {
                                     if (selectedLanguage != lang) {
                                         selectedLanguage = lang
-                                        loadMistralSolution(item, lang)
+                                        loadVastavikAiSolution(item, lang)
                                     }
                                 }
                                 .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -696,7 +696,7 @@ private fun SectionHeading(source: QuestionSource, onSuggestNew: (() -> Unit)? =
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = if (source == QuestionSource.SIR) "Hand-picked by Sir" else "Auto-generated by Mistral AI",
+            text = if (source == QuestionSource.SIR) "Hand-picked by Sir" else "Auto-generated by Vastavik AI",
             fontSize = 11.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Medium,
@@ -860,7 +860,7 @@ private fun MCQPromptDialog(
         isGeneratingTopics = true
         coroutineScope.launch {
             try {
-                val topics = callMistralGenerateMCQTopics(cleanQuery)
+                val topics = callVastavikAiGenerateMCQTopics(cleanQuery)
                 onTopicsGenerated(topics)
                 Toast.makeText(context, "Generated ${topics.size} MCQ topics!", Toast.LENGTH_SHORT).show()
                 onDismiss()
@@ -1250,7 +1250,7 @@ private fun PredictOutputPromptDialog(
         isGeneratingQuestions = true
         coroutineScope.launch {
             try {
-                val sets = callMistralGeneratePredictOutput(cleanQuery, startSetNumber)
+                val sets = callVastavikAiGeneratePredictOutput(cleanQuery, startSetNumber)
                 onSetsGenerated(sets)
                 Toast.makeText(context, "Generated ${sets.size} Output Tracing sets!", Toast.LENGTH_SHORT).show()
                 onDismiss()
@@ -1634,7 +1634,7 @@ private fun CodingPromptDialog(
         isGeneratingQuestions = true
         coroutineScope.launch {
             try {
-                val questions = callMistralGenerateQuestions(cleanQuery)
+                val questions = callVastavikAiGenerateQuestions(cleanQuery)
                 onQuestionsGenerated(questions)
                 Toast.makeText(context, "Generated ${questions.size} coding questions!", Toast.LENGTH_SHORT).show()
                 onDismiss()
@@ -1965,7 +1965,7 @@ private fun MCQContent(
     onNavigate: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val saved = remember { MistralDiskCache.getSavedMCQs(context) }
+    val saved = remember { VastavikAiDiskCache.getSavedMCQs(context) }
     val aiItems = remember {
         mutableStateListOf<MCQItem>().apply {
             if (saved.isNotEmpty()) {
@@ -1992,7 +1992,7 @@ private fun MCQContent(
             onDismiss = { showDialog = false },
             onTopicsGenerated = { newTopics ->
                 aiItems.addAll(0, newTopics)
-                MistralDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
+                VastavikAiDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
             }
         )
     }
@@ -2011,7 +2011,7 @@ private fun MCQContent(
                 onDelete = if (item.source == QuestionSource.AI) {
                     { toDelete ->
                         aiItems.remove(toDelete)
-                        MistralDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
+                        VastavikAiDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
                         Toast.makeText(context, "Quiz topic removed", Toast.LENGTH_SHORT).show()
                     }
                 } else null
@@ -2026,7 +2026,7 @@ private fun PredictOutputContent(
     onNavigate: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val saved = remember { MistralDiskCache.getSavedPredictOutput(context) }
+    val saved = remember { VastavikAiDiskCache.getSavedPredictOutput(context) }
     val aiItems = remember {
         mutableStateListOf<PredictOutputItem>().apply {
             if (saved.isNotEmpty()) {
@@ -2081,7 +2081,7 @@ private fun PredictOutputContent(
                     )
                 )
                 addAll(defaults)
-                MistralDiskCache.savePredictOutput(context, defaults.map { Triple(it.title, it.questionCount, it.difficulty) })
+                VastavikAiDiskCache.savePredictOutput(context, defaults.map { Triple(it.title, it.questionCount, it.difficulty) })
             }
         }
     }
@@ -2132,7 +2132,7 @@ private fun PredictOutputContent(
             startSetNumber = aiItems.size,
             onSetsGenerated = { newSets ->
                 aiItems.addAll(0, newSets)
-                MistralDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
+                VastavikAiDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
             }
         )
     }
@@ -2151,7 +2151,7 @@ private fun PredictOutputContent(
                 onDelete = if (item.source == QuestionSource.AI) {
                     { toDelete ->
                         aiItems.remove(toDelete)
-                        MistralDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
+                        VastavikAiDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
                         Toast.makeText(context, "Set deleted", Toast.LENGTH_SHORT).show()
                     }
                 } else null
@@ -2392,10 +2392,10 @@ private fun getSnippetForTopic(topic: String): String {
 private fun CodingContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit,
-    onOpenMistralAi: (CodingItem) -> Unit
+    onOpenVastavikAi: (CodingItem) -> Unit
 ) {
     val context = LocalContext.current
-    val saved = remember { MistralDiskCache.getSavedCoding(context) }
+    val saved = remember { VastavikAiDiskCache.getSavedCoding(context) }
     val aiItems = remember {
         mutableStateListOf<CodingItem>().apply {
             if (saved.isNotEmpty()) {
@@ -2407,7 +2407,7 @@ private fun CodingContent(
                     CodingItem("Merge Intervals", "Hard", "Intervals", QuestionSource.AI)
                 )
                 addAll(defaults)
-                MistralDiskCache.saveCoding(context, defaults.map { Triple(it.title, it.difficulty, it.topic) })
+                VastavikAiDiskCache.saveCoding(context, defaults.map { Triple(it.title, it.difficulty, it.topic) })
             }
         }
     }
@@ -2424,7 +2424,7 @@ private fun CodingContent(
             onDismiss = { showDialog = false },
             onQuestionsGenerated = { newQuestions ->
                 aiItems.addAll(0, newQuestions)
-                MistralDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
+                VastavikAiDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
             }
         )
     }
@@ -2440,14 +2440,14 @@ private fun CodingContent(
             CodingCard(
                 item = item,
                 onNavigate = onNavigate,
-                onOpenMistralAi = onOpenMistralAi,
+                onOpenVastavikAi = onOpenVastavikAi,
                 onDelete = if (item.source == QuestionSource.AI) {
                     { toDelete ->
                         aiItems.remove(toDelete)
-                        MistralDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
+                        VastavikAiDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
                         val sanitizedTitle = toDelete.title.trim().lowercase().replace(Regex("[^a-z0-9]"), "_")
                         listOf("java", "python", "c++", "javascript").forEach { lang ->
-                            MistralDiskCache.removeSolution(context, "code_${sanitizedTitle}_$lang")
+                            VastavikAiDiskCache.removeSolution(context, "code_${sanitizedTitle}_$lang")
                         }
                         Toast.makeText(context, "Question deleted", Toast.LENGTH_SHORT).show()
                     }
@@ -2463,7 +2463,7 @@ private fun PYQContent(
     onNavigate: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val saved = remember { MistralDiskCache.getSavedPYQs(context) }
+    val saved = remember { VastavikAiDiskCache.getSavedPYQs(context) }
     val aiItems = remember {
         mutableStateListOf<PYQItem>().apply {
             if (saved.isNotEmpty()) {
@@ -2488,7 +2488,7 @@ private fun PYQContent(
             onDismiss = { showDialog = false },
             onSubmit = { topic ->
                 aiItems.add(0, PYQItem(topic, "30 questions", QuestionSource.AI))
-                MistralDiskCache.savePYQs(context, aiItems.map { Pair(it.title, it.questions) })
+                VastavikAiDiskCache.savePYQs(context, aiItems.map { Pair(it.title, it.questions) })
                 showDialog = false
             }
         )
@@ -2589,7 +2589,7 @@ private fun MCQCard(
 private fun CodingCard(
     item: CodingItem,
     onNavigate: (String) -> Unit,
-    onOpenMistralAi: (CodingItem) -> Unit,
+    onOpenVastavikAi: (CodingItem) -> Unit,
     onDelete: ((CodingItem) -> Unit)? = null
 ) {
     val bb = brutalBorderColor()
@@ -2608,7 +2608,7 @@ private fun CodingCard(
                 .fillMaxWidth()
                 .clickable {
                     if (item.source == QuestionSource.AI) {
-                        onOpenMistralAi(item)
+                        onOpenVastavikAi(item)
                     } else {
                         val encodedQ = Uri.encode(item.title, "UTF-8")
                         onNavigate("code_editor?question=$encodedQ")
@@ -2687,7 +2687,7 @@ private fun CodingCard(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color(0xFF2563EB))
                                     .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
-                                    .clickable { onOpenMistralAi(item) }
+                                    .clickable { onOpenVastavikAi(item) }
                                     .padding(horizontal = 10.dp, vertical = 6.dp),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -2699,46 +2699,66 @@ private fun CodingCard(
                             }
                         }
 
+                        // 3-dot menu containing Editor + Delete
+                        var menuOpen by remember { mutableStateOf(false) }
                         Box(
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .defaultMinSize(minHeight = 28.dp)
+                                .defaultMinSize(minHeight = 28.dp, minWidth = 32.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
                                 .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
-                                .clickable {
-                                    val encodedQ = Uri.encode(item.title, "UTF-8")
-                                    onNavigate("code_editor?question=$encodedQ")
-                                }
-                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                                .clickable { menuOpen = true }
+                                .padding(horizontal = 6.dp, vertical = 4.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Code, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(12.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Editor", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-
-                        // Delete option on the right of the Editor button
-                        if (onDelete != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .defaultMinSize(minHeight = 28.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFFEF4444).copy(alpha = 0.12f))
-                                    .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
-                                    .clickable { onDelete(item) }
-                                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                                contentAlignment = Alignment.Center
+                            Icon(
+                                Icons.Filled.MoreVert,
+                                contentDescription = "More options",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            DropdownMenu(
+                                expanded = menuOpen,
+                                onDismissRequest = { menuOpen = false },
+                                shape = RoundedCornerShape(10.dp),
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                border = BorderStroke(1.5.dp, bb)
                             ) {
-                                Icon(
-                                    Icons.Filled.DeleteOutline,
-                                    contentDescription = "Delete Question",
-                                    tint = Color(0xFFDC2626),
-                                    modifier = Modifier.size(15.dp)
+                                DropdownMenuItem(
+                                    text = { Text("Editor", fontSize = 13.sp, fontWeight = FontWeight.SemiBold) },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Filled.Code,
+                                            contentDescription = null,
+                                            tint = Color(0xFF2563EB),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    },
+                                    onClick = {
+                                        menuOpen = false
+                                        val encodedQ = Uri.encode(item.title, "UTF-8")
+                                        onNavigate("code_editor?question=$encodedQ")
+                                    }
                                 )
+                                if (onDelete != null) {
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                    DropdownMenuItem(
+                                        text = { Text("Delete", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFDC2626)) },
+                                        leadingIcon = {
+                                            Icon(
+                                                Icons.Filled.DeleteOutline,
+                                                contentDescription = null,
+                                                tint = Color(0xFFDC2626),
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        },
+                                        onClick = {
+                                            menuOpen = false
+                                            onDelete(item)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -2805,83 +2825,45 @@ private fun PYQCard(item: PYQItem, onNavigate: (String) -> Unit) {
     }
 }
 
-// AI CODING QUESTION GENERATOR: Calls Mistral AI to produce 3-4 structured coding questions as per user prompt
-private suspend fun callMistralGenerateQuestions(promptText: String): List<CodingItem> = withContext(Dispatchers.IO) {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) {
-        return@withContext getFallbackQuestions(promptText)
-    }
-
+// AI CODING QUESTION GENERATOR: Calls Vastavik AI to produce 3-4 structured coding questions as per user prompt
+private suspend fun callVastavikAiGenerateQuestions(promptText: String): List<CodingItem> = withContext(Dispatchers.IO) {
+    val systemPrompt = """
+        You are an expert computer science teacher and coding question generator for Indian school students (Class 9-12 ICSE/CBSE and beginners).
+        Generate exactly 3 to 4 distinct, high-quality, practical coding problems based on the user's prompt.
+        Return ONLY a valid JSON array of objects. No markdown backticks, no markdown code fence, no commentary.
+        Each object in the array MUST have:
+        - "title": A clear, concise title of the problem (e.g. "Linear Search in Integer Array")
+        - "difficulty": Exactly one of "Easy", "Medium", or "Hard"
+        - "topic": Short topic name (e.g. "Arrays", "Strings", "Recursion", "Loops", "OOP")
+        Example:
+        [
+          {"title": "Sum of Array Elements", "difficulty": "Easy", "topic": "Arrays"},
+          {"title": "Search Element in Array", "difficulty": "Easy", "topic": "Arrays"},
+          {"title": "Find Second Largest Element", "difficulty": "Medium", "topic": "Arrays"},
+          {"title": "Bubble Sort an Array", "difficulty": "Medium", "topic": "Arrays"}
+        ]
+    """.trimIndent()
     try {
-        val url = URL("https://api.mistral.ai/v1/chat/completions")
-        val conn = url.openConnection() as HttpURLConnection
-        conn.requestMethod = "POST"
-        conn.setRequestProperty("Content-Type", "application/json")
-        conn.setRequestProperty("Authorization", "Bearer $apiKey")
-        conn.doOutput = true
-        conn.connectTimeout = 25000
-        conn.readTimeout = 25000
-
-        val systemPrompt = """
-            You are an expert computer science teacher and coding question generator for Indian school students (Class 9-12 ICSE/CBSE and beginners).
-            Generate exactly 3 to 4 distinct, high-quality, practical coding problems based on the user's prompt.
-            Return ONLY a valid JSON array of objects. No markdown backticks, no markdown code fence, no commentary.
-            Each object in the array MUST have:
-            - "title": A clear, concise title of the problem (e.g. "Linear Search in Integer Array")
-            - "difficulty": Exactly one of "Easy", "Medium", or "Hard"
-            - "topic": Short topic name (e.g. "Arrays", "Strings", "Recursion", "Loops", "OOP")
-            Example:
-            [
-              {"title": "Sum of Array Elements", "difficulty": "Easy", "topic": "Arrays"},
-              {"title": "Search Element in Array", "difficulty": "Easy", "topic": "Arrays"},
-              {"title": "Find Second Largest Element", "difficulty": "Medium", "topic": "Arrays"},
-              {"title": "Bubble Sort an Array", "difficulty": "Medium", "topic": "Arrays"}
-            ]
-        """.trimIndent()
-
-        val body = JSONObject().apply {
-            put("model", "mistral-small-latest")
-            put("messages", JSONArray().apply {
-                put(JSONObject().put("role", "system").put("content", systemPrompt))
-                put(JSONObject().put("role", "user").put("content", "Generate 3 to 4 coding questions for: $promptText"))
-            })
-            put("max_tokens", 800)
-            put("temperature", 0.3)
+        val content = com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = systemPrompt,
+            userPrompt = "Generate 3 to 4 coding questions for: $promptText",
+            temperature = 0.3,
+            maxOutputTokens = 800
+        )
+        val cleanJson = content
+            .replace(Regex("^```(?:json)?\\s*"), "")
+            .replace(Regex("\\s*```$"), "")
+            .trim()
+        val arr = JSONArray(cleanJson)
+        val list = mutableListOf<CodingItem>()
+        for (i in 0 until arr.length()) {
+            val obj = arr.getJSONObject(i)
+            val title = obj.optString("title", "").trim()
+            val diff = obj.optString("difficulty", "Medium").trim()
+            val topic = obj.optString("topic", "Coding").trim()
+            if (title.isNotBlank()) list.add(CodingItem(title, diff, topic, QuestionSource.AI))
         }
-
-        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-        val responseCode = conn.responseCode
-        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-        val responseText = stream.bufferedReader().use { it.readText() }
-
-        if (responseCode in 200..299) {
-            val json = JSONObject(responseText)
-            val content = json.getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content")
-                .trim()
-
-            val cleanJson = content
-                .replace(Regex("^```(?:json)?\\s*"), "")
-                .replace(Regex("\\s*```$"), "")
-                .trim()
-
-            val arr = JSONArray(cleanJson)
-            val list = mutableListOf<CodingItem>()
-            for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                val title = obj.optString("title", "").trim()
-                val diff = obj.optString("difficulty", "Medium").trim()
-                val topic = obj.optString("topic", "Coding").trim()
-                if (title.isNotBlank()) {
-                    list.add(CodingItem(title, diff, topic, QuestionSource.AI))
-                }
-            }
-            if (list.size >= 3) list.take(4) else getFallbackQuestions(promptText)
-        } else {
-            getFallbackQuestions(promptText)
-        }
+        if (list.size >= 3) list.take(4) else getFallbackQuestions(promptText)
     } catch (_: Exception) {
         getFallbackQuestions(promptText)
     }
@@ -2930,74 +2912,36 @@ private fun getFallbackQuestions(prompt: String): List<CodingItem> {
     }
 }
 
-// AI MCQ TOPIC GENERATOR: Calls Mistral AI to produce 3-4 structured MCQ quiz topics as per user prompt
-private suspend fun callMistralGenerateMCQTopics(promptText: String): List<MCQItem> = withContext(Dispatchers.IO) {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) {
-        return@withContext getFallbackMCQTopics(promptText)
-    }
-
+// AI MCQ TOPIC GENERATOR: Calls Vastavik AI to produce 3-4 structured MCQ quiz topics as per user prompt
+private suspend fun callVastavikAiGenerateMCQTopics(promptText: String): List<MCQItem> = withContext(Dispatchers.IO) {
+    val systemPrompt = """
+        You are an expert computer science teacher generating Multiple Choice Quiz (MCQ) topics for students (ICSE Class 9-10 & CBSE Class 11-12).
+        Generate exactly 3 to 4 distinct MCQ quiz topics based on the user's prompt.
+        Return ONLY a valid JSON array of objects. No markdown backticks, no markdown fence, no commentary.
+        Each object in the array MUST have:
+        - "title": Short descriptive title of the quiz topic (e.g. "String Class & Methods")
+        - "questions": Question count string (e.g. "12 questions", "15 questions")
+    """.trimIndent()
     try {
-        val url = URL("https://api.mistral.ai/v1/chat/completions")
-        val conn = url.openConnection() as HttpURLConnection
-        conn.requestMethod = "POST"
-        conn.setRequestProperty("Content-Type", "application/json")
-        conn.setRequestProperty("Authorization", "Bearer $apiKey")
-        conn.doOutput = true
-        conn.connectTimeout = 25000
-        conn.readTimeout = 25000
-
-        val systemPrompt = """
-            You are an expert computer science teacher generating Multiple Choice Quiz (MCQ) topics for students (ICSE Class 9-10 & CBSE Class 11-12).
-            Generate exactly 3 to 4 distinct MCQ quiz topics based on the user's prompt.
-            Return ONLY a valid JSON array of objects. No markdown backticks, no markdown fence, no commentary.
-            Each object in the array MUST have:
-            - "title": Short descriptive title of the quiz topic (e.g. "String Class & Methods")
-            - "questions": Question count string (e.g. "12 questions", "15 questions")
-        """.trimIndent()
-
-        val body = JSONObject().apply {
-            put("model", "mistral-small-latest")
-            put("messages", JSONArray().apply {
-                put(JSONObject().put("role", "system").put("content", systemPrompt))
-                put(JSONObject().put("role", "user").put("content", "Generate 3 to 4 MCQ topics for: $promptText"))
-            })
-            put("max_tokens", 600)
-            put("temperature", 0.3)
+        val content = com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = systemPrompt,
+            userPrompt = "Generate MCQ topics for: $promptText",
+            temperature = 0.3,
+            maxOutputTokens = 600
+        )
+        val cleanJson = content
+            .replace(Regex("^```(?:json)?\\s*"), "")
+            .replace(Regex("\\s*```$"), "")
+            .trim()
+        val arr = JSONArray(cleanJson)
+        val list = mutableListOf<MCQItem>()
+        for (i in 0 until arr.length()) {
+            val obj = arr.getJSONObject(i)
+            val title = obj.optString("title", "").trim()
+            val count = obj.optString("questions", "10 questions").trim()
+            if (title.isNotBlank()) list.add(MCQItem(title, count, QuestionSource.AI))
         }
-
-        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-        val responseCode = conn.responseCode
-        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-        val responseText = stream.bufferedReader().use { it.readText() }
-
-        if (responseCode in 200..299) {
-            val json = JSONObject(responseText)
-            val content = json.getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content")
-                .trim()
-
-            val cleanJson = content
-                .replace(Regex("^```(?:json)?\\s*"), "")
-                .replace(Regex("\\s*```$"), "")
-                .trim()
-
-            val arr = JSONArray(cleanJson)
-            val list = mutableListOf<MCQItem>()
-            for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                val title = obj.optString("title", "").trim()
-                val qCount = obj.optString("questions", "10 questions").trim()
-                if (title.isNotBlank()) {
-                    list.add(MCQItem(title, qCount, QuestionSource.AI))
-                }
-            }
-            if (list.isNotEmpty()) list else getFallbackMCQTopics(promptText)
-        } else {
-            getFallbackMCQTopics(promptText)
-        }
+        if (list.size >= 3) list.take(4) else getFallbackMCQTopics(promptText)
     } catch (_: Exception) {
         getFallbackMCQTopics(promptText)
     }
@@ -3035,90 +2979,55 @@ private fun getFallbackMCQTopics(prompt: String): List<MCQItem> {
     }
 }
 
-// AI PREDICT OUTPUT GENERATOR: Calls Mistral AI to produce 2-3 structured Predict the Output question sets as per user prompt
-private suspend fun callMistralGeneratePredictOutput(promptText: String, startSetIndex: Int): List<PredictOutputItem> = withContext(Dispatchers.IO) {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) {
-        return@withContext getFallbackPredictOutput(promptText, startSetIndex)
-    }
-
+// AI PREDICT OUTPUT GENERATOR: Calls Vastavik AI to produce 2-3 structured Predict the Output question sets as per user prompt
+private suspend fun callVastavikAiGeneratePredictOutput(promptText: String, startSetIndex: Int): List<PredictOutputItem> = withContext(Dispatchers.IO) {
+    data class _PredRaw(val title: String, val code: String, val options: List<String>, val correctIndex: Int)
+    val systemPrompt = """
+        Generate exactly 2 to 3 distinct output prediction question sets based on the user's topic prompt.
+        Return ONLY a valid JSON array of objects. No markdown backticks, no commentary.
+        Each object MUST have:
+        - "title": A short title for the set
+        - "codeSnippet": A short 3 to 6 line valid Java snippet demonstrating the output problem (use System.out.println)
+        - "options": An array of exactly 4 short strings (the candidate outputs, only one is correct)
+        - "correctIndex": Integer 0..3 indicating the correct option
+    """.trimIndent()
     try {
-        val url = URL("https://api.mistral.ai/v1/chat/completions")
-        val conn = url.openConnection() as HttpURLConnection
-        conn.requestMethod = "POST"
-        conn.setRequestProperty("Content-Type", "application/json")
-        conn.setRequestProperty("Authorization", "Bearer $apiKey")
-        conn.doOutput = true
-        conn.connectTimeout = 25000
-        conn.readTimeout = 25000
-
-        val systemPrompt = """
-            You are an expert computer science teacher generating Java "Predict the Output" code tracing practice question sets for students (ICSE Class 9-10 & CBSE Class 11-12).
-            Generate exactly 2 to 3 distinct output prediction question sets based on the user's topic prompt.
-            Return ONLY a valid JSON array of objects. No markdown backticks, no markdown fence, no commentary.
-            Each object in the array MUST have:
-            - "title": Title of the set (e.g. "Nested For-Loops & Break Tracing")
-            - "topic": Topic name (e.g. "Loops", "Strings", "Precedence", "Recursion")
-            - "questionCount": Number of questions string (e.g. "10 Questions", "12 Questions")
-            - "difficulty": Exactly one of "Easy", "Medium", or "Hard"
-            - "codeSnippet": A short 3 to 6 line valid Java snippet demonstrating the output problem (use System.out.println)
-        """.trimIndent()
-
-        val body = JSONObject().apply {
-            put("model", "mistral-small-latest")
-            put("messages", JSONArray().apply {
-                put(JSONObject().put("role", "system").put("content", systemPrompt))
-                put(JSONObject().put("role", "user").put("content", "Generate 2 to 3 Predict the Output sets for: $promptText"))
-            })
-            put("max_tokens", 800)
-            put("temperature", 0.3)
-        }
-
-        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-        val responseCode = conn.responseCode
-        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-        val responseText = stream.bufferedReader().use { it.readText() }
-
-        if (responseCode in 200..299) {
-            val json = JSONObject(responseText)
-            val content = json.getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content")
-                .trim()
-
-            val cleanJson = content
-                .replace(Regex("^```(?:json)?\\s*"), "")
-                .replace(Regex("\\s*```$"), "")
-                .trim()
-
-            val arr = JSONArray(cleanJson)
-            val list = mutableListOf<PredictOutputItem>()
-            for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                val title = obj.optString("title", "").trim()
-                val topic = obj.optString("topic", "Output Tracing").trim()
-                val count = obj.optString("questionCount", "10 Questions").trim()
-                val diff = obj.optString("difficulty", "Medium").trim()
-                val snippet = obj.optString("codeSnippet", getSnippetForTopic(topic)).trim()
-                if (title.isNotBlank()) {
-                    list.add(
-                        PredictOutputItem(
-                            setNumber = startSetIndex + i + 1,
-                            title = title,
-                            topic = topic,
-                            questionCount = count,
-                            difficulty = diff,
-                            codeSnippet = snippet,
-                            source = QuestionSource.AI
-                        )
-                    )
-                }
+        val content = com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = systemPrompt,
+            userPrompt = "Generate predict-output question sets for: $promptText",
+            temperature = 0.3,
+            maxOutputTokens = 800
+        )
+        val cleanJson = content
+            .replace(Regex("^```(?:json)?\\s*"), "")
+            .replace(Regex("\\s*```$"), "")
+            .trim()
+        val arr = JSONArray(cleanJson)
+        val list = mutableListOf<_PredRaw>()
+        for (i in 0 until arr.length()) {
+            val obj = arr.getJSONObject(i)
+            val title = obj.optString("title", "").trim()
+            val code = obj.optString("codeSnippet", "").trim()
+            val optsArr = obj.optJSONArray("options")
+            val opts = if (optsArr != null) (0 until optsArr.length()).map { optsArr.optString(it, "").trim() } else emptyList()
+            val correct = obj.optInt("correctIndex", 0)
+            if (title.isNotBlank() && code.isNotBlank() && opts.size == 4) {
+                list.add(_PredRaw(title = title, code = code, options = opts, correctIndex = correct.coerceIn(0, 3)))
             }
-            if (list.isNotEmpty()) list else getFallbackPredictOutput(promptText, startSetIndex)
-        } else {
-            getFallbackPredictOutput(promptText, startSetIndex)
         }
+        if (list.size >= 2) {
+            list.mapIndexed { idx, item ->
+                PredictOutputItem(
+                    setNumber = startSetIndex + idx + 1,
+                    title = item.title,
+                    topic = promptText,
+                    questionCount = "1 question",
+                    difficulty = "Medium",
+                    codeSnippet = item.code,
+                    source = QuestionSource.AI
+                )
+            }
+        } else getFallbackPredictOutput(promptText, startSetIndex)
     } catch (_: Exception) {
         getFallbackPredictOutput(promptText, startSetIndex)
     }
@@ -3157,84 +3066,35 @@ private fun getFallbackPredictOutput(prompt: String, startSetIndex: Int): List<P
     }
 }
 
-// 3. MISTRAL AI CODE GENERATOR HELPER: Calls Mistral AI to produce line-by-line commented code formatted in Markdown
-private suspend fun callMistralGenerateCode(
-    title: String,
-    topic: String,
-    difficulty: String,
-    language: String
+// 3. VASTAVIK AI CODE GENERATOR HELPER: Calls Vastavik AI to produce line-by-line commented code formatted in Markdown
+private suspend fun callVastavikAiGenerateCode(
+    problemTitle: String,
+    problemDescription: String,
+    language: String,
+    contextCode: String
 ): String = withContext(Dispatchers.IO) {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) {
-        return@withContext getFallbackCommentedCode(title, language)
-    }
-
+    val systemPrompt = """
+        You are a senior computer science teacher for Indian school students (Class 9-12 ICSE/CBSE).
+        Produce a clear, line-by-line commented solution in the requested language.
+        1. The solution MUST be runnable and correct for the given problem.
+        2. The entire output MUST be formatted in proper, clean Markdown.
+        3. Structure your markdown output as follows:
+            - Start with a short "## Explanation" section.
+            - Then "## Algorithm" with 3-5 numbered steps.
+            - Then "## Code" with a single fenced code block in the requested language.
+            - Then "## Complexity Analysis" with Time and Space.
+        4. Do NOT include any preamble or postamble outside the markdown.
+    """.trimIndent()
+    val userPrompt = "Problem: $problemTitle\n\nDescription: $problemDescription\n\nLanguage: $language\n\nStudent's current code (may be empty):\n$contextCode\n\nProduce the markdown solution now."
     try {
-        val url = URL("https://api.mistral.ai/v1/chat/completions")
-        val conn = url.openConnection() as HttpURLConnection
-        conn.requestMethod = "POST"
-        conn.setRequestProperty("Content-Type", "application/json")
-        conn.setRequestProperty("Authorization", "Bearer $apiKey")
-        conn.doOutput = true
-        conn.connectTimeout = 30000
-        conn.readTimeout = 30000
-
-        val prompt = """
-            You are an expert programming instructor.
-            Write a complete, optimal, and beginner-friendly solution in $language for the coding problem: "$title".
-            Topic: $topic, Difficulty: $difficulty.
-
-            CRITICAL MANDATORY INSTRUCTIONS:
-            1. YOU MUST WRITE A CLEAR, EXPLANATORY COMMENT FOR EACH AND EVERY SINGLE LINE OF CODE. Do NOT skip any line. Every single line of code must have its own comment.
-            2. The entire output MUST be formatted in proper, clean Markdown.
-            3. Structure your markdown output as follows:
-
-            ## Problem Overview
-            (Brief explanation of the logic and concept)
-
-            ## Solution ($language)
-            ```$language
-            // Comment for every line
-            ...
-            ```
-
-            ## Expected Output
-            ```text
-            Sample Input: ...
-            Sample Output: ...
-            ```
-
-            ## Complexity Analysis
-            - **Time Complexity:** ...
-            - **Space Complexity:** ...
-        """.trimIndent()
-
-        val body = JSONObject().apply {
-            put("model", "mistral-small-latest")
-            put("messages", JSONArray().put(
-                JSONObject().put("role", "user").put("content", prompt)
-            ))
-            put("max_tokens", 1800)
-            put("temperature", 0.15)
-        }
-
-        conn.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
-        val responseCode = conn.responseCode
-        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-        val responseText = stream.bufferedReader().use { it.readText() }
-
-        if (responseCode in 200..299) {
-            val json = JSONObject(responseText)
-            val content = json.getJSONArray("choices")
-                .getJSONObject(0)
-                .getJSONObject("message")
-                .getString("content")
-            if (content.isNotBlank()) content else getFallbackCommentedCode(title, language)
-        } else {
-            getFallbackCommentedCode(title, language)
-        }
+        com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = systemPrompt,
+            userPrompt = userPrompt,
+            temperature = 0.2,
+            maxOutputTokens = 1800
+        )
     } catch (_: Exception) {
-        getFallbackCommentedCode(title, language)
+        com.vastavik.computer.utils.VastavikAi.ERROR_MESSAGE
     }
 }
 

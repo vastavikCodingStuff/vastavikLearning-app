@@ -309,7 +309,11 @@ private fun CommentsBottomSheet(
                             isPosting = true
                             val textToPost = inputText
                             coroutineScope.launch {
-                                val result = withContext(Dispatchers.IO) { moderateComment(textToPost) }
+                                val result = withContext(Dispatchers.IO) {
+                                    val ai = callVastavikAiInsight("Is this student comment safe and on-topic? Answer exactly: SAFE|UNSAFE then a one-line reason. Comment: " + textToPost)
+                                    val safe = ai.trim().uppercase().startsWith("SAFE")
+                                    Pair(safe, if (safe) textToPost else "Comment blocked by Vastavik AI: " + ai)
+                                }
                                 if (result.first) {
                                     onPost(LessonComment("You", textToPost, "Just now"))
                                     inputText = ""
@@ -335,43 +339,17 @@ private fun CommentsBottomSheet(
     }
 }
 
-private fun moderateComment(text: String): Pair<Boolean, String> {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) return Pair(true, "")
+private suspend fun callVastavikAiInsight(prompt: String): String {
     return try {
-        val url = URL("https://api.mistral.ai/v1/chat/completions")
-        val conn = url.openConnection() as HttpURLConnection
-        conn.requestMethod = "POST"
-        conn.setRequestProperty("Content-Type", "application/json")
-        conn.setRequestProperty("Authorization", "Bearer $apiKey")
-        conn.doOutput = true
-        conn.connectTimeout = 20000
-        conn.readTimeout = 20000
-        val prompt = """You are a comment moderator for an educational app for Indian school students (Class 5-12). Review this comment: "$text"
-Rules:
-- Allow comments that are helpful, encouraging, or ask genuine questions
-- BLOCK comments that are: spam, inappropriate, hateful, trolling, off-topic, contain profanity, or are deliberately unhelpful/misleading
-- Be strict but fair
-Reply ONLY with JSON: {"pass": true/false, "reason": "brief reason if blocked"}"""
-        val body = JSONObject().apply {
-            put("model", "mistral-small-latest")
-            put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-            put("max_tokens", 100)
-            put("temperature", 0.1)
-        }
-        conn.outputStream.use { it.write(body.toString().toByteArray()) }
-        val responseCode = conn.responseCode
-        val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-        val response = stream.bufferedReader().use { it.readText() }
-        if (responseCode in 200..299) {
-            val content = JSONObject(response).getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content").trim()
-            val cleaned = content.replace(Regex("```json\\s*"), "").replace(Regex("```\\s*"), "").trim()
-            val json = JSONObject(cleaned)
-            val pass = json.optBoolean("pass", true)
-            val reason = json.optString("reason", "")
-            if (pass) Pair(true, "") else Pair(false, "Comment blocked: $reason")
-        } else Pair(true, "")
-    } catch (e: Exception) { Pair(true, "") }
+        com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = "You are Vastavik AI. Produce short, helpful learning insights for students.",
+            userPrompt = prompt,
+            temperature = 0.3,
+            maxOutputTokens = 400
+        )
+    } catch (_: Exception) {
+        ""
+    }
 }
 
 @Composable

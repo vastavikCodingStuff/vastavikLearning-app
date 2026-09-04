@@ -21,7 +21,9 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLConnection
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +34,27 @@ object AppUpdater {
 
     private val _updateState = MutableStateFlow<AppUpdateInfo?>(null)
     val updateState: StateFlow<AppUpdateInfo?> = _updateState.asStateFlow()
+
+    @Volatile private var cancelRequested: AtomicBoolean = AtomicBoolean(false)
+    @Volatile private var currentDownloadJob: Job? = null
+
+    fun cancelCurrentDownload() {
+        cancelRequested.set(true)
+    }
+
+    fun isCancelRequested(): Boolean = cancelRequested.get()
+
+    fun resetCancel() {
+        cancelRequested.set(false)
+    }
+
+    fun setCurrentJob(job: Job?) {
+        currentDownloadJob = job
+    }
+
+    fun clearCurrentJob() {
+        currentDownloadJob = null
+    }
 
     fun getApkFile(context: Context, version: String): File =
         File(context.cacheDir, "vastavik_update_$version.apk")
@@ -498,6 +521,7 @@ object AppUpdater {
         val urlStr = info.apkUrl
         val version = info.latestVersion
         if (urlStr.isBlank() || version.isBlank()) return@withContext null
+        resetCancel()
         return@withContext try {
             val url = URL(urlStr)
             val conn = (url.openConnection() as HttpURLConnection).apply {
@@ -529,6 +553,12 @@ object AppUpdater {
                 var bytesRead: Int
                 var totalRead = 0L
                 while (input.read(buffer).also { bytesRead = it } != -1) {
+                    if (cancelRequested.get()) {
+                        try { input.close() } catch (_: Exception) {}
+                        try { out.close() } catch (_: Exception) {}
+                        if (target.exists()) target.delete()
+                        return@withContext null
+                    }
                     out.write(buffer, 0, bytesRead)
                     totalRead += bytesRead
                     val progress = if (contentLength > 0) totalRead.toFloat() / contentLength.toFloat() else 0f
@@ -548,6 +578,9 @@ object AppUpdater {
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        } finally {
+            resetCancel()
+            clearCurrentJob()
         }
     }
 
@@ -593,4 +626,117 @@ object AppUpdater {
             null
         }
     }
+
+    fun ensureDownloadChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val channelId = "vastavik_app_downloads"
+            if (nm.getNotificationChannel(channelId) == null) {
+                val channel = NotificationChannel(
+                    channelId,
+                    "App Downloads",
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Shows progress while the Vastavik app update APK is downloading."
+                    setShowBadge(false)
+                }
+                nm.createNotificationChannel(channel)
+            }
+        }
+    }
+
+    fun buildDownloadProgressNotification(
+        context: Context,
+        version: String,
+        title: String,
+        bytesRead: Long,
+        totalBytes: Long,
+        progressFloat: Float
+    ): android.app.Notification {
+        ensureDownloadChannel(context)
+        val channelId = "vastavik_app_downloads"
+        val percent = (progressFloat * 100).toInt().coerceIn(0, 100)
+        val indeterminate = totalBytes <= 0
+        val sizeStr = if (totalBytes > 0) {
+            val cur = bytesRead.toDouble() / (1024.0 * 1024.0)
+            val tot = totalBytes.toDouble() / (1024.0 * 1024.0)
+            String.format(java.util.Locale.US, "%.1f / %.1f MB", cur, tot)
+        } else {
+            String.format(java.util.Locale.US, "%.1f MB downloaded", bytesRead.toDouble() / (1024.0 * 1024.0))
+        }
+
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("navigate_to", "app_update")
+        }
+        val openPiFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        val openPi = PendingIntent.getActivity(context, 2003, openIntent, openPiFlags)
+
+        val cancelIntent = Intent(context, DownloadProgressReceiver::class.java).apply {
+            action = DownloadProgressReceiver.ACTION_CANCEL
+            putExtra(EXTRA_DOWNLOAD_VERSION, version)
+        }
+        val cancelPi = PendingIntent.getBroadcast(
+            context,
+            2004,
+            cancelIntent,
+            openPiFlags
+        )
+
+        val appIconBitmap = getAppIconBitmap(context)
+        val builder = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Downloading Vastavik v$version")
+            .setContentText("$percent% • $sizeStr")
+            .setSubText(title)
+            .setProgress(100, percent, indeterminate)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setContentIntent(openPi)
+            .addAction(
+                NotificationCompat.Action.Builder(
+                    R.drawable.ic_notification,
+                    "Cancel",
+                    cancelPi
+                ).build()
+            )
+
+        if (appIconBitmap != null) builder.setLargeIcon(appIconBitmap)
+        return builder.build()
+    }
+
+    fun postDownloadProgress(
+        context: Context,
+        version: String,
+        title: String,
+        bytesRead: Long,
+        totalBytes: Long,
+        progressFloat: Float
+    ) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val n = buildDownloadProgressNotification(
+                context, version, title, bytesRead, totalBytes, progressFloat
+            )
+            nm.notify(DownloadProgressReceiver.NOTIFICATION_ID_DOWNLOAD, n)
+        } catch (e: Exception) {
+            android.util.Log.e("AppUpdater", "Failed to post download progress notification: ${e.message}")
+        }
+    }
+
+    fun cancelDownloadNotification(context: Context) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            nm.cancel(DownloadProgressReceiver.NOTIFICATION_ID_DOWNLOAD)
+        } catch (_: Exception) {
+        }
+    }
+
+    const val EXTRA_DOWNLOAD_VERSION = "extra_download_version"
 }

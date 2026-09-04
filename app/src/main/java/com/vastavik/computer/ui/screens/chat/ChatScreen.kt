@@ -87,43 +87,22 @@ RULES:
 - Always be encouraging and supportive
 - Format code with ```code blocks when showing examples"""
 
-private fun callMistralApi(messages: List<ChatMessage>): String {
-    val apiKey = BuildConfig.MISTRAL_API_KEY
-    if (apiKey.isBlank()) return "Mistral API key not configured. Please add MISTRAL_API_KEY to local.properties."
-
-    val url = URL("https://api.mistral.ai/v1/chat/completions")
-    val conn = url.openConnection() as HttpURLConnection
-    conn.requestMethod = "POST"
-    conn.setRequestProperty("Content-Type", "application/json")
-    conn.setRequestProperty("Authorization", "Bearer $apiKey")
-    conn.doOutput = true
-    conn.connectTimeout = 30000
-    conn.readTimeout = 30000
-
-    val apiMessages = JSONArray()
-    apiMessages.put(JSONObject().put("role", "system").put("content", SYSTEM_PROMPT))
+private suspend fun callVastavikAiChat(messages: List<ChatMessage>): String {
+    val apiMessages = StringBuilder()
     for (msg in messages) {
-        apiMessages.put(JSONObject().put("role", if (msg.isUser) "user" else "assistant").put("content", msg.text))
+        if (apiMessages.isNotEmpty()) apiMessages.append("\n\n")
+        apiMessages.append(if (msg.isUser) "Student: " else "Assistant: ")
+        apiMessages.append(msg.text)
     }
-
-    val body = JSONObject().apply {
-        put("model", "mistral-small-latest")
-        put("messages", apiMessages)
-        put("max_tokens", 1024)
-        put("temperature", 0.3)
-    }
-
-    conn.outputStream.use { it.write(body.toString().toByteArray()) }
-
-    val responseCode = conn.responseCode
-    val stream = if (responseCode in 200..299) conn.inputStream else conn.errorStream
-    val response = stream.bufferedReader().use { it.readText() }
-
-    return if (responseCode in 200..299) {
-        val json = JSONObject(response)
-        json.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content")
-    } else {
-        "Error ($responseCode): ${JSONObject(response).optJSONObject("message")?.optString("message") ?: "Unknown error"}"
+    return try {
+        com.vastavik.computer.utils.VastavikAi.chat(
+            systemPrompt = SYSTEM_PROMPT,
+            userPrompt = apiMessages.toString(),
+            temperature = 0.3,
+            maxOutputTokens = 1024
+        )
+    } catch (_: Exception) {
+        com.vastavik.computer.utils.VastavikAi.ERROR_MESSAGE
     }
 }
 
@@ -164,13 +143,9 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
         }
     }
 
-    suspend fun askMistral(prompt: String): String {
+    suspend fun askVastavikAi(prompt: String): String {
         return withContext(Dispatchers.IO) {
-            try {
-                callMistralApi(messages + ChatMessage(prompt, isUser = true))
-            } catch (e: Exception) {
-                "Error: ${e.message}. Check your internet connection."
-            }
+            callVastavikAiChat(messages + ChatMessage(prompt, isUser = true))
         }
     }
 
@@ -183,7 +158,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
             coroutineScope.launch {
                 try {
                     listState.animateScrollToItem(messages.lastIndex + 1)
-                    val resp = askMistral(userText)
+                    val resp = askVastavikAi(userText)
                     viewModel.addMessage(ChatMessage(resp, isUser = false))
                     listState.animateScrollToItem(messages.lastIndex)
                 } finally { isLoading = false }
@@ -286,7 +261,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         }
                     }
             ) {
-                // Top bar with "Vastavik AI Mistral Small" + New button
+                // Top bar with Vastavik AI + New button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -304,7 +279,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         border = BorderStroke(1.dp, bb)
                     ) {
                         Text(
-                            "Mistral Small",
+                            "Vastavik AI",
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -374,7 +349,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                     isLoading = true
                                     coroutineScope.launch {
                                         listState.animateScrollToItem(messages.lastIndex + 1)
-                                        val resp = askMistral(prompt)
+                                        val resp = askVastavikAi(prompt)
                                         viewModel.addMessage(ChatMessage(resp, isUser = false))
                                         isLoading = false
                                         listState.animateScrollToItem(messages.lastIndex)
@@ -613,7 +588,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                     } else {
                                                         userText
                                                     }
-                                                    val resp = askMistral(promptWithContext)
+                                                    val resp = askVastavikAi(promptWithContext)
                                                     viewModel.addMessage(ChatMessage(resp, isUser = false))
                                                     listState.animateScrollToItem(messages.lastIndex)
                                                     // Save conversation after AI response

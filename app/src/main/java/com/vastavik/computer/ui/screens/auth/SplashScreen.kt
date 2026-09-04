@@ -24,7 +24,6 @@ import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.tasks.await
 
 private val PrimaryIndigo = Color(0xFF2563EB)
 
@@ -47,11 +46,6 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             animationSpec = tween(durationMillis = 500)
         )
         delay(2000)
-        // Auto-check for a new APK on the server route (self-hosted updates, no Play Store)
-        if (hasUpdateOnRoute()) {
-            onNavigate("app_update")
-            return@LaunchedEffect
-        }
         if (BuildConfig.SECURITY_CHECK_ENABLED) {
             onNavigate("security_check")
         } else {
@@ -123,16 +117,4 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             )
         }
     }
-}
-
-private suspend fun hasUpdateOnRoute(): Boolean = try {
-    val doc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-        .collection(com.vastavik.computer.utils.Constants.COLLECTION_ADMIN_SETTINGS)
-        .document(com.vastavik.computer.utils.Constants.ADMIN_SETTINGS_UPDATE_DOC)
-        .get()
-        .await()
-    val latest = doc.getString("latestVersion") ?: ""
-    latest.isNotEmpty() && latest != BuildConfig.VERSION_NAME
-} catch (_: Exception) {
-    false
 }

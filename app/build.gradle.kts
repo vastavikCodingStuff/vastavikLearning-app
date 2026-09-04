@@ -18,8 +18,8 @@ android {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 21
-        versionName = "1.0.21"
+        versionCode = 22
+        versionName = "1.0.22"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
@@ -32,13 +32,14 @@ android {
             properties.load(localPropsFile.inputStream())
         }
         buildConfigField("String", "GEMINI_API_KEY", "\"${properties.getProperty("GEMINI_API_KEY", "")}\"")
-        buildConfigField("String", "MISTRAL_API_KEY", "\"${properties.getProperty("MISTRAL_API_KEY", "")}\"")
         buildConfigField("Boolean", "SECURITY_CHECK_ENABLED", "false")
         // Backend connection — override in local.properties if needed
         // Prod (Render): https://vastavik-admin-backend.onrender.com  |  Emulator: http://10.0.2.2:3001  |  LAN: http://192.168.x.x:3001
         buildConfigField("String", "BACKEND_BASE_URL", "\"${properties.getProperty("BACKEND_BASE_URL", "https://vastavik-admin-backend.onrender.com")}\"")
         buildConfigField("String", "API_KEY_ID", "\"${properties.getProperty("API_KEY_ID", "android-prod")}\"")
         buildConfigField("String", "API_KEY_SECRET", "\"${properties.getProperty("API_KEY_SECRET", "dev-secret-android-32bytes-hex-0000")}\"")
+        // Judge0 self-hosted instance on http://139.84.172.230:2358 — set JUDGE0_AUTH_TOKEN in local.properties
+        buildConfigField("String", "JUDGE0_AUTH_TOKEN", "\"${properties.getProperty("JUDGE0_AUTH_TOKEN", "4187f0c558ee335d9be43697718fa5f7")}\"")
     }
 
     signingConfigs {
