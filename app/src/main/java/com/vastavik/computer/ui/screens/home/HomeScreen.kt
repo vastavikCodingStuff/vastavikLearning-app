@@ -70,6 +70,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         )
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
+    }
+
     if (showPromo) {
         promoShown = true
         PromoPopup(
@@ -164,6 +169,7 @@ private fun HomeTab(
 ) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
+    val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -174,6 +180,69 @@ private fun HomeTab(
                 onProfileClick = { onNavigate("profile") },
                 onNotificationClick = { onNavigate("notifications") }
             )
+        }
+
+        if (updateInfo?.isUpdateAvailable == true) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                        .padding(end = 4.dp, bottom = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .offset(x = 3.dp, y = 3.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(bs)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFF2563EB))
+                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp))
+                            .clickable { onNavigate("app_update") }
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Filled.SystemUpdate,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "App Update Available: v${updateInfo?.latestVersion}",
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                fontSize = 13.sp
+                            )
+                            Text(
+                                "New build found on GitHub Assets. Tap to install.",
+                                color = Color.White.copy(alpha = 0.85f),
+                                fontSize = 11.sp
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White)
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                        ) {
+                            Text(
+                                "UPDATE",
+                                fontWeight = FontWeight.Black,
+                                color = Color(0xFF2563EB),
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         // Hero Brutal Card with integrated stats footer

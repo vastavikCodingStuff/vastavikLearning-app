@@ -1,12 +1,18 @@
 package com.vastavik.computer.utils
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.vastavik.computer.BuildConfig
+import com.vastavik.computer.MainActivity
+import com.vastavik.computer.R
 import com.vastavik.computer.data.model.AppUpdateInfo
 import java.io.File
 import java.net.HttpURLConnection
@@ -109,6 +115,70 @@ object AppUpdater {
         } catch (e: Exception) {
             e.printStackTrace()
             null
+        }
+    }
+
+    /**
+     * Checks GitHub Releases for new update assets and displays a system notification
+     * when a newer version is found.
+     */
+    suspend fun checkGitHubReleaseAndNotify(
+        context: Context,
+        currentVersion: String = BuildConfig.VERSION_NAME
+    ): AppUpdateInfo? = withContext(Dispatchers.IO) {
+        val info = checkGitHubRelease(currentVersion)
+        if (info != null && info.isUpdateAvailable) {
+            postUpdateNotification(context, info)
+        }
+        info
+    }
+
+    /**
+     * Posts an Android system notification alerting the user about the GitHub asset update.
+     */
+    fun postUpdateNotification(context: Context, info: AppUpdateInfo) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val channelId = "vastavik_app_updates"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    channelId,
+                    "App Updates",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Notifications for new APK updates on GitHub Assets"
+                    enableVibration(true)
+                    enableLights(true)
+                }
+                nm.createNotificationChannel(channel)
+            }
+
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("navigate_to", "app_update")
+            }
+
+            val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            val pendingIntent = PendingIntent.getActivity(context, 2001, intent, pendingIntentFlags)
+
+            val sizeStr = if (info.apkSize > 0) " (${String.format(java.util.Locale.US, "%.1f MB", info.apkSize / (1024.0 * 1024.0))})" else ""
+            val notification = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("New App Update Available: v${info.latestVersion}")
+                .setContentText("${info.releaseTitle}$sizeStr. Tap to install.")
+                .setStyle(NotificationCompat.BigTextStyle().bigText("${info.releaseTitle}$sizeStr\n\nA newer build is available on GitHub Assets. Tap here to download and install."))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            nm.notify(2001, notification)
+        } catch (e: Exception) {
+            android.util.Log.e("AppUpdater", "Failed to post update notification: ${e.message}")
         }
     }
 
