@@ -310,11 +310,10 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.height(6.dp))
-                            Text(
-                                text = updateInfo.changelog.ifBlank { "- Improvements, performance optimizations, and bug fixes." },
-                                fontSize = 13.sp,
-                                lineHeight = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            com.vastavik.computer.ui.components.MarkdownContent(
+                                content = updateInfo.changelog.ifBlank { "- Improvements, performance optimizations, and bug fixes." },
+                                baseColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                accentColor = Color(0xFF2563EB)
                             )
 
                             if (downloading) {

@@ -226,39 +226,30 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
                         val hasUpdate = updateInfo?.isUpdateAvailable == true
 
-                        // App Update Button (Green)
-                        Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .offset(x = 2.dp, y = 2.dp)
-                                    .clip(CircleShape)
-                                    .background(bs)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFF10B981))
-                                    .border(BorderStroke(2.dp, bb), CircleShape)
-                                    .clickable { onNavigate("app_update") },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Filled.SystemUpdate,
-                                    contentDescription = "App Updates",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(18.dp)
+                        // App Update Button (Green) - shown ONLY when update is available
+                        if (hasUpdate) {
+                            Box(modifier = Modifier.padding(end = 2.dp, bottom = 2.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .offset(x = 2.dp, y = 2.dp)
+                                        .clip(CircleShape)
+                                        .background(bs)
                                 )
-                                if (hasUpdate) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(9.dp)
-                                            .align(Alignment.TopEnd)
-                                            .offset(x = (-4).dp, y = 4.dp)
-                                            .clip(CircleShape)
-                                            .background(Color(0xFFFFD600))
-                                            .border(BorderStroke(1.dp, Color.Black), CircleShape)
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF10B981))
+                                        .border(BorderStroke(2.dp, bb), CircleShape)
+                                        .clickable { onNavigate("app_update") },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Download,
+                                        contentDescription = "Download Update",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                             }
