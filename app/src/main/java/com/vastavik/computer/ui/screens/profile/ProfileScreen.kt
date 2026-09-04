@@ -117,7 +117,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.width(6.dp))
 
-                    // Blue rounded notification button
+                    // Deep green rounded notification button
                     Box(modifier = Modifier.padding(end = 4.dp, bottom = 4.dp)) {
                         Box(
                             modifier = Modifier
@@ -130,7 +130,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(CircleShape)
-                                .background(Color(0xFF2563EB))
+                                .background(Color(0xFF059669))
                                 .border(BorderStroke(1.5.dp, bb), CircleShape)
                                 .clickable { onNavigate("notifications") },
                             contentAlignment = Alignment.Center
@@ -184,7 +184,7 @@ fun ProfileScreen(
                                     )
                                 )
                         ) {
-                            // Small chat chip pinned to the top-right of the gradient header
+                            // Small chat chip pinned to the top-right of the gradient header in deep green
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -205,7 +205,7 @@ fun ProfileScreen(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .clip(RoundedCornerShape(50.dp))
-                                            .background(Color(0xFF2AABEE))
+                                            .background(Color(0xFF059669))
                                             .border(BorderStroke(1.5.dp, Color.White), RoundedCornerShape(50.dp))
                                             .clickable { onNavigate("peer_chat") },
                                         contentAlignment = Alignment.Center
@@ -241,72 +241,29 @@ fun ProfileScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Spacer(modifier = Modifier.height(18.dp))
-                                    // Avatar with brutal border and Peer Chat button on the right
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
+                                    // Avatar with brutal border
+                                    Box(
+                                        modifier = Modifier
+                                            .size(84.dp)
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(Color.White)
+                                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp))
+                                            .padding(4.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        // Left spacer to keep avatar centered
-                                        Spacer(modifier = Modifier.size(54.dp))
-                                        Spacer(modifier = Modifier.width(12.dp))
-
-                                        // Student Icon (square avatar)
                                         Box(
                                             modifier = Modifier
-                                                .size(84.dp)
-                                                .clip(RoundedCornerShape(20.dp))
-                                                .background(Color.White)
-                                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(20.dp))
-                                                .padding(4.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Filled.Person,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.size(40.dp)
-                                                )
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.width(12.dp))
-
-                                        // Peer Chat button on the right
-                                        Box(
-                                            modifier = Modifier
-                                                .size(54.dp)
+                                                .fillMaxSize()
                                                 .clip(RoundedCornerShape(16.dp))
-                                                .background(Color(0xFF2AABEE))
-                                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
-                                                .clickable { onNavigate("peer_chat") },
+                                                .background(MaterialTheme.colorScheme.surfaceVariant),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.Center
-                                            ) {
-                                                Icon(
-                                                    Icons.Filled.Forum,
-                                                    contentDescription = "Peer Chat",
-                                                    tint = Color.White,
-                                                    modifier = Modifier.size(22.dp)
-                                                )
-                                                Spacer(modifier = Modifier.height(2.dp))
-                                                Text(
-                                                    text = "Chat",
-                                                    fontSize = 10.sp,
-                                                    fontWeight = FontWeight.ExtraBold,
-                                                    color = Color.White
-                                                )
-                                            }
+                                            Icon(
+                                                Icons.Filled.Person,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(40.dp)
+                                            )
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(12.dp))

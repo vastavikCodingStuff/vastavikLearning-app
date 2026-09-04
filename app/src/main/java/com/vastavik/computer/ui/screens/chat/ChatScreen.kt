@@ -101,8 +101,12 @@ private suspend fun callVastavikAiChat(messages: List<ChatMessage>): String {
             temperature = 0.3,
             maxOutputTokens = 1024
         )
-    } catch (_: Exception) {
-        com.vastavik.computer.utils.VastavikAi.ERROR_MESSAGE
+    } catch (e: Exception) {
+        if (com.vastavik.computer.utils.AdminSession.isAdmin.value) {
+            "Error Connecting to the Server\n\n```\n[ADMIN MODE DIAGNOSTICS]\nFile: VastavikAi.kt\nEngine: Vastavik AI (${com.vastavik.computer.utils.DebugLogBox.activeModel})\nEndpoint: ${com.vastavik.computer.utils.VastavikAi.ENDPOINT}\nReason: ${e.message ?: e.javaClass.simpleName}\n```"
+        } else {
+            com.vastavik.computer.utils.VastavikAi.ERROR_MESSAGE
+        }
     }
 }
 

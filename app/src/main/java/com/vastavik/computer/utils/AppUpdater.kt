@@ -212,6 +212,33 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.23",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.23/app-v1.0.23-debug.apk",
+                releaseTitle = "v1.0.23 - Gemini 3.6 Flash Engine, Admin Diagnostics Banner & Student Info UI Polish",
+                changelog = """
+### What's New in this Release:
+- **Gemini 3.6 Flash Engine**: Upgraded Vastavik AI underlying model to Gemini 3.6 Flash with automatic Gemini 3.7 Flash fallback for maximum availability and zero timeouts.
+- **Admin Diagnostics Banner Box**: In Admin Mode, any failed AI call immediately displays a dedicated banner card indicating the exact file (VastavikAi.kt), target model, and HTTP error trace.
+- **Student Info Page Polish**: Removed duplicate chat icon beside the student avatar picture, and set the top-right profile card chat icon and notification button to deep green (#059669).
+                """.trimIndent(),
+                apkSize = 72000000L,
+                publishedAt = "2026-09-04T08:50:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.23", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.22",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.22/app-v1.0.22-debug.apk",
+                releaseTitle = "v1.0.22 - Vastavik AI Unified Client & Live Judge0 Code Execution",
+                changelog = """
+### What's New in this Release:
+- **Unified Vastavik AI Client**: Migrated all AI tutor and practice generators to Google Gemini backend.
+- **Live Code Execution**: Direct Judge0 compiler integration supporting stdin input for Java, Python, C++, and JS.
+                """.trimIndent(),
+                apkSize = 71800000L,
+                publishedAt = "2026-09-04T06:45:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.22", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.20",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.20/app-v1.0.20-debug.apk",
                 releaseTitle = "v1.0.20 - In-App Bug Reporting with Screenshots & Screen Recording",

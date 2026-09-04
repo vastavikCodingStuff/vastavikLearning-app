@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -97,6 +98,16 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter),
                         onNavigate = { route -> navController.navigate(route) }
                     )
+
+                    // Admin-only floating debug banner showing Vastavik AI call logs
+                    if (isAdmin) {
+                        com.vastavik.computer.ui.components.DebugLogBoxOverlay(
+                            modifier = Modifier
+                                .align(androidx.compose.ui.Alignment.BottomCenter)
+                                .navigationBarsPadding()
+                                .padding(bottom = 68.dp)
+                        )
+                    }
                 }
             }
         }
