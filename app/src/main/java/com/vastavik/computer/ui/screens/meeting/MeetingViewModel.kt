@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+import com.vastavik.computer.data.realtime.WebRtcMeetingClient
+
 class MeetingViewModel(
-    private val meetingClient: MeetingClient = LocalMeetingClient()
+    private val meetingClient: MeetingClient = WebRtcMeetingClient()
 ) : ViewModel() {
     val connectionState: StateFlow<ConnectionState> = meetingClient.connectionState
     val participants: StateFlow<Map<String, Participant>> = meetingClient.participants

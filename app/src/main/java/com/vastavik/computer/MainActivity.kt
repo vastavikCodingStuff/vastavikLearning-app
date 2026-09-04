@@ -42,6 +42,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Request POST_NOTIFICATIONS permission on Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+
+        // Initialize Student Conversation & WebRTC signaling manager
+        com.vastavik.computer.data.realtime.StudentConversationManager.initialize(this@MainActivity)
+
         // Asynchronously check for new app update assets on GitHub and notify the user
         lifecycleScope.launch {
             com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(this@MainActivity)
@@ -80,6 +90,12 @@ class MainActivity : ComponentActivity() {
                     AppNavHost(
                         navController = navController,
                         startRoute = getStartRoute(intent)
+                    )
+
+                    // Telegram-style floating heads-up in-app notification banner
+                    com.vastavik.computer.ui.components.TelegramNotificationHost(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter),
+                        onNavigate = { route -> navController.navigate(route) }
                     )
                 }
             }

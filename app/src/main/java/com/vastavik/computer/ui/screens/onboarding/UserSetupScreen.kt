@@ -149,10 +149,39 @@ fun UserSetupScreen(onNavigate: (String) -> Unit) {
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
-
+            val context = androidx.compose.ui.platform.LocalContext.current
             Button(
-                onClick = { onNavigate("home") },
+                onClick = {
+                    val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        try {
+                            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            db.collection("users").document(user.uid).set(
+                                mapOf(
+                                    "name" to name,
+                                    "displayName" to name,
+                                    "studentClass" to studentClass,
+                                    "board" to board,
+                                    "school" to school,
+                                    "preferredLanguage" to language,
+                                    "setupCompleted" to true
+                                ),
+                                com.google.firebase.firestore.SetOptions.merge()
+                            )
+                        } catch (_: Exception) {}
+                    }
+                    val prefs = context.getSharedPreferences("user_profile", android.content.Context.MODE_PRIVATE)
+                    prefs.edit()
+                        .putString("name", name)
+                        .putString("class", studentClass)
+                        .putString("board", board)
+                        .putString("school", school)
+                        .putString("language", language)
+                        .putBoolean("setup_done", true)
+                        .apply()
+
+                    onNavigate("home")
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

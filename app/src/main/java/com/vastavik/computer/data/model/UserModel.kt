@@ -51,7 +51,7 @@ data class UserModel(
             val data = doc.data ?: return UserModel(uid = doc.id)
             return UserModel(
                 uid = doc.id,
-                name = data["name"] as? String ?: "",
+                name = (data["name"] as? String)?.takeIf { it.isNotBlank() } ?: ((data["displayName"] as? String) ?: ""),
                 email = data["email"] as? String ?: "",
                 dateOfBirth = data["dateOfBirth"] as? String ?: "",
                 school = data["school"] as? String ?: "",

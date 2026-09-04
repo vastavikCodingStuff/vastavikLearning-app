@@ -269,6 +269,12 @@ fun AppNavHost(
         composable("app_update") {
             AppUpdateScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
+        composable("doubts") {
+            com.vastavik.computer.ui.screens.doubts.DoubtSolvingScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() }
+            )
+        }
         composable("course") {
             LearningPathScreen(onNavigate = { route -> navController.navigate(route) })
         }
