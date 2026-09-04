@@ -233,6 +233,23 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.24",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.24/app-v1.0.24-debug.apk",
+                releaseTitle = "v1.0.24 - App Update Experience: Swipe Gestures, Read More Truncation & Download Cancel Integrity",
+                changelog = """
+### What's New in this Release:
+- **Swipe Gestures Between Tabs**: Seamlessly navigate between Latest Update and All Updates history tabs with horizontal swipe gestures.
+- **Compact Changelog with Read More**: Release notes are truncated at the Platform line by default with an expandable Read More toggle, keeping action buttons visible without scrolling.
+- **Download Cancellation & APK Integrity Guard**: Cancelling a download immediately wipes incomplete partial files and resets the action button to Download & Install Update instead of falsely displaying Install Update Now.
+- **Notification Polish**: Download progress notification title updated to 'Downloading Vastavik v1.0.24 Update' with quick cancel cleanup.
+- **Platform**: Android
+- **Architecture**: Universal APK
+                """.trimIndent(),
+                apkSize = 72000000L,
+                publishedAt = "2026-09-04T11:15:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.24", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.23",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.23/app-v1.0.23-debug.apk",
                 releaseTitle = "v1.0.23 - Gemini 3.6 Flash Engine, Admin Diagnostics Banner & Student Info UI Polish",
