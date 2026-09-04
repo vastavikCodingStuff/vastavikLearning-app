@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -39,6 +41,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Asynchronously check for new app update assets on GitHub and notify the user
+        lifecycleScope.launch {
+            com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(this@MainActivity)
+        }
 
         // Request the highest supported refresh rate (60/90/120 FPS) so the
         // Compose UI renders at the device's full display capability.
@@ -119,6 +126,8 @@ class MainActivity : ComponentActivity() {
         val screenId = intent?.getStringExtra("screen_id")
 
         return when (navigateTo) {
+            "app_update" -> "app_update"
+            "notifications" -> "notifications"
             "course" -> "home"
             "quiz" -> if (!screenId.isNullOrEmpty()) "quiz_taking/$screenId" else "home"
             "lesson" -> if (!screenId.isNullOrEmpty()) {
