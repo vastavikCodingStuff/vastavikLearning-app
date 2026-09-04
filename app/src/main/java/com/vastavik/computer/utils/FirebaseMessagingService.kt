@@ -86,7 +86,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             this, 0, intent, pendingIntentFlags
         )
 
-        val notification = NotificationCompat.Builder(this, channelId)
+        val appIcon = AppUpdater.getAppIconBitmap(this)
+        val notifBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(body)
@@ -94,7 +95,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
-            .build()
+        if (appIcon != null) {
+            notifBuilder.setLargeIcon(appIcon)
+        }
+        val notification = notifBuilder.build()
 
         val notificationId = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
         notificationManager.notify(notificationId, notification)

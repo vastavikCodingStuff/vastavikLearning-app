@@ -5,10 +5,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.MainActivity
@@ -185,6 +188,20 @@ object AppUpdater {
 
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
+            AppUpdateInfo(
+                latestVersion = "1.0.17",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.17/app-v1.0.17-debug.apk",
+                releaseTitle = "v1.0.17 - Notification Icon Visibility in Expanded View",
+                changelog = """
+### What's New in this Release:
+- **Notification Icon Visibility Fix**: Resolved the issue where expanding notifications displayed a hollow/missing app icon in the header.
+- **Crisp Monochrome Status Icon**: Updated `ic_notification` with a clean, scaled vector of the Vastavik Computers logo.
+- **Full-Color Large Icon**: Added app icon bitmap rendering to notifications so the full-color logo is visible in both collapsed and expanded views.
+                """.trimIndent(),
+                apkSize = 71397257L,
+                publishedAt = "2026-09-04T02:55:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.17", currentVersion)
+            ),
             AppUpdateInfo(
                 latestVersion = "1.0.16",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.16/app-v1.0.16-debug.apk",
@@ -386,19 +403,43 @@ object AppUpdater {
             val pendingIntent = PendingIntent.getActivity(context, 2001, intent, pendingIntentFlags)
 
             val sizeStr = if (info.apkSize > 0) " (${String.format(java.util.Locale.US, "%.1f MB", info.apkSize / (1024.0 * 1024.0))})" else ""
-            val notification = NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
+            val appIconBitmap = getAppIconBitmap(context)
+            val builder = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("New App Update Available: v${info.latestVersion}")
                 .setContentText("${info.releaseTitle}$sizeStr. Tap to install.")
                 .setStyle(NotificationCompat.BigTextStyle().bigText("${info.releaseTitle}$sizeStr\n\nA newer build is available on GitHub Assets. Tap here to download and install."))
+                .setColor(ContextCompat.getColor(context, R.color.primary))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .build()
 
-            nm.notify(2001, notification)
+            if (appIconBitmap != null) {
+                builder.setLargeIcon(appIconBitmap)
+            }
+
+            nm.notify(2001, builder.build())
         } catch (e: Exception) {
             android.util.Log.e("AppUpdater", "Failed to post update notification: ${e.message}")
+        }
+    }
+
+    /**
+     * Safely renders the app launcher icon (including adaptive icon) into a high-resolution Bitmap
+     * for notification largeIcon usage across all Android versions.
+     */
+    fun getAppIconBitmap(context: Context): Bitmap? {
+        return try {
+            val drawable = ContextCompat.getDrawable(context, R.mipmap.ic_launcher) ?: return null
+            val width = if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else 192
+            val height = if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else 192
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        } catch (e: Exception) {
+            null
         }
     }
 

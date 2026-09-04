@@ -55,13 +55,17 @@ class MeetingForegroundService : Service() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pending = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val appIcon = AppUpdater.getAppIconBitmap(this)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Active Meeting: $topic")
             .setContentText("Tap to return to class")
             .setOngoing(true)
             .setContentIntent(pending)
-            .build()
+        if (appIcon != null) {
+            builder.setLargeIcon(appIcon)
+        }
+        return builder.build()
     }
 }
 
@@ -81,14 +85,17 @@ class MeetingNotificationManager(private val context: Context) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pending = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val notif = NotificationCompat.Builder(context, channelId)
+        val appIcon = AppUpdater.getAppIconBitmap(context)
+        val notifBuilder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("$topic is Live!")
             .setContentText("Tap to join the class")
             .setAutoCancel(true)
             .setContentIntent(pending)
-            .build()
-        nm.notify(2001, notif)
+        if (appIcon != null) {
+            notifBuilder.setLargeIcon(appIcon)
+        }
+        nm.notify(2001, notifBuilder.build())
     }
     fun startForegroundService(classId: String, topic: String) {
         val intent = Intent(context, MeetingForegroundService::class.java).apply {
