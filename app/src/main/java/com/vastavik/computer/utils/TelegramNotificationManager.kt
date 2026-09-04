@@ -137,16 +137,20 @@ object TelegramNotificationManager {
                 .setConversationTitle("Student Chat")
                 .addMessage(message, System.currentTimeMillis(), sender)
 
-            val notification = NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
+            val appIconBitmap = AppUpdater.getAppIconBitmap(context)
+            val builder = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setStyle(messagingStyle)
                 .setColor(0xFF2AABEE.toInt()) // Telegram Cyan-Blue
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .build()
 
-            nm.notify(3001, notification)
+            if (appIconBitmap != null) {
+                builder.setLargeIcon(appIconBitmap)
+            }
+
+            nm.notify(3001, builder.build())
         } catch (e: Exception) {
             android.util.Log.e("TelegramNotification", "Failed to post system notification: ${e.message}")
         }
