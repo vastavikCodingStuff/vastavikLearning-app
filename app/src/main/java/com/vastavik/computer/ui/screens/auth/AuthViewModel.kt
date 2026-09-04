@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,10 +66,36 @@ class AuthViewModel @Inject constructor(
                 }
 
                 authRepository.signInWithEmail(email, password)
+                FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign in failed")
             }
+        }
+    }
+
+    private suspend fun syncUserDocument(user: FirebaseUser) {
+        try {
+            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val docRef = db.collection(com.vastavik.computer.utils.Constants.COLLECTION_USERS).document(user.uid)
+            val snap = docRef.get().await()
+            if (!snap.exists()) {
+                val displayName = user.displayName?.takeIf { it.isNotBlank() }
+                    ?: user.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
+                    ?: "Student"
+                val newUser = com.vastavik.computer.data.model.UserModel(
+                    uid = user.uid,
+                    name = displayName,
+                    email = user.email ?: "",
+                    role = if (com.vastavik.computer.utils.AdminSession.isAdminCredentials(user.email ?: "", "")) "admin" else "student",
+                    createdAt = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())
+                )
+                docRef.set(newUser.toMap()).await()
+            } else {
+                docRef.update("lastActiveDate", com.google.firebase.firestore.FieldValue.serverTimestamp())
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("AuthViewModel", "User document sync failed: ${e.message}")
         }
     }
 
@@ -85,6 +112,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authRepository.signUpWithEmail(email, password)
+                FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign up failed")
@@ -101,6 +129,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authRepository.signInWithGoogle(idToken)
+                FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Google sign in failed")

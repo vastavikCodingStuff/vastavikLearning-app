@@ -29,18 +29,44 @@ import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.BrutalDefaults
 import com.vastavik.computer.ui.theme.NeoBrutalistColors
 import com.vastavik.computer.ui.theme.brutalBorderColor
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     val bb = brutalBorderColor()
+    val context = LocalContext.current
     var selectedPlan by remember { mutableStateOf("monthly") }
-    var gateway by remember { mutableStateOf("Razorpay") }
+    var gateway by remember { mutableStateOf("PhonePe") }
     val promoActive = true
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var showPaySheet by remember { mutableStateOf(false) }
+
+    val currentAmount = if (selectedPlan == "monthly") (if (promoActive) "149" else "299") else (if (promoActive) "999" else "1999")
+    val planDesc = if (selectedPlan == "monthly") "Vastavik Monthly Pro" else "Vastavik Yearly Pro"
+
+    fun initiatePhonePePayment() {
+        val upiUri = Uri.parse("upi://pay?pa=vastavik@ybl&pn=Vastavik+Computers&am=$currentAmount&cu=INR&tn=$planDesc")
+        val phonePeIntent = Intent(Intent.ACTION_VIEW, upiUri).apply {
+            setPackage("com.phonepe.app")
+        }
+        try {
+            context.startActivity(phonePeIntent)
+        } catch (e: Exception) {
+            val chooser = Intent.createChooser(Intent(Intent.ACTION_VIEW, upiUri), "Pay with PhonePe or UPI")
+            try {
+                context.startActivity(chooser)
+            } catch (_: Exception) {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Direct UPI ID: vastavik@ybl copied to clipboard!")
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -165,6 +191,102 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
 
                 Spacer(Modifier.height(16.dp))
 
+                Spacer(Modifier.height(16.dp))
+
+                // Payment Gateway Selection — PhonePe Default
+                BrutalCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(BrutalDefaults.Radius),
+                    backgroundColor = MaterialTheme.colorScheme.surface
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Payment Method", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
+                        Spacer(Modifier.height(10.dp))
+
+                        // PhonePe Option
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (gateway == "PhonePe") Color(0xFF5F259F).copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface)
+                                .border(
+                                    BorderStroke(if (gateway == "PhonePe") 2.dp else 1.5.dp, if (gateway == "PhonePe") Color(0xFF5F259F) else bb),
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .clickable { gateway = "PhonePe" }
+                                .padding(14.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(Color(0xFF5F259F)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("पे", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("PhonePe UPI", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                                        Spacer(Modifier.width(6.dp))
+                                        Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFF10B981)).padding(horizontal = 5.dp, vertical = 1.dp)) {
+                                            Text("RECOMMENDED", fontSize = 9.sp, fontWeight = FontWeight.Black, color = Color.White)
+                                        }
+                                    }
+                                    Text("Instant UPI / AutoPay with 0% gateway fee", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                RadioButton(
+                                    selected = gateway == "PhonePe",
+                                    onClick = { gateway = "PhonePe" },
+                                    colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF5F259F))
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(8.dp))
+
+                        // Other UPI / Cards Option
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (gateway == "UPI") Color(0xFF2563EB).copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface)
+                                .border(
+                                    BorderStroke(if (gateway == "UPI") 2.dp else 1.5.dp, if (gateway == "UPI") Color(0xFF2563EB) else bb),
+                                    RoundedCornerShape(12.dp)
+                                )
+                                .clickable { gateway = "UPI" }
+                                .padding(14.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(Color(0xFF2563EB)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Filled.AccountBalanceWallet, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Other UPI / Cards", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                                    Text("GPay, Paytm, NetBanking, Debit/Credit Card", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                RadioButton(
+                                    selected = gateway == "UPI",
+                                    onClick = { gateway = "UPI" },
+                                    colors = RadioButtonDefaults.colors(selectedColor = Color(0xFF2563EB))
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
                 // Features — brutal white card
                 BrutalCard(
                     modifier = Modifier.fillMaxWidth(),
@@ -193,7 +315,7 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 )
             }
 
-            // Sticky pay bar — always visible, brutal black-bordered pill button
+            // Sticky pay bar — always visible, PhonePe styled pill button
             Box(
                 modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.96f))
@@ -203,14 +325,18 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 BrutalBoxCard(
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
-                    backgroundColor = Color.Black,
+                    backgroundColor = if (gateway == "PhonePe") Color(0xFF5F259F) else Color.Black,
                     onClick = { showPaySheet = true }
                 ) {
                     Row(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Icon(Icons.Filled.Bolt, contentDescription = null, tint = NeoBrutalistColors.Yellow, modifier = Modifier.size(20.dp))
+                        if (gateway == "PhonePe") {
+                            Text("पे", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                        } else {
+                            Icon(Icons.Filled.Bolt, contentDescription = null, tint = NeoBrutalistColors.Yellow, modifier = Modifier.size(20.dp))
+                        }
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            if (promoActive) "Pay with $gateway — UPI AutoPay (50% OFF)" else "Pay with $gateway — UPI AutoPay",
+                            "Pay ₹$currentAmount with $gateway — UPI AutoPay",
                             fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = Color.White, textAlign = TextAlign.Center
                         )
                     }
@@ -225,38 +351,52 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 ) {
                     Column(Modifier.padding(18.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                            Text("Confirm payment", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+                            Text("Confirm Payment via $gateway", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
                             Box(modifier = Modifier.size(28.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant).border(BorderStroke(1.5.dp, bb), CircleShape).clickable { showPaySheet = false }, contentAlignment = Alignment.Center) {
                                 Icon(Icons.Filled.Close, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurface)
                             }
                         }
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(14.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(NeoBrutalistColors.Yellow).border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
-                                Icon(if (gateway == "Razorpay") Icons.Filled.CreditCard else Icons.Filled.PhoneAndroid, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
+                            Box(
+                                modifier = Modifier.size(42.dp).clip(RoundedCornerShape(10.dp))
+                                    .background(if (gateway == "PhonePe") Color(0xFF5F259F) else NeoBrutalistColors.Yellow)
+                                    .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (gateway == "PhonePe") {
+                                    Text("पे", color = Color.White, fontWeight = FontWeight.Black, fontSize = 22.sp)
+                                } else {
+                                    Icon(Icons.Filled.CreditCard, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.Black)
+                                }
                             }
-                            Spacer(Modifier.width(10.dp))
+                            Spacer(Modifier.width(12.dp))
                             Column {
-                                Text(gateway, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
-                                Text("UPI AutoPay • " + if (selectedPlan == "monthly") "Monthly ₹${if (promoActive) "149" else "299"}" else "Yearly ₹${if (promoActive) "999" else "1,999"}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(if (gateway == "PhonePe") "PhonePe UPI Gateway" else "UPI / NetBanking", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
+                                Text("Amount: ₹$currentAmount • $planDesc", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                             }
                         }
-                        Spacer(Modifier.height(14.dp))
+                        Spacer(Modifier.height(16.dp))
+
+                        // Pay Button with PhonePe Intent trigger
                         BrutalBoxCard(
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
-                            backgroundColor = NeoBrutalistColors.Yellow,
+                            backgroundColor = if (gateway == "PhonePe") Color(0xFF5F259F) else NeoBrutalistColors.Yellow,
                             onClick = {
                                 showPaySheet = false
-                                scope.launch { snackbarHostState.showSnackbar("Starting $gateway UPI AutoPay…") }
-                                // createMandate via gateway backend, then webhook; for now record locally and open history
+                                initiatePhonePePayment()
                                 onNavigate("payment_history")
                             }
                         ) {
                             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                                Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Black)
+                                Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.size(16.dp), tint = if (gateway == "PhonePe") Color.White else Color.Black)
                                 Spacer(Modifier.width(8.dp))
-                                Text("Pay securely with $gateway", fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                                Text(
+                                    "Pay ₹$currentAmount via $gateway",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (gateway == "PhonePe") Color.White else Color.Black
+                                )
                             }
                         }
                         Spacer(Modifier.height(8.dp))

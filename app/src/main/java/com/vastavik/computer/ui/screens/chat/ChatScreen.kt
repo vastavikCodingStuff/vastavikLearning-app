@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextOverflow
 import com.vastavik.computer.ui.theme.neoShape
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
@@ -54,6 +55,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import android.net.Uri
+import com.vastavik.computer.data.realtime.StudentConversationManager
+import com.vastavik.computer.data.realtime.StudentChatMessage
+import com.vastavik.computer.data.realtime.ConnectionState
 
 data class ChatMessage(val text: String, val isUser: Boolean)
 
@@ -246,11 +250,64 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 .padding(padding)
                 .imePadding()
         ) {
+            var selectedChatTab by remember { mutableStateOf(0) }
+
+            // Mode Selector: AI Tutor vs Student Peer Chat (Socket.IO)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selectedChatTab == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
+                        .clickable { selectedChatTab = 0 }
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.SmartToy, contentDescription = null, tint = if (selectedChatTab == 0) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("AI Tutor", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = if (selectedChatTab == 0) Color.White else MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selectedChatTab == 1) Color(0xFF2AABEE) else MaterialTheme.colorScheme.surface)
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
+                        .clickable { selectedChatTab = 1 }
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Filled.Group, contentDescription = null, tint = if (selectedChatTab == 1) Color.White else MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text("Peer Chat (Socket.IO)", fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, color = if (selectedChatTab == 1) Color.White else MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+
+            if (selectedChatTab == 1) {
+                StudentPeerChatView(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    bb = bb,
+                    bs = bs
+                )
+            } else {
             // Top bar with "Vastavik AI Mistral Small" + New button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Filled.SmartToy, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
@@ -467,6 +524,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -1020,3 +1078,304 @@ private fun highlightCode(code: String, language: String) = buildAnnotatedString
         }
     }
 }
+
+@Composable
+private fun StudentPeerChatView(
+    modifier: Modifier = Modifier,
+    bb: Color,
+    bs: Color
+) {
+    val messages by StudentConversationManager.messages.collectAsState()
+    val typingStudents by StudentConversationManager.typingStudents.collectAsState()
+    val connState by StudentConversationManager.connectionState.collectAsState()
+    var inputText by remember { mutableStateOf("") }
+    var replyToMessage by remember { mutableStateOf<StudentChatMessage?>(null) }
+    val listState = rememberLazyListState()
+    val currentUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    LaunchedEffect(Unit) {
+        StudentConversationManager.joinChannel("general_coding")
+    }
+
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
+        }
+    }
+
+    Column(modifier = modifier) {
+        // Status indicator bar
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            shape = RoundedCornerShape(8.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            border = BorderStroke(1.dp, bb.copy(alpha = 0.4f))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(if (connState == ConnectionState.CONNECTED) Color(0xFF10B981) else Color(0xFFF59E0B))
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        if (connState == ConnectionState.CONNECTED) "Socket.IO Live • Student Community" else "Connecting to Socket.IO...",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Text(
+                    "#general-coding",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF2AABEE)
+                )
+            }
+        }
+
+        // Messages list
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(vertical = 8.dp)
+        ) {
+            if (messages.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Filled.Forum, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(40.dp))
+                            Spacer(Modifier.height(8.dp))
+                            Text("No messages in community chat yet.", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
+                            Text("Say hello to fellow learners!", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                        }
+                    }
+                }
+            } else {
+                items(messages, key = { it.id }) { msg ->
+                    StudentPeerChatBubble(
+                        msg = msg,
+                        isMe = msg.senderId == currentUid,
+                        bb = bb,
+                        bs = bs,
+                        onReply = { replyToMessage = msg }
+                    )
+                }
+            }
+        }
+
+        // Typing indicator
+        if (typingStudents.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "${typingStudents.joinToString(", ")} ${if (typingStudents.size == 1) "is" else "are"} typing...",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2AABEE),
+                    fontStyle = FontStyle.Italic
+                )
+            }
+        }
+
+        // Reply Preview Banner
+        replyToMessage?.let { r ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                border = BorderStroke(1.dp, Color(0xFF2AABEE))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Replying to ${r.senderName}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2AABEE))
+                        Text(r.text, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    IconButton(onClick = { replyToMessage = null }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Filled.Close, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
+        }
+
+        // Bottom Input bar
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface,
+            border = BorderStroke(2.dp, bb)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = inputText,
+                    onValueChange = {
+                        inputText = it
+                        StudentConversationManager.setTyping(it.isNotBlank())
+                    },
+                    placeholder = { Text("Message student peers...", fontSize = 13.sp) },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(24.dp),
+                    maxLines = 3,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF2AABEE),
+                        unfocusedBorderColor = bb
+                    )
+                )
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(if (inputText.isNotBlank()) Color(0xFF2AABEE) else MaterialTheme.colorScheme.surfaceVariant)
+                        .border(BorderStroke(1.5.dp, bb), CircleShape)
+                        .clickable(enabled = inputText.isNotBlank()) {
+                            StudentConversationManager.sendMessage(inputText, replyToMessage)
+                            inputText = ""
+                            replyToMessage = null
+                            StudentConversationManager.setTyping(false)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Filled.Send,
+                        contentDescription = "Send",
+                        tint = if (inputText.isNotBlank()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StudentPeerChatBubble(
+    msg: StudentChatMessage,
+    isMe: Boolean,
+    bb: Color,
+    bs: Color,
+    onReply: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
+    ) {
+        if (!isMe) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF2AABEE))
+                    .border(BorderStroke(1.dp, bb), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    msg.senderName.firstOrNull()?.uppercase() ?: "S",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+        }
+
+        Column(modifier = Modifier.widthIn(max = 260.dp)) {
+            if (!isMe) {
+                Text(
+                    msg.senderName,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF2AABEE)
+                )
+                Spacer(Modifier.height(2.dp))
+            }
+
+            // Replying preview
+            msg.replyToText?.let { replySnippet ->
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = BorderStroke(1.dp, bb.copy(alpha = 0.3f)),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+                ) {
+                    Column(modifier = Modifier.padding(6.dp)) {
+                        Text(msg.replyToName ?: "Student", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(replySnippet, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+
+            // Message card
+            Surface(
+                shape = RoundedCornerShape(
+                    topStart = 14.dp,
+                    topEnd = 14.dp,
+                    bottomStart = if (isMe) 14.dp else 2.dp,
+                    bottomEnd = if (isMe) 2.dp else 14.dp
+                ),
+                color = if (isMe) Color(0xFF1E293B) else MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.5.dp, bb)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        msg.text,
+                        fontSize = 13.sp,
+                        color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(msg.timestamp)),
+                        fontSize = 9.sp,
+                        color = if (isMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (!isMe) {
+                Text(
+                    "Reply",
+                    modifier = Modifier.padding(top = 2.dp).clickable { onReply() },
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2AABEE)
+                )
+            }
+        }
+    }
+}
+

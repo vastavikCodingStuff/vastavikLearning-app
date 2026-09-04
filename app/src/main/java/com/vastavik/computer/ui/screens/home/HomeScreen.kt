@@ -43,6 +43,7 @@ import com.vastavik.computer.ui.components.VastavikTopBar
 import com.vastavik.computer.ui.components.PromoPopup
 import com.vastavik.computer.ui.components.PromoData
 import com.vastavik.computer.ui.components.UnderDevelopmentBanner
+import com.vastavik.computer.ui.theme.NeoBrutalistColors
 import com.vastavik.computer.ui.theme.BrutalBoxCard
 import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.BrutalDefaults
@@ -178,68 +179,125 @@ private fun HomeTab(
         item {
             VastavikTopBar(
                 onProfileClick = { onNavigate("profile") },
-                onNotificationClick = { onNavigate("notifications") }
+                onNotificationClick = { onNavigate("notifications") },
+                onUpdateClick = { onNavigate("app_update") }
             )
         }
 
-        if (updateInfo?.isUpdateAvailable == true) {
-            item {
+        // Live Frontend Update Banner connected to GitHub/Backend
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .padding(end = 4.dp, bottom = 4.dp)
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
-                        .padding(end = 4.dp, bottom = 4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 3.dp, y = 3.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(bs)
-                    )
+                        .matchParentSize()
+                        .offset(x = 3.dp, y = 3.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(bs)
+                )
+                if (updateInfo?.isUpdateAvailable == true) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF2563EB))
+                            .background(Color(0xFF10B981))
                             .border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp))
                             .clickable { onNavigate("app_update") }
                             .padding(horizontal = 14.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Filled.SystemUpdate,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "App Update Available: v${updateInfo?.latestVersion}",
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White,
-                                fontSize = 13.sp
-                            )
-                            Text(
-                                "New build found on GitHub Assets. Tap to install.",
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontSize = 11.sp
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(Color.White)
+                                .border(BorderStroke(1.5.dp, bb), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.SystemUpdate,
+                                contentDescription = null,
+                                tint = Color(0xFF10B981),
+                                modifier = Modifier.size(20.dp)
                             )
                         }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    "New Update: v${updateInfo?.latestVersion}",
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White,
+                                    fontSize = 13.sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(Color(0xFFFFD600))
+                                        .padding(horizontal = 5.dp, vertical = 1.dp)
+                                ) {
+                                    Text("NEW", fontWeight = FontWeight.Black, color = Color.Black, fontSize = 9.sp)
+                                }
+                            }
+                            Text(
+                                if (!updateInfo?.releaseTitle.isNullOrBlank()) updateInfo!!.releaseTitle else "GitHub release asset ready to install",
+                                color = Color.White.copy(alpha = 0.95f),
+                                fontSize = 11.sp,
+                                maxLines = 1
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                .background(Color.Black)
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
                                 "UPDATE",
                                 fontWeight = FontWeight.Black,
-                                color = Color(0xFF2563EB),
+                                color = Color.White,
                                 fontSize = 11.sp
                             )
                         }
+                    }
+                } else {
+                    // Backend Connected / Up-to-date strip
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .border(BorderStroke(1.5.dp, bb.copy(alpha = 0.6f)), RoundedCornerShape(14.dp))
+                            .clickable { onNavigate("app_update") }
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF10B981))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Backend Synced • v${com.vastavik.computer.BuildConfig.VERSION_NAME} Latest",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            "Check Updates →",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF2563EB)
+                        )
                     }
                 }
             }
@@ -379,7 +437,86 @@ private fun HomeTab(
             }
         }
 
-        item { Spacer(modifier = Modifier.height(22.dp)) }
+        // 3-Step Doubt Solver Banner
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(end = 4.dp, bottom = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 3.dp, y = 3.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(bs)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color(0xFF4F46E5), Color(0xFF7C3AED))
+                            )
+                        )
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp))
+                        .clickable { onNavigate("doubts") }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.Psychology,
+                            contentDescription = null,
+                            tint = Color(0xFF4F46E5),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                "3-Step Doubt Solver",
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                fontSize = 14.sp
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(NeoBrutalistColors.Yellow)
+                                    .padding(horizontal = 5.dp, vertical = 1.dp)
+                            ) {
+                                Text("NEW", fontSize = 9.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                            }
+                        }
+                        Text(
+                            "AI Solution • Veo 3 Video • Live Human Expert",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontSize = 11.sp
+                        )
+                    }
+                    Icon(
+                        Icons.Filled.ArrowForwardIos,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
+        item { Spacer(modifier = Modifier.height(16.dp)) }
 
         // Continue Learning
         item {

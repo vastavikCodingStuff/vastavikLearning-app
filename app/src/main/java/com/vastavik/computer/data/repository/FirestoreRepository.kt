@@ -22,7 +22,17 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class FirestoreRepository {
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance().apply {
+        try {
+            firestoreSettings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+                .setLocalCacheSettings(
+                    com.google.firebase.firestore.PersistentCacheSettings.newBuilder().build()
+                )
+                .build()
+        } catch (_: Exception) {
+            // Cache already initialized
+        }
+    }
 
     // --- Courses ---
     fun streamCourses(): Flow<List<CourseModel>> = callbackFlow {
