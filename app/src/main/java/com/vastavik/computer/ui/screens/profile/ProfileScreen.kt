@@ -456,6 +456,7 @@ fun ProfileScreen(
                             )
                             add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
                             add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
+                            add(Quadruple("Bug Reporting", "Report issues & attach media", Icons.Filled.BugReport, "bug_report"))
                             if (isAdmin) {
                                 add(Quadruple("Admin Dashboard", "Admin-only controls", Icons.Filled.AdminPanelSettings, "admin"))
                             }
