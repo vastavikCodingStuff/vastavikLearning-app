@@ -204,7 +204,7 @@ private fun HomeTab(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF10B981))
+                            .background(Color(0xFF2563EB))
                             .border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp))
                             .clickable { onNavigate("app_update") }
                             .padding(horizontal = 14.dp, vertical = 10.dp),
@@ -213,56 +213,47 @@ private fun HomeTab(
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                                .border(BorderStroke(1.5.dp, bb), CircleShape),
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.18f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Filled.SystemUpdate,
                                 contentDescription = null,
-                                tint = Color(0xFF10B981),
-                                modifier = Modifier.size(20.dp)
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    "New Update: v${updateInfo?.latestVersion}",
-                                    fontWeight = FontWeight.Black,
-                                    color = Color.White,
-                                    fontSize = 13.sp
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(Color(0xFFFFD600))
-                                        .padding(horizontal = 5.dp, vertical = 1.dp)
-                                ) {
-                                    Text("NEW", fontWeight = FontWeight.Black, color = Color.Black, fontSize = 9.sp)
-                                }
-                            }
                             Text(
-                                if (!updateInfo?.releaseTitle.isNullOrBlank()) updateInfo!!.releaseTitle else "GitHub release asset ready to install",
-                                color = Color.White.copy(alpha = 0.95f),
-                                fontSize = 11.sp,
-                                maxLines = 1
+                                "App Update Available: v${updateInfo?.latestVersion}",
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                fontSize = 13.sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                "New build found on GitHub Assets. Tap to install.",
+                                color = Color.White.copy(alpha = 0.85f),
+                                fontSize = 11.sp
                             )
                         }
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        // Circular green color download button
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.Black)
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF10B981))
+                                .border(BorderStroke(1.5.dp, Color.White), CircleShape),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                "UPDATE",
-                                fontWeight = FontWeight.Black,
-                                color = Color.White,
-                                fontSize = 11.sp
+                            Icon(
+                                Icons.Filled.Download,
+                                contentDescription = "Download Update",
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
