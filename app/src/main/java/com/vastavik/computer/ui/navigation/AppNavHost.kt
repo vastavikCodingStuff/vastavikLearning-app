@@ -37,6 +37,7 @@ import com.vastavik.computer.ui.screens.notifications.NotificationsScreen
 import com.vastavik.computer.ui.screens.notifications.AppUpdateScreen
 import com.vastavik.computer.ui.screens.practice.PracticeScreen
 import com.vastavik.computer.ui.screens.profile.ProfileScreen
+import com.vastavik.computer.ui.screens.profile.BugReportScreen
 import com.vastavik.computer.ui.screens.quiz.QuizSetupScreen
 import com.vastavik.computer.ui.screens.quiz.QuizTakingScreen
 import com.vastavik.computer.ui.screens.video.VideoLessonScreen
@@ -132,6 +133,9 @@ fun AppNavHost(
         }
         composable("peer_chat") {
             PeerChatScreen(onBack = { navController.popBackStack() })
+        }
+        composable("bug_report") {
+            BugReportScreen(onBack = { navController.popBackStack() })
         }
         composable("profile") {
             ProfileScreen(onNavigate = { route ->

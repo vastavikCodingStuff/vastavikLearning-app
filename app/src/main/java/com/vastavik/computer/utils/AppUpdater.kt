@@ -189,6 +189,21 @@ object AppUpdater {
     fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
         return listOf(
             AppUpdateInfo(
+                latestVersion = "1.0.20",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.20/app-v1.0.20-debug.apk",
+                releaseTitle = "v1.0.20 - In-App Bug Reporting with Screenshots & Screen Recording",
+                changelog = """
+### What's New in this Release:
+- **Bug Reporting on Student Info Page**: Added a dedicated "Bug Reporting" option directly following Settings on the Student Info page.
+- **Screenshot Attachments**: Integrated gallery image picker supporting multiple screenshot uploads with live thumbnail previews and remove actions.
+- **Screen Recording Attachments**: Supports selecting and attaching screen recording videos (MP4, MKV, WebM) to reproduce bugs in real time.
+- **Automated Device Diagnostics**: Automatically packages device manufacturer, model, and Android OS version to assist engineering in rapid reproduction and patching.
+                """.trimIndent(),
+                apkSize = 71500000L,
+                publishedAt = "2026-09-04T03:45:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.20", currentVersion)
+            ),
+            AppUpdateInfo(
                 latestVersion = "1.0.19",
                 apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.19/app-v1.0.19-debug.apk",
                 releaseTitle = "v1.0.19 - Swipe-to-Dismiss Update Banner & Peer Chat in Student Info",
