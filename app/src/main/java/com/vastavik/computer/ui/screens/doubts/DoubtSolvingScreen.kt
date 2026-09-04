@@ -2,6 +2,8 @@ package com.vastavik.computer.ui.screens.doubts
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,15 +53,38 @@ fun DoubtSolvingScreen(
     var currentStep by remember { mutableIntStateOf(1) }
     var isAnalyzing by remember { mutableStateOf(false) }
 
+    // Media Attachments State (Images & Videos)
+    var attachedMedia by remember { mutableStateOf<List<Pair<Uri, String>>>(emptyList()) }
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            attachedMedia = attachedMedia + uris.map { it to "image" }
+        }
+    }
+    val videoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            attachedMedia = attachedMedia + (uri to "video")
+        }
+    }
+
     // Step 2 Veo3 Video State
     var isVideoPlaying by remember { mutableStateOf(false) }
     var videoProgress by remember { mutableFloatStateOf(0.42f) }
 
-    // Step 3 Paid Human Expert State
+    // Step 3 Paid Human Expert State & Pricing Tier
+    var selectedDoubtPlan by remember { mutableIntStateOf(29) } // 29: Single doubt, 150: 1 week unlimited, 200: 1 month unlimited
     var isExpertPaid by remember { mutableStateOf(false) }
 
-    fun launchPhonePeForDoubt() {
-        val upiUri = Uri.parse("upi://pay?pa=vastavik@ybl&pn=Vastavik+Computers&am=29&cu=INR&tn=1-on-1+Doubt+Expert+Session")
+    fun launchPhonePeForDoubt(amount: Int = selectedDoubtPlan) {
+        val planDesc = when (amount) {
+            150 -> "1-Week+Unlimited+Doubts"
+            200 -> "1-Month+Unlimited+Doubts"
+            else -> "Single+Doubt+Resolution"
+        }
+        val upiUri = Uri.parse("upi://pay?pa=vastavik@ybl&pn=Vastavik+Computers&am=$amount&cu=INR&tn=$planDesc")
         val phonePeIntent = Intent(Intent.ACTION_VIEW, upiUri).apply {
             setPackage("com.phonepe.app")
         }
@@ -67,13 +92,13 @@ fun DoubtSolvingScreen(
             context.startActivity(phonePeIntent)
             isExpertPaid = true
         } catch (_: Exception) {
-            val chooser = Intent.createChooser(Intent(Intent.ACTION_VIEW, upiUri), "Pay ₹29 with PhonePe or UPI")
+            val chooser = Intent.createChooser(Intent(Intent.ACTION_VIEW, upiUri), "Pay ₹$amount with PhonePe or UPI")
             try {
                 context.startActivity(chooser)
                 isExpertPaid = true
             } catch (_: Exception) {
                 scope.launch {
-                    snackbarHostState.showSnackbar("Payment simulated for doubt resolution!")
+                    snackbarHostState.showSnackbar("Payment simulated for plan ₹$amount!")
                     isExpertPaid = true
                 }
             }
@@ -161,20 +186,103 @@ fun DoubtSolvingScreen(
                         placeholder = { Text("Paste your error, code, or concept question (e.g. NullPointerException in Java)...", fontSize = 13.sp) },
                         shape = RoundedCornerShape(12.dp)
                     )
+                    // Media attachments preview
+                    if (attachedMedia.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            attachedMedia.forEachIndexed { index, (uri, type) ->
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color(0xFF2563EB).copy(alpha = 0.12f))
+                                        .border(BorderStroke(1.dp, Color(0xFF2563EB).copy(alpha = 0.4f)), RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            if (type == "image") Icons.Filled.Image else Icons.Filled.Videocam,
+                                            contentDescription = null,
+                                            tint = Color(0xFF2563EB),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        Text(
+                                            if (type == "image") "Image ${index + 1}" else "Video ${index + 1}",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF2563EB)
+                                        )
+                                        Spacer(Modifier.width(6.dp))
+                                        Icon(
+                                            Icons.Filled.Close,
+                                            contentDescription = "Remove",
+                                            tint = Color(0xFF2563EB),
+                                            modifier = Modifier
+                                                .size(14.dp)
+                                                .clickable {
+                                                    attachedMedia = attachedMedia.filterIndexed { i, _ -> i != index }
+                                                }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     Spacer(Modifier.height(10.dp))
+
+                    // Action buttons: Attach Image/Video + Languages + Compact Centered Solve Button
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            // Add Image button
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.4f)), RoundedCornerShape(8.dp))
+                                    .clickable { imagePicker.launch("image/*") }
+                                    .padding(horizontal = 7.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Image, contentDescription = "Add Image", tint = Color(0xFF2563EB), modifier = Modifier.size(14.dp))
+                                    Spacer(Modifier.width(3.dp))
+                                    Text("Image", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
+
+                            // Add Video button
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.dp, bb.copy(alpha = 0.4f)), RoundedCornerShape(8.dp))
+                                    .clickable { videoPicker.launch("video/*") }
+                                    .padding(horizontal = 7.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Videocam, contentDescription = "Add Video", tint = Color(0xFF7C3AED), modifier = Modifier.size(15.dp))
+                                    Spacer(Modifier.width(3.dp))
+                                    Text("Video", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
+
                             listOf("Java", "Python", "SQL").forEach { lang ->
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(if (selectedLanguage == lang) Color.Black else MaterialTheme.colorScheme.surfaceVariant)
                                         .clickable { selectedLanguage = lang }
-                                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                                        .padding(horizontal = 7.dp, vertical = 6.dp)
                                 ) {
                                     Text(
                                         lang,
@@ -186,30 +294,50 @@ fun DoubtSolvingScreen(
                             }
                         }
 
-                        BrutalBoxCard(
-                            modifier = Modifier.height(40.dp),
-                            shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
-                            backgroundColor = Color(0xFF2563EB),
-                            onClick = {
-                                if (doubtQuery.isBlank()) {
-                                    doubtQuery = "How to reverse an array in Java without using extra space?"
-                                }
-                                isAnalyzing = true
-                                scope.launch {
-                                    delay(1000)
-                                    isAnalyzing = false
-                                }
-                            }
+                        // Compact, Centered Solve Button aligned to the right with reduced horizontal padding
+                        Box(
+                            modifier = Modifier
+                                .height(36.dp)
+                                .padding(end = 2.dp, bottom = 2.dp)
                         ) {
-                            Row(Modifier.fillMaxHeight().padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                if (isAnalyzing) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
-                                    Spacer(Modifier.width(6.dp))
-                                    Text("Solving…", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                                } else {
-                                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                                    Spacer(Modifier.width(6.dp))
-                                    Text("Solve", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 2.dp, y = 2.dp)
+                                    .clip(RoundedCornerShape(BrutalDefaults.RadiusPill))
+                                    .background(bs)
+                            )
+                            Surface(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(BrutalDefaults.RadiusPill))
+                                    .clickable {
+                                        if (doubtQuery.isBlank()) {
+                                            doubtQuery = "How to reverse an array in Java without using extra space?"
+                                        }
+                                        isAnalyzing = true
+                                        scope.launch {
+                                            delay(1000)
+                                            isAnalyzing = false
+                                        }
+                                    },
+                                shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
+                                color = Color(0xFF2563EB),
+                                border = BorderStroke(1.5.dp, bb)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    if (isAnalyzing) {
+                                        CircularProgressIndicator(modifier = Modifier.size(13.dp), color = Color.White, strokeWidth = 2.dp)
+                                        Spacer(Modifier.width(5.dp))
+                                        Text("Solving…", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    } else {
+                                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Solve", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                                    }
                                 }
                             }
                         }
@@ -390,7 +518,7 @@ while (left < right) {
                             onClick = { currentStep = 3 }
                         ) {
                             Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                                Text("Paisa Do: Talk to Human Expert (₹29) →", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
+                                Text("Paisa Do: Talk to Human Expert (from ₹29) →", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
                             }
                         }
                     }
@@ -430,7 +558,7 @@ while (left < right) {
                                     .border(BorderStroke(1.dp, bb), RoundedCornerShape(6.dp))
                                     .padding(horizontal = 8.dp, vertical = 3.dp)
                             ) {
-                                Text("₹29 only", fontWeight = FontWeight.Black, fontSize = 11.sp, color = Color.Black)
+                                Text("₹$selectedDoubtPlan", fontWeight = FontWeight.Black, fontSize = 11.sp, color = Color.Black)
                             }
                         }
 
@@ -450,6 +578,100 @@ while (left < right) {
                             }
                         }
 
+                        Spacer(Modifier.height(14.dp))
+
+                        // Pricing Plans Div
+                        Text("Select Expert Doubt Plan:", fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                        Spacer(Modifier.height(8.dp))
+
+                        val doubtPlans = listOf(
+                            Triple(29, "Single Doubt Pass", "Solved only one doubt"),
+                            Triple(150, "1-Week Unlimited Pass", "Unlimited doubts for 1 week"),
+                            Triple(200, "1-Month Unlimited Pass", "Unlimited doubts for entire month")
+                        )
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            doubtPlans.forEach { (planPrice, planTitle, planDescription) ->
+                                val isSelected = selectedDoubtPlan == planPrice
+                                val cardBg = if (isSelected) Color(0xFF059669).copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+                                val borderColor = if (isSelected) Color(0xFF059669) else bb.copy(alpha = 0.4f)
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(cardBg)
+                                        .border(BorderStroke(if (isSelected) 2.dp else 1.dp, borderColor), RoundedCornerShape(12.dp))
+                                        .clickable { selectedDoubtPlan = planPrice }
+                                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Radio indicator
+                                        Box(
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .clip(CircleShape)
+                                                .border(BorderStroke(2.dp, if (isSelected) Color(0xFF059669) else bb.copy(alpha = 0.6f)), CircleShape)
+                                                .background(if (isSelected) Color(0xFF059669) else Color.Transparent),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (isSelected) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(8.dp)
+                                                        .clip(CircleShape)
+                                                        .background(Color.White)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(Modifier.width(12.dp))
+
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(planTitle, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                                                if (planPrice == 200) {
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .clip(RoundedCornerShape(4.dp))
+                                                            .background(Color(0xFF2563EB))
+                                                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text("BEST VALUE", fontSize = 9.sp, fontWeight = FontWeight.Black, color = Color.White)
+                                                    }
+                                                } else if (planPrice == 150) {
+                                                    Spacer(Modifier.width(6.dp))
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .clip(RoundedCornerShape(4.dp))
+                                                            .background(NeoBrutalistColors.Yellow)
+                                                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text("POPULAR", fontSize = 9.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                                                    }
+                                                }
+                                            }
+                                            Spacer(Modifier.height(2.dp))
+                                            Text(planDescription, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+
+                                        Spacer(Modifier.width(8.dp))
+
+                                        Text(
+                                            "₹$planPrice",
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 16.sp,
+                                            color = if (isSelected) Color(0xFF059669) else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                         Spacer(Modifier.height(16.dp))
 
                         if (!isExpertPaid) {
@@ -457,12 +679,12 @@ while (left < right) {
                                 modifier = Modifier.fillMaxWidth().height(50.dp),
                                 shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
                                 backgroundColor = Color(0xFF5F259F), // PhonePe Purple
-                                onClick = { launchPhonePeForDoubt() }
+                                onClick = { launchPhonePeForDoubt(selectedDoubtPlan) }
                             ) {
                                 Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                                     Text("पे", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Pay ₹29 with PhonePe — Unlock Expert", fontWeight = FontWeight.ExtraBold, color = Color.White, fontSize = 13.sp)
+                                    Text("Pay ₹$selectedDoubtPlan with PhonePe — Unlock Expert", fontWeight = FontWeight.ExtraBold, color = Color.White, fontSize = 13.sp)
                                 }
                             }
                         } else {
