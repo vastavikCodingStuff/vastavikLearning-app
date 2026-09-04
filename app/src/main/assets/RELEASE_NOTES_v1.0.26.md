@@ -48,6 +48,3 @@
 - **Architecture:** Universal APK
 - **Asset Packages:**
   - `vastavikLearning-v1.0.26.apk`
-  - `vastavikLearning.apk`
-  - `app-v1.0.26-debug.apk`
-  - `app-debug.apk`
