@@ -11,7 +11,8 @@ class DownloadProgressReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_CANCEL -> {
-                AppUpdater.cancelCurrentDownload()
+                val version = intent.getStringExtra(AppUpdater.EXTRA_DOWNLOAD_VERSION)
+                AppUpdater.cancelCurrentDownload(context, version)
                 try {
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
                     nm?.cancel(NOTIFICATION_ID_DOWNLOAD)

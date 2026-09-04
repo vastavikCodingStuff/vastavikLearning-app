@@ -38,8 +38,29 @@ object AppUpdater {
     @Volatile private var cancelRequested: AtomicBoolean = AtomicBoolean(false)
     @Volatile private var currentDownloadJob: Job? = null
 
-    fun cancelCurrentDownload() {
+    fun cancelCurrentDownload(context: Context? = null, version: String? = null) {
         cancelRequested.set(true)
+        currentDownloadJob?.cancel()
+        currentDownloadJob = null
+        if (context != null) {
+            cancelDownloadNotification(context)
+            if (!version.isNullOrBlank()) {
+                try {
+                    val file = getApkFile(context, version)
+                    if (file.exists()) file.delete()
+                } catch (_: Exception) {}
+            }
+            try {
+                context.cacheDir.listFiles()
+                    ?.filter { it.name.startsWith("vastavik_update_") }
+                    ?.forEach { file ->
+                        val pkgInfo = context.packageManager.getPackageArchiveInfo(file.absolutePath, 0)
+                        if (pkgInfo == null) {
+                            file.delete()
+                        }
+                    }
+            } catch (_: Exception) {}
+        }
     }
 
     fun isCancelRequested(): Boolean = cancelRequested.get()
@@ -595,15 +616,28 @@ object AppUpdater {
             }
             input.close()
 
-            if (target.length() > 0) {
+            if (cancelRequested.get()) {
+                if (target.exists()) target.delete()
+                null
+            } else if (contentLength > 0 && target.length() < contentLength) {
+                if (target.exists()) target.delete()
+                null
+            } else if (hasUsableApk(context, version)) {
                 // Purge APKs of other versions so only the current one is kept
                 context.cacheDir.listFiles()
                     ?.filter { it.name.startsWith("vastavik_update_") && it != target }
                     ?.forEach { it.delete() }
                 target
-            } else null
+            } else {
+                if (target.exists()) target.delete()
+                null
+            }
         } catch (e: Exception) {
             e.printStackTrace()
+            try {
+                val target = getApkFile(context, version)
+                if (target.exists()) target.delete()
+            } catch (_: Exception) {}
             null
         } finally {
             resetCancel()
@@ -615,8 +649,21 @@ object AppUpdater {
         downloadApkWithProgress(context, info) { _, _, _ -> }
 
     fun hasUsableApk(context: Context, version: String): Boolean {
+        if (version.isBlank()) return false
         val file = getApkFile(context, version)
-        return file.exists() && file.length() > 0L
+        if (!file.exists() || file.length() <= 0L) return false
+        return try {
+            val pkgInfo = context.packageManager.getPackageArchiveInfo(file.absolutePath, 0)
+            if (pkgInfo != null && !pkgInfo.packageName.isNullOrBlank()) {
+                true
+            } else {
+                file.delete()
+                false
+            }
+        } catch (e: Exception) {
+            try { file.delete() } catch (_: Exception) {}
+            false
+        }
     }
 
     fun canRequestPackageInstalls(context: Context): Boolean {
@@ -714,10 +761,11 @@ object AppUpdater {
             openPiFlags
         )
 
+        val cleanVersion = version.trim().removePrefix("v").removePrefix("V")
         val appIconBitmap = getAppIconBitmap(context)
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Downloading Vastavik v$version")
+            .setContentTitle("Downloading Vastavik v$cleanVersion Update")
             .setContentText("$percent% • $sizeStr")
             .setSubText(title)
             .setProgress(100, percent, indeterminate)

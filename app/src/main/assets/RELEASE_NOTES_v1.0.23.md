@@ -30,7 +30,16 @@
 
 ---
 
+### 4. App Update Enhancements & Download Cancellation Fixes
+- **Compact Changelog Preview with "Read More"**: Release notes in both "Latest Update" and "All Updates" history tabs are previewed up to the `Platform` specification line with a "Read More" / "Read Less" toggle, keeping the download and later action buttons accessible without long scrolling.
+- **Strict APK Integrity Check & Partial Download Purge**: Completely resolved the issue where cancelling a download left partial data (e.g. 1MB) and falsely displayed "Install Update Now". Android package validation ensures partial files are wiped immediately on cancel, resetting the button to "Download & Install Update".
+- **Horizontal Swipe Navigation**: Added bidirectional horizontal swipe gestures between "Latest Update" and "All Updates" tabs via `HorizontalPager`.
+- **Notification Title & Action Polish**: Updated the ongoing download notification title to `Downloading Vastavik v1.0.23 Update`, with immediate file deletion when tapping "Cancel" from the notification drawer.
+
+---
+
 ## 🛠 Fixes & Internal Changes
 - Bumped `versionCode` to `23` and `versionName` to `"1.0.23"`.
 - Added `app-v1.0.23-debug.apk` and `vastavikLearning-v1.0.23.apk` to `app/src/main/assets/`.
+- Configured asset resource packaging to exclude nested APKs from APK bundles.
 - Updated `AppUpdater.kt` fallback changelog viewer with v1.0.23 metadata.
