@@ -269,12 +269,12 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     .imePadding()
                     .pointerInput(showSidebar) {
                         detectHorizontalDragGestures { _, dragAmount ->
-                            if (dragAmount < -40f) {
-                                showSidebar = true
-                            } else if (dragAmount > 40f) {
-                                if (showSidebar) {
+                            if (showSidebar) {
+                                if (dragAmount > 20f || dragAmount < -20f) {
                                     showSidebar = false
-                                } else {
+                                }
+                            } else {
+                                if (dragAmount > 25f || dragAmount < -25f) {
                                     onNavigate("practice")
                                 }
                             }
@@ -317,17 +317,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                     },
                                     modifier = Modifier.size(17.dp)
                                 )
-                                Spacer(Modifier.width(6.dp))
-                                Text(
-                                    text = selectedAiModel.displayName,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.5.sp,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Spacer(Modifier.width(4.dp))
+                                Spacer(Modifier.width(8.dp))
                                 Surface(
                                     shape = RoundedCornerShape(6.dp),
                                     color = when (selectedAiModel) {
@@ -339,12 +329,13 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                 ) {
                                     Text(
                                         text = selectedAiModel.badge,
-                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
-                                        fontSize = 9.sp,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = Color.White
                                     )
                                 }
+                                Spacer(Modifier.weight(1f))
                                 Icon(
                                     Icons.Filled.ArrowDropDown,
                                     contentDescription = null,
@@ -702,7 +693,14 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(0.55f)
-                        .clip(RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp)),
+                        .clip(RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp))
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                if (dragAmount > 20f || dragAmount < -20f) {
+                                    showSidebar = false
+                                }
+                            }
+                        },
                     shape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp),
                     color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 8.dp,
@@ -814,13 +812,22 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // Dim overlay when sidebar open (covers left 45%)
+            // Transparent overlay when sidebar open (covers left 45%) - screen color does not turn grey
             if (showSidebar) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.25f))
-                        .clickable { showSidebar = false }
+                        .clickable(
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                            indication = null
+                        ) { showSidebar = false }
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                if (dragAmount > 20f || dragAmount < -20f) {
+                                    showSidebar = false
+                                }
+                            }
+                        }
                         .align(Alignment.CenterStart)
                         .fillMaxWidth(0.45f)
                 )
@@ -932,45 +939,38 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text(
-                                                    text = model.displayName,
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 14.sp,
-                                                    color = MaterialTheme.colorScheme.onBackground
-                                                )
-                                                Spacer(Modifier.width(6.dp))
-                                                Surface(
-                                                    shape = RoundedCornerShape(6.dp),
-                                                    color = when (model) {
-                                                        com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD -> Color(0xFFD97706)
-                                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD -> Color(0xFF2563EB)
-                                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN -> Color(0xFF059669)
-                                                    }
-                                                ) {
-                                                    Text(
-                                                        text = model.badge,
-                                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                                        fontSize = 10.sp,
-                                                        fontWeight = FontWeight.ExtraBold,
-                                                        color = Color.White
-                                                    )
+                                            Surface(
+                                                shape = RoundedCornerShape(6.dp),
+                                                color = when (model) {
+                                                    com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD -> Color(0xFFD97706)
+                                                    com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD -> Color(0xFF2563EB)
+                                                    com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN -> Color(0xFF059669)
                                                 }
+                                            ) {
+                                                Text(
+                                                    text = model.badge,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = Color.White
+                                                )
                                             }
-                                            Spacer(Modifier.height(3.dp))
+                                            Spacer(Modifier.height(5.dp))
                                             Text(
                                                 text = model.subtitle,
-                                                fontSize = 11.sp,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                         }
 
                                         if (isSelected) {
+                                            Spacer(Modifier.width(8.dp))
                                             Icon(
                                                 Icons.Filled.CheckCircle,
                                                 contentDescription = "Selected",
                                                 tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(20.dp)
+                                                modifier = Modifier.size(22.dp)
                                             )
                                         }
                                     }

@@ -23,21 +23,21 @@ enum class AiEngineModel(
 ) {
     MISTRAL_GOD(
         id = "mistral-god",
-        displayName = "Mistral is GOD",
+        displayName = "GOD",
         badge = "GOD",
-        subtitle = "Mistral Small • Highest accuracy & best performance"
+        subtitle = "Best and accurate performance"
     ),
     GEMINI_37_DEMI_GOD(
         id = "gemini-3.7-flash",
-        displayName = "Gemini 3.7 flash is Demi-god",
-        badge = "Demi-god",
-        subtitle = "Google Gemini 3.7 Flash • High speed & reasoning"
+        displayName = "Demi-God",
+        badge = "Demi-God",
+        subtitle = "High speed & reasoning"
     ),
     GEMINI_36_HUMAN(
         id = "gemini-3.6-flash",
-        displayName = "Gemini 3.6 flash is Human AI",
+        displayName = "Human AI",
         badge = "Human AI",
-        subtitle = "Google Gemini 3.6 Flash • Compact everyday AI"
+        subtitle = "Compact everyday AI"
     );
 
     companion object {
@@ -145,11 +145,11 @@ object VastavikAi {
         }
 
         if (apiKey.isBlank()) {
-            DebugLogBox.warn("Mistral", "Mistral API key not configured. Failing over to Gemini", model = "Mistral is GOD")
+            DebugLogBox.warn("Mistral", "Mistral API key not configured. Failing over to Gemini", model = "GOD")
             return callGeminiWithFallback(GEMINI_PRIMARY, composedSystem, userPrompt, temperature, maxOutputTokens)
         }
 
-        DebugLogBox.activeModel = "Mistral is GOD"
+        DebugLogBox.activeModel = "GOD"
 
         // 1. Primary Mistral attempt: mistral-small-latest
         try {
@@ -157,20 +157,20 @@ object VastavikAi {
         } catch (e: Exception) {
             val isRateLimitedOrNotFound = e.message?.contains("429") == true || e.message?.contains("404") == true
             if (isRateLimitedOrNotFound) {
-                DebugLogBox.warn("Mistral", "mistral-small-latest 429. Falling back to ministral-8b-latest", model = "Mistral is GOD")
+                DebugLogBox.warn("Mistral", "mistral-small-latest 429. Falling back to ministral-8b-latest", model = "GOD")
                 try {
                     // 2. Mistral fallback: ministral-8b-latest (Mistral 8B Small)
                     return sendMistralRequest("ministral-8b-latest", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
                 } catch (fallback2: Exception) {
-                    DebugLogBox.warn("Mistral", "ministral-8b-latest failed. Trying open-mistral-7b", model = "Mistral is GOD")
+                    DebugLogBox.warn("Mistral", "ministral-8b-latest failed. Trying open-mistral-7b", model = "GOD")
                     try {
                         return sendMistralRequest("open-mistral-7b", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
                     } catch (fallback3: Exception) {
-                        DebugLogBox.error("Mistral", "All Mistral models failed. Failing over to Gemini 3.6", fallback3, model = "Mistral is GOD")
+                        DebugLogBox.error("Mistral", "All Mistral models failed. Failing over to Gemini 3.6", fallback3, model = "GOD")
                     }
                 }
             } else {
-                DebugLogBox.warn("Mistral", "Mistral failed: ${e.message?.take(80)}. Failing over to Gemini", model = "Mistral is GOD")
+                DebugLogBox.warn("Mistral", "Mistral failed: ${e.message?.take(80)}. Failing over to Gemini", model = "GOD")
             }
         }
 
