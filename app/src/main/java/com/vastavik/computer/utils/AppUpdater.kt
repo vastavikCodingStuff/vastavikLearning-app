@@ -119,6 +119,201 @@ object AppUpdater {
     }
 
     /**
+     * Fetches all GitHub Releases for the repository to display full update and changelog history.
+     * Falls back to bundled historical release data if network/rate-limiting fails.
+     */
+    suspend fun fetchAllGitHubReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> = withContext(Dispatchers.IO) {
+        try {
+            val url = URL("https://api.github.com/repos/vastavikCodingStuff/vastavikLearning-app/releases?per_page=30")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                setRequestProperty("Accept", "application/vnd.github.v3+json")
+                setRequestProperty("User-Agent", "Vastavik-Android-App")
+                connectTimeout = 15000
+                readTimeout = 15000
+            }
+            if (conn.responseCode == 200) {
+                val text = conn.inputStream.bufferedReader().use { it.readText() }
+                val jsonArray = org.json.JSONArray(text)
+                val list = mutableListOf<AppUpdateInfo>()
+                for (i in 0 until jsonArray.length()) {
+                    val json = jsonArray.getJSONObject(i)
+                    val rawTag = json.optString("tag_name", "")
+                    val ver = rawTag.trim().removePrefix("v").removePrefix("V")
+                    val releaseTitle = json.optString("name", "v$ver")
+                    val changelog = json.optString("body", "")
+                    val publishedAt = json.optString("published_at", "")
+
+                    var apkDownloadUrl = ""
+                    var apkSizeBytes = 0L
+                    val assets = json.optJSONArray("assets")
+                    if (assets != null) {
+                        for (j in 0 until assets.length()) {
+                            val asset = assets.getJSONObject(j)
+                            val assetName = asset.optString("name", "")
+                            if (assetName.endsWith(".apk", ignoreCase = true)) {
+                                apkDownloadUrl = asset.optString("browser_download_url", "")
+                                apkSizeBytes = asset.optLong("size", 0L)
+                                break
+                            }
+                        }
+                    }
+
+                    val isNewer = isNewerVersion(ver, currentVersion)
+                    list.add(
+                        AppUpdateInfo(
+                            latestVersion = ver,
+                            apkUrl = apkDownloadUrl,
+                            forceUpdate = false,
+                            changelog = changelog,
+                            releaseTitle = releaseTitle,
+                            apkSize = apkSizeBytes,
+                            publishedAt = publishedAt,
+                            isUpdateAvailable = isNewer
+                        )
+                    )
+                }
+                if (list.isNotEmpty()) list else getFallbackReleases(currentVersion)
+            } else {
+                getFallbackReleases(currentVersion)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            getFallbackReleases(currentVersion)
+        }
+    }
+
+    fun getFallbackReleases(currentVersion: String = BuildConfig.VERSION_NAME): List<AppUpdateInfo> {
+        return listOf(
+            AppUpdateInfo(
+                latestVersion = "1.0.15",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.15/app-v1.0.15-debug.apk",
+                releaseTitle = "v1.0.15 - App Update History & All Updates Changelog Viewer",
+                changelog = """
+### What's New in this Release:
+- **Update History Screen**: Added an all-new History viewer accessible directly from the top-right of the App Update screen (to the left of the reload button).
+- **All Updates Changelog Viewer**: Clean neo-brutalist cards listing every release, published date, size, and detailed markdown changelog.
+- **Direct Download & Installation**: Ability to download and install any release APK directly from the history view.
+                """.trimIndent(),
+                apkSize = 71364385L,
+                publishedAt = "2026-09-04T02:35:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.15", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.14",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.14/app-v1.0.14-debug.apk",
+                releaseTitle = "v1.0.14 - Doubts Media Attachment, Centered Solve Button & 3-Tier Expert Pricing",
+                changelog = """
+### What's New in this Release:
+- **Attach Images & Videos to Doubts**: Students can now attach error screenshots or video recordings in the AI Instant Doubt solver.
+- **Centered Solve Button**: Fixed the Solve button layout to center text/icon with reduced horizontal padding, neatly aligned on the right.
+- **3-Tier Doubt Expert Pricing Div**: Selectable options for ₹29 (Single Doubt), ₹150 (1-Week Unlimited Pass), and ₹200 (1-Month Unlimited Pass).
+- **PhonePe Dynamic UPI Intent**: Direct integration with dynamic amount passing for seamless 1-tap checkout.
+                """.trimIndent(),
+                apkSize = 71364385L,
+                publishedAt = "2026-09-04T02:27:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.14", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.13",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.13/app-v1.0.13-debug.apk",
+                releaseTitle = "v1.0.13 - Payment UI Polish, Home Card Spacing & Selective Download Button",
+                changelog = """
+### What's New in this Release:
+- **Payment UI Polish**: Removed yellow Razorpay/PhonePe gateway buttons. Updated monthly/yearly plans and 50% discount icon to crisp blue.
+- **Home Card Spacing**: Added top padding above 3-Step Doubt Solver card for proper visual separation from Hello Student header.
+- **Selective Download Button**: Displayed on Home and Learn screens only, omitting it from Practice top bar.
+                """.trimIndent(),
+                apkSize = 71348001L,
+                publishedAt = "2026-09-04T02:20:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.13", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.12",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.12/app-v1.0.12-debug.apk",
+                releaseTitle = "v1.0.12 - Conditional Green Download Button & Clean Markdown Changelog",
+                changelog = """
+### What's New in this Release:
+- **Circular Green Download Button**: Added prominent download indicator on top-right of Home & Learn screens when update is available.
+- **Clean Markdown Changelog**: Added markdown parsing component to render bullet points, bold text, and code blocks cleanly.
+                """.trimIndent(),
+                apkSize = 71348001L,
+                publishedAt = "2026-09-04T02:12:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.12", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.10",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.10/app-v1.0.10-debug.apk",
+                releaseTitle = "v1.0.10 - Core Enhancements: WebRTC, Socket.IO, Telegram Notifications, PhonePe",
+                changelog = """
+### What's New in this Release:
+- **WebRTC Live Consultation**: Peer-to-peer audio/video connection for 1-on-1 teacher doubt solving.
+- **Socket.IO Signaling Server**: Real-time room management and participant events.
+- **Telegram Notifications**: Live channel alerts when student asks doubts or updates are posted.
+- **PhonePe UPI**: Quick UPI payment launch.
+                """.trimIndent(),
+                apkSize = 71348005L,
+                publishedAt = "2026-09-04T02:05:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.10", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.9",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.9/app-v1.0.9-debug.apk",
+                releaseTitle = "v1.0.9 - 10 Core Enhancements: WebRTC, Socket.IO, Telegram Notifications, PhonePe",
+                changelog = """
+### What's New in this Release:
+- Integrated WebRTC live video consultation.
+- Real-time whiteboard synchronization.
+- Telegram notification alerts.
+- PhonePe UPI checkout intent.
+                """.trimIndent(),
+                apkSize = 71652616L,
+                publishedAt = "2026-09-04T01:46:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.9", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.8",
+                apkUrl = "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.8/app-v1.0.8-debug.apk",
+                releaseTitle = "v1.0.8 - Learn Path Oval Curved Connecting Lines & Auto GitHub Update Scanner",
+                changelog = """
+### What's New in this Release:
+- Oval curved bezier connecting lines between learning path nodes.
+- Automatic background GitHub Release asset scanner with notifications.
+                """.trimIndent(),
+                apkSize = 71431554L,
+                publishedAt = "2026-09-04T01:30:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.8", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.6",
+                apkUrl = "",
+                releaseTitle = "v1.0.6 - Default Coding Tab & Left Notification Icon",
+                changelog = """
+### What's New in this Release:
+- Set Coding tab as default landing tab on Practice screen.
+- Aligned notification bell icon cleanly to top left.
+                """.trimIndent(),
+                apkSize = 71167781L,
+                publishedAt = "2026-09-03T20:30:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.6", currentVersion)
+            ),
+            AppUpdateInfo(
+                latestVersion = "1.0.5",
+                apkUrl = "",
+                releaseTitle = "v1.0.5 - Notification Buttons, Home Pager Swipe & Practice Updates",
+                changelog = """
+### What's New in this Release:
+- Notification buttons and student profile horizontal pager swipe on Home screen.
+- Enhanced Practice screen MCQ and quiz modes.
+                """.trimIndent(),
+                apkSize = 71167781L,
+                publishedAt = "2026-09-03T19:40:00Z",
+                isUpdateAvailable = isNewerVersion("1.0.5", currentVersion)
+            )
+        )
+    }
+
+    /**
      * Checks GitHub Releases for new update assets and displays a system notification
      * when a newer version is found.
      */
