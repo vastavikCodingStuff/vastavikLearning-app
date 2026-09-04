@@ -18,8 +18,8 @@ android {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 24
-        versionName = "1.0.24"
+        versionCode = 25
+        versionName = "1.0.25"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
@@ -32,6 +32,7 @@ android {
             properties.load(localPropsFile.inputStream())
         }
         buildConfigField("String", "GEMINI_API_KEY", "\"${properties.getProperty("GEMINI_API_KEY", "")}\"")
+        buildConfigField("String", "MISTRAL_API_KEY", "\"${properties.getProperty("MISTRAL_API_KEY", "")}\"")
         buildConfigField("Boolean", "SECURITY_CHECK_ENABLED", "false")
         // Backend connection — override in local.properties if needed
         // Prod (Render): https://vastavik-admin-backend.onrender.com  |  Emulator: http://10.0.2.2:3001  |  LAN: http://192.168.x.x:3001

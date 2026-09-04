@@ -87,7 +87,10 @@ RULES:
 - Always be encouraging and supportive
 - Format code with ```code blocks when showing examples"""
 
-private suspend fun callVastavikAiChat(messages: List<ChatMessage>): String {
+private suspend fun callVastavikAiChat(
+    engineModel: com.vastavik.computer.utils.AiEngineModel,
+    messages: List<ChatMessage>
+): String {
     val apiMessages = StringBuilder()
     for (msg in messages) {
         if (apiMessages.isNotEmpty()) apiMessages.append("\n\n")
@@ -95,7 +98,8 @@ private suspend fun callVastavikAiChat(messages: List<ChatMessage>): String {
         apiMessages.append(msg.text)
     }
     return try {
-        com.vastavik.computer.utils.VastavikAi.chat(
+        com.vastavik.computer.utils.VastavikAi.chatWithModel(
+            engineModel = engineModel,
             systemPrompt = SYSTEM_PROMPT,
             userPrompt = apiMessages.toString(),
             temperature = 0.3,
@@ -103,7 +107,7 @@ private suspend fun callVastavikAiChat(messages: List<ChatMessage>): String {
         )
     } catch (e: Exception) {
         if (com.vastavik.computer.utils.AdminSession.isAdmin.value) {
-            "Error Connecting to the Server\n\n```\n[ADMIN MODE DIAGNOSTICS]\nFile: VastavikAi.kt\nEngine: Vastavik AI (${com.vastavik.computer.utils.DebugLogBox.activeModel})\nEndpoint: ${com.vastavik.computer.utils.VastavikAi.ENDPOINT}\nReason: ${e.message ?: e.javaClass.simpleName}\n```"
+            "Error Connecting to the Server\n\n```\n[ADMIN MODE DIAGNOSTICS]\nFile: VastavikAi.kt\nEngine: Vastavik AI (${engineModel.displayName})\nEndpoint: ${com.vastavik.computer.utils.VastavikAi.ENDPOINT}\nReason: ${e.message ?: e.javaClass.simpleName}\n```"
         } else {
             com.vastavik.computer.utils.VastavikAi.ERROR_MESSAGE
         }
@@ -141,6 +145,11 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     var conversations by remember { mutableStateOf(AiConversationCache.loadConversations(context)) }
     var activeConversationId by remember { mutableStateOf(AiConversationCache.getActiveConversationId(context) ?: UUID.randomUUID().toString()) }
 
+    // Model selector state (Default: Mistral is GOD)
+    var selectedAiModel by remember { mutableStateOf(com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD) }
+    var showModelDialog by remember { mutableStateOf(false) }
+    var modelSearchQuery by remember { mutableStateOf("") }
+
     DisposableEffect(Unit) {
         onDispose {
             speechRecognizer?.destroy()
@@ -149,7 +158,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
 
     suspend fun askVastavikAi(prompt: String): String {
         return withContext(Dispatchers.IO) {
-            callVastavikAiChat(messages + ChatMessage(prompt, isUser = true))
+            callVastavikAiChat(selectedAiModel, messages + ChatMessage(prompt, isUser = true))
         }
     }
 
@@ -260,37 +269,92 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     .imePadding()
                     .pointerInput(showSidebar) {
                         detectHorizontalDragGestures { _, dragAmount ->
-                            if (dragAmount < -40f) showSidebar = true
-                            if (dragAmount > 40f) showSidebar = false
+                            if (dragAmount < -40f) {
+                                showSidebar = true
+                            } else if (dragAmount > 40f) {
+                                if (showSidebar) {
+                                    showSidebar = false
+                                } else {
+                                    onNavigate("practice")
+                                }
+                            }
                         }
                     }
             ) {
-                // Top bar with Vastavik AI + New button
+                // Top bar with Stylish AI Model Selector + History + New button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Filled.SmartToy, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Vastavik", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                    Text("AI", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                    Spacer(Modifier.width(8.dp))
-                    Surface(
-                        shape = RoundedCornerShape(50.dp),
-                        color = Color(0xFF2563EB),
-                        border = BorderStroke(1.dp, bb)
+                    // Stylish Search/Selector Box for choosing among the 3 AIs
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
                     ) {
-                        Text(
-                            "Vastavik AI",
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surface)
+                                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(12.dp))
+                                .clickable { showModelDialog = true }
+                                .padding(horizontal = 10.dp, vertical = 7.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Filled.Search,
+                                    contentDescription = "Search & Select Model",
+                                    tint = when (selectedAiModel) {
+                                        com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD -> Color(0xFFD97706)
+                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD -> Color(0xFF2563EB)
+                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN -> Color(0xFF059669)
+                                    },
+                                    modifier = Modifier.size(17.dp)
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    text = selectedAiModel.displayName,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.5.sp,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = when (selectedAiModel) {
+                                        com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD -> Color(0xFFD97706)
+                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD -> Color(0xFF2563EB)
+                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN -> Color(0xFF059669)
+                                    },
+                                    border = BorderStroke(1.dp, bb)
+                                ) {
+                                    Text(
+                                        text = selectedAiModel.badge,
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.White
+                                    )
+                                }
+                                Icon(
+                                    Icons.Filled.ArrowDropDown,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
                     }
-                    Spacer(modifier = Modifier.weight(1f))
+
                     // History icon to open sidebar
                     Box(
                         modifier = Modifier
@@ -304,7 +368,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     ) {
                         Icon(Icons.Filled.History, contentDescription = "Conversations", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
@@ -325,7 +389,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                 activeConversationId = UUID.randomUUID().toString()
                                 viewModel.clearMessages()
                             }
-                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
@@ -335,7 +399,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     }
                 }
 
-                // Suggestion chips
+                // Suggestion chips (Sample inputs across multiple CS domains)
                 LazyRow(
                     modifier = Modifier.padding(vertical = 8.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -344,7 +408,10 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     items(listOf(
                         "Explain Code" to "Explain this Java code for Class 8: public class Hello { public static void main(String[] args){ System.out.println(\"hi\"); } }",
                         "Generate Quiz" to "Generate 3 MCQs about Python loops for Class 7 with 4 options each.",
-                        "Find Bug" to "Help me find bug in this Python: for i in range(5) print(i)"
+                        "Find Bug" to "Help me find bug in this Python: for i in range(5) print(i)",
+                        "SQL Query" to "Write a SQL query to find the 2nd highest salary from an Employee table.",
+                        "Binary Search" to "Explain Binary Search in Java step-by-step with time complexity.",
+                        "OOP Pillars" to "Explain the 4 pillars of OOP with short real-world examples for ICSE Class 10."
                     )) { (label, prompt) ->
                         Surface(
                             onClick = {
@@ -622,17 +689,21 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // Sidebar overlay — 40% width, slides in from right
+            // Sidebar overlay — 55% width (+15%), slides in from right, reduced height on top & bottom, rounded left vertices, delete button
             AnimatedVisibility(
                 visible = showSidebar,
-                modifier = Modifier.align(Alignment.CenterEnd),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(top = 16.dp, bottom = 28.dp),
                 enter = slideInHorizontally { it },
                 exit = slideOutHorizontally { it }
             ) {
                 Surface(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth(0.4f),
+                        .fillMaxWidth(0.55f)
+                        .clip(RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp)),
+                    shape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp),
                     color = MaterialTheme.colorScheme.surface,
                     shadowElevation = 8.dp,
                     border = BorderStroke(2.dp, bb)
@@ -642,15 +713,16 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 0.dp, bottomStart = 0.dp, bottomEnd = 0.dp))
                                 .background(MaterialTheme.colorScheme.primary)
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 "Chats",
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
+                                fontSize = 14.sp,
                                 modifier = Modifier.weight(1f)
                             )
                             Icon(
@@ -671,7 +743,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         ) {
                             items(conversations) { conv ->
                                 val isActive = conv.id == activeConversationId
-                                Box(
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .background(
@@ -696,7 +768,8 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                             conversations = AiConversationCache.loadConversations(context)
                                             showSidebar = false
                                         }
-                                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
                                         text = conv.title.ifBlank { "Chat" },
@@ -704,8 +777,35 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
+                                        modifier = Modifier.weight(1f)
                                     )
+                                    Spacer(Modifier.width(4.dp))
+                                    IconButton(
+                                        onClick = {
+                                            AiConversationCache.deleteConversation(context, conv.id)
+                                            conversations = AiConversationCache.loadConversations(context)
+                                            if (activeConversationId == conv.id) {
+                                                val nextConv = conversations.firstOrNull()
+                                                if (nextConv != null) {
+                                                    activeConversationId = nextConv.id
+                                                    AiConversationCache.setActiveConversationId(context, nextConv.id)
+                                                    viewModel.setMessages(nextConv.messages.map { ChatMessage(it.text, it.isUser) })
+                                                } else {
+                                                    activeConversationId = UUID.randomUUID().toString()
+                                                    viewModel.clearMessages()
+                                                }
+                                            }
+                                        },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.DeleteOutline,
+                                            contentDescription = "Delete",
+                                            tint = Color(0xFFEF4444),
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 }
                                 HorizontalDivider(thickness = 0.5.dp, color = bb.copy(alpha = 0.3f))
                             }
@@ -714,7 +814,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // Dim overlay when sidebar open
+            // Dim overlay when sidebar open (covers left 45%)
             if (showSidebar) {
                 Box(
                     modifier = Modifier
@@ -722,9 +822,163 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                         .background(Color.Black.copy(alpha = 0.25f))
                         .clickable { showSidebar = false }
                         .align(Alignment.CenterStart)
-                        // Only cover the left 60%
-                        .fillMaxWidth(0.6f)
+                        .fillMaxWidth(0.45f)
                 )
+            }
+        }
+    }
+
+    // Interactive AI Model Search & Selection Dialog
+    if (showModelDialog) {
+        val allModels = listOf(
+            com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD,
+            com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD,
+            com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN
+        )
+        val filteredModels = if (modelSearchQuery.isBlank()) allModels else {
+            allModels.filter {
+                it.displayName.contains(modelSearchQuery, ignoreCase = true) ||
+                it.badge.contains(modelSearchQuery, ignoreCase = true) ||
+                it.subtitle.contains(modelSearchQuery, ignoreCase = true)
+            }
+        }
+
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { showModelDialog = false }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .padding(end = 4.dp, bottom = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 4.dp, y = 4.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(bs)
+                )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = BorderStroke(2.dp, bb)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                "Select AI Model",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            IconButton(
+                                onClick = { showModelDialog = false },
+                                modifier = Modifier.size(26.dp)
+                            ) {
+                                Icon(Icons.Filled.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+
+                        Spacer(Modifier.height(10.dp))
+
+                        // Search box
+                        OutlinedTextField(
+                            value = modelSearchQuery,
+                            onValueChange = { modelSearchQuery = it },
+                            placeholder = { Text("Search AI model...", fontSize = 13.sp) },
+                            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(10.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = bb,
+                                unfocusedBorderColor = bb.copy(alpha = 0.5f)
+                            )
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            filteredModels.forEach { model ->
+                                val isSelected = model == selectedAiModel
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(
+                                            if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                                        )
+                                        .border(
+                                            BorderStroke(
+                                                if (isSelected) 2.dp else 1.dp,
+                                                if (isSelected) MaterialTheme.colorScheme.primary else bb.copy(alpha = 0.3f)
+                                            ),
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                        .clickable {
+                                            selectedAiModel = model
+                                            showModelDialog = false
+                                        }
+                                        .padding(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(
+                                                    text = model.displayName,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 14.sp,
+                                                    color = MaterialTheme.colorScheme.onBackground
+                                                )
+                                                Spacer(Modifier.width(6.dp))
+                                                Surface(
+                                                    shape = RoundedCornerShape(6.dp),
+                                                    color = when (model) {
+                                                        com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD -> Color(0xFFD97706)
+                                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_37_DEMI_GOD -> Color(0xFF2563EB)
+                                                        com.vastavik.computer.utils.AiEngineModel.GEMINI_36_HUMAN -> Color(0xFF059669)
+                                                    }
+                                                ) {
+                                                    Text(
+                                                        text = model.badge,
+                                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.ExtraBold,
+                                                        color = Color.White
+                                                    )
+                                                }
+                                            }
+                                            Spacer(Modifier.height(3.dp))
+                                            Text(
+                                                text = model.subtitle,
+                                                fontSize = 11.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+
+                                        if (isSelected) {
+                                            Icon(
+                                                Icons.Filled.CheckCircle,
+                                                contentDescription = "Selected",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
