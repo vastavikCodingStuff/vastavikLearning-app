@@ -640,6 +640,18 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                             viewModel.addMessage(ChatMessage(userText, isUser = true, images = sendingImages))
                                             inputText = ""
                                             attachedImages = emptyList()
+
+                                            // Save user message immediately to disk
+                                            val liveList = viewModel.messages.value.map { ChatMessageData(it.text, it.isUser) }
+                                            val userConv = AiConversation(
+                                                id = activeConversationId,
+                                                title = liveList.firstOrNull { it.isUser }?.text?.take(40) ?: userText.take(40),
+                                                messages = liveList,
+                                                updatedAt = System.currentTimeMillis()
+                                            )
+                                            AiConversationCache.saveConversation(context, userConv)
+                                            conversations = AiConversationCache.loadConversations(context)
+
                                             isLoading = true
                                             coroutineScope.launch {
                                                 try {
@@ -653,15 +665,17 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                     val resp = askVastavikAi(promptWithContext)
                                                     viewModel.addMessage(ChatMessage(resp, isUser = false))
                                                     listState.animateScrollToItem(messages.lastIndex)
-                                                    // Save conversation after AI response
-                                                    val conv = AiConversation(
+
+                                                    // Save conversation with AI response immediately to disk
+                                                    val updatedList = viewModel.messages.value.map { ChatMessageData(it.text, it.isUser) }
+                                                    val finalConv = AiConversation(
                                                         id = activeConversationId,
-                                                        title = messages.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
-                                                        messages = messages.map { ChatMessageData(it.text, it.isUser) },
+                                                        title = updatedList.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
+                                                        messages = updatedList,
                                                         updatedAt = System.currentTimeMillis()
                                                     )
-                                                    AiConversationCache.saveConversation(context, conv)
-                                                    AiConversationSyncManager.syncConversationToServer(conv)
+                                                    AiConversationCache.saveConversation(context, finalConv)
+                                                    AiConversationSyncManager.syncConversationToServer(finalConv)
                                                     conversations = AiConversationCache.loadConversations(context)
                                                 } finally { isLoading = false }
                                             }
@@ -680,139 +694,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // Sidebar overlay — 55% width (+15%), slides in from right, reduced height on top & bottom, rounded left vertices, delete button
-            AnimatedVisibility(
-                visible = showSidebar,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(top = 16.dp, bottom = 28.dp),
-                enter = slideInHorizontally { it },
-                exit = slideOutHorizontally { it }
-            ) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.55f)
-                        .clip(RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp))
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures { _, dragAmount ->
-                                if (dragAmount > 20f || dragAmount < -20f) {
-                                    showSidebar = false
-                                }
-                            }
-                        },
-                    shape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp, topEnd = 0.dp, bottomEnd = 0.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    shadowElevation = 8.dp,
-                    border = BorderStroke(2.dp, bb)
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        // Sidebar header
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 0.dp, bottomStart = 0.dp, bottomEnd = 0.dp))
-                                .background(MaterialTheme.colorScheme.primary)
-                                .padding(horizontal = 14.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Chats",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                Icons.Filled.Close,
-                                contentDescription = "Close",
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(18.dp)
-                                    .clickable { showSidebar = false }
-                            )
-                        }
-                        // Conversation list
-                        LazyColumn(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            contentPadding = PaddingValues(vertical = 4.dp)
-                        ) {
-                            items(conversations) { conv ->
-                                val isActive = conv.id == activeConversationId
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                            else Color.Transparent
-                                        )
-                                        .clickable {
-                                            // Save current before switching
-                                            if (messages.isNotEmpty() && activeConversationId != conv.id) {
-                                                val cur = AiConversation(
-                                                    id = activeConversationId,
-                                                    title = messages.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
-                                                    messages = messages.map { ChatMessageData(it.text, it.isUser) },
-                                                    updatedAt = System.currentTimeMillis()
-                                                )
-                                                AiConversationCache.saveConversation(context, cur)
-                                            }
-                                            // Load selected conversation
-                                            activeConversationId = conv.id
-                                            AiConversationCache.setActiveConversationId(context, conv.id)
-                                            viewModel.setMessages(conv.messages.map { ChatMessage(it.text, it.isUser) })
-                                            conversations = AiConversationCache.loadConversations(context)
-                                            showSidebar = false
-                                        }
-                                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = conv.title.ifBlank { "Chat" },
-                                        fontSize = 11.sp,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                        color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Spacer(Modifier.width(4.dp))
-                                    IconButton(
-                                        onClick = {
-                                            AiConversationCache.deleteConversation(context, conv.id)
-                                            conversations = AiConversationCache.loadConversations(context)
-                                            if (activeConversationId == conv.id) {
-                                                val nextConv = conversations.firstOrNull()
-                                                if (nextConv != null) {
-                                                    activeConversationId = nextConv.id
-                                                    AiConversationCache.setActiveConversationId(context, nextConv.id)
-                                                    viewModel.setMessages(nextConv.messages.map { ChatMessage(it.text, it.isUser) })
-                                                } else {
-                                                    activeConversationId = UUID.randomUUID().toString()
-                                                    viewModel.clearMessages()
-                                                }
-                                            }
-                                        },
-                                        modifier = Modifier.size(24.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.DeleteOutline,
-                                            contentDescription = "Delete",
-                                            tint = Color(0xFFEF4444),
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                    }
-                                }
-                                HorizontalDivider(thickness = 0.5.dp, color = bb.copy(alpha = 0.3f))
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Transparent overlay when sidebar open (covers left 45%) - screen color does not turn grey
+            // Transparent scrim overlay when sidebar open — placed BEFORE AnimatedVisibility so sidebar sits ON TOP and captures clicks
             if (showSidebar) {
                 Box(
                     modifier = Modifier
@@ -828,9 +710,209 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                 }
                             }
                         }
-                        .align(Alignment.CenterStart)
-                        .fillMaxWidth(0.45f)
                 )
+            }
+
+            // Redesigned Sidebar overlay — 78% width (+spacious & readable), slides in from right, rounded left vertices, 3-dot menu with delete option
+            AnimatedVisibility(
+                visible = showSidebar,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(top = 16.dp, bottom = 28.dp),
+                enter = slideInHorizontally { it },
+                exit = slideOutHorizontally { it }
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.78f)
+                        .clip(RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, topEnd = 0.dp, bottomEnd = 0.dp))
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                if (dragAmount > 25f || dragAmount < -25f) {
+                                    showSidebar = false
+                                }
+                            }
+                        },
+                    shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, topEnd = 0.dp, bottomEnd = 0.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 12.dp,
+                    border = BorderStroke(2.dp, bb)
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Sidebar header
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 0.dp, bottomStart = 0.dp, bottomEnd = 0.dp))
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Filled.History, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Saved Chats",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            // New Chat Quick Button
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.White.copy(alpha = 0.2f))
+                                    .clickable {
+                                        activeConversationId = UUID.randomUUID().toString()
+                                        viewModel.clearMessages()
+                                        conversations = AiConversationCache.loadConversations(context)
+                                        showSidebar = false
+                                    }
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.Add, contentDescription = null, tint = Color.White, modifier = Modifier.size(13.dp))
+                                    Spacer(Modifier.width(2.dp))
+                                    Text("New", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            Icon(
+                                Icons.Filled.Close,
+                                contentDescription = "Close",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable { showSidebar = false }
+                            )
+                        }
+
+                        // Conversation list
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(conversations) { conv ->
+                                val isActive = conv.id == activeConversationId
+                                var showMenu by remember { mutableStateOf(false) }
+                                val formattedDate = remember(conv.updatedAt) {
+                                    java.text.SimpleDateFormat("dd MMM yyyy • hh:mm a", java.util.Locale.getDefault()).format(java.util.Date(conv.updatedAt))
+                                }
+
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .clickable {
+                                            if (messages.isNotEmpty() && activeConversationId != conv.id) {
+                                                val currentData = viewModel.messages.value.map { ChatMessageData(it.text, it.isUser) }
+                                                val cur = AiConversation(
+                                                    id = activeConversationId,
+                                                    title = currentData.firstOrNull { it.isUser }?.text?.take(40) ?: "Chat",
+                                                    messages = currentData,
+                                                    updatedAt = System.currentTimeMillis()
+                                                )
+                                                AiConversationCache.saveConversation(context, cur)
+                                            }
+                                            activeConversationId = conv.id
+                                            AiConversationCache.setActiveConversationId(context, conv.id)
+                                            viewModel.setMessages(conv.messages.map { ChatMessage(it.text, it.isUser) })
+                                            conversations = AiConversationCache.loadConversations(context)
+                                            showSidebar = false
+                                        },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isActive) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                    border = BorderStroke(if (isActive) 1.5.dp else 1.dp, if (isActive) MaterialTheme.colorScheme.primary else bb.copy(alpha = 0.25f))
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        // Date header row with 3-dot menu
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = formattedDate,
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Box {
+                                                IconButton(
+                                                    onClick = { showMenu = true },
+                                                    modifier = Modifier.size(24.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.MoreVert,
+                                                        contentDescription = "Options",
+                                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                                DropdownMenu(
+                                                    expanded = showMenu,
+                                                    onDismissRequest = { showMenu = false }
+                                                ) {
+                                                    DropdownMenuItem(
+                                                        text = { Text("Delete Chat", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold, fontSize = 12.sp) },
+                                                        leadingIcon = {
+                                                            Icon(
+                                                                Icons.Filled.DeleteOutline,
+                                                                contentDescription = null,
+                                                                tint = Color(0xFFEF4444),
+                                                                modifier = Modifier.size(18.dp)
+                                                            )
+                                                        },
+                                                        onClick = {
+                                                            showMenu = false
+                                                            AiConversationCache.deleteConversation(context, conv.id)
+                                                            conversations = AiConversationCache.loadConversations(context)
+                                                            if (activeConversationId == conv.id) {
+                                                                val nextConv = conversations.firstOrNull()
+                                                                if (nextConv != null) {
+                                                                    activeConversationId = nextConv.id
+                                                                    AiConversationCache.setActiveConversationId(context, nextConv.id)
+                                                                    viewModel.setMessages(nextConv.messages.map { ChatMessage(it.text, it.isUser) })
+                                                                } else {
+                                                                    activeConversationId = UUID.randomUUID().toString()
+                                                                    viewModel.clearMessages()
+                                                                }
+                                                            }
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(Modifier.height(4.dp))
+
+                                        // Chat heading title
+                                        Text(
+                                            text = conv.title.ifBlank { "Conversation" },
+                                            fontSize = 12.sp,
+                                            fontWeight = if (isActive) FontWeight.Bold else FontWeight.SemiBold,
+                                            color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+
+                                        Spacer(Modifier.height(4.dp))
+
+                                        Text(
+                                            text = "${conv.messages.size} message(s)",
+                                            fontSize = 10.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

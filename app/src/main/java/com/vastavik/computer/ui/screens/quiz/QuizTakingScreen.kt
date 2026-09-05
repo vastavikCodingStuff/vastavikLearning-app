@@ -6,6 +6,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
+import android.graphics.Typeface
+import androidx.core.content.res.ResourcesCompat
+import com.vastavik.computer.R
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
@@ -117,39 +120,175 @@ private fun openPdf(context: Context, file: File) {
     }
 }
 
+private fun wrapPdfText(text: String, paint: Paint, maxWidth: Float): List<String> {
+    val result = mutableListOf<String>()
+    val lines = text.split("\n")
+    for (line in lines) {
+        val words = line.split(" ")
+        var current = ""
+        for (w in words) {
+            if (w.isEmpty()) continue
+            val test = if (current.isEmpty()) w else "$current $w"
+            if (paint.measureText(test) <= maxWidth) {
+                current = test
+            } else {
+                if (current.isNotEmpty()) result.add(current)
+                if (paint.measureText(w) > maxWidth) {
+                    var rem = w
+                    while (rem.isNotEmpty()) {
+                        val cnt = paint.breakText(rem, true, maxWidth, null)
+                        result.add(rem.substring(0, cnt))
+                        rem = rem.substring(cnt)
+                    }
+                    current = ""
+                } else {
+                    current = w
+                }
+            }
+        }
+        if (current.isNotEmpty()) result.add(current)
+    }
+    return result
+}
+
+private fun drawPdfPageFrame(canvas: Canvas, pageNumber: Int, title: String) {
+    // 1-inch margin is 72pt. Draw outer border slightly outside 1-inch mark (at 56pt) and inner border at 60pt
+    val borderPaint = Paint().apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.2f
+        color = Color.parseColor("#0F172A")
+    }
+    val innerBorderPaint = Paint().apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 0.5f
+        color = Color.parseColor("#94A3B8")
+    }
+    // Outer border box (A4 is 595 x 842)
+    canvas.drawRect(56f, 56f, 539f, 786f, borderPaint)
+    canvas.drawRect(60f, 60f, 535f, 782f, innerBorderPaint)
+
+    // Header title in safe area
+    val headerPaint = Paint().apply {
+        color = Color.parseColor("#475569")
+        textSize = 8.5f
+        isFakeBoldText = true
+        typeface = Typeface.DEFAULT
+    }
+    canvas.drawText("VASTAVIK COMPUTERS • $title", 72f, 69f, headerPaint)
+
+    // Footer in safe area
+    val footerPaint = Paint().apply {
+        color = Color.parseColor("#64748B")
+        textSize = 8.5f
+        typeface = Typeface.DEFAULT
+    }
+    canvas.drawText("Confidential • Vastavik AI Learning System", 72f, 775f, footerPaint)
+    val pageStr = "Page $pageNumber"
+    canvas.drawText(pageStr, 523f - footerPaint.measureText(pageStr), 775f, footerPaint)
+}
+
 private fun saveAndOpenPdf(context: Context, questions: List<QuizQuestionData>, openAfterSave: Boolean = true): File? {
     val document = PdfDocument()
     val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+    var pageNumber = 1
     var page = document.startPage(pageInfo)
     var canvas: Canvas = page.canvas
-    val paint = Paint().apply { color = Color.BLACK; textSize = 12f; typeface = android.graphics.Typeface.DEFAULT }
-    val boldPaint = Paint(paint).apply { isFakeBoldText = true; textSize = 14f }
-    val titlePaint = Paint(paint).apply { isFakeBoldText = true; textSize = 18f }
-    var y = 40f
 
-    canvas.drawText("Vastavik Computer - Quiz Questions", 40f, y, titlePaint)
-    y += 30f
-    paint.color = Color.GRAY
-    canvas.drawText("Generated on ${java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(java.util.Date())}", 40f, y, paint)
-    y += 30f
-    paint.color = Color.BLACK
+    val timesTypeface = try {
+        Typeface.create("Times New Roman", Typeface.NORMAL) ?: Typeface.SERIF
+    } catch (_: Exception) {
+        Typeface.SERIF
+    }
+    val timesBoldTypeface = Typeface.create(timesTypeface, Typeface.BOLD)
+
+    // Content bounds with 1 inch (72 pt) margin
+    val leftMargin = 72f
+    val rightMargin = 523f
+    val contentWidth = rightMargin - leftMargin // 451 pt
+    val bottomMargin = 760f
+    var y = 84f
+
+    drawPdfPageFrame(canvas, pageNumber, "QUIZ QUESTIONS")
+
+    val titlePaint = Paint().apply {
+        color = Color.parseColor("#0F172A")
+        textSize = 16f
+        typeface = timesBoldTypeface
+    }
+    val metaPaint = Paint().apply {
+        color = Color.parseColor("#64748B")
+        textSize = 10f
+        typeface = timesTypeface
+    }
+    val questionPaint = Paint().apply {
+        color = Color.parseColor("#0F172A")
+        textSize = 11f
+        typeface = timesBoldTypeface
+    }
+    val optionPaint = Paint().apply {
+        color = Color.parseColor("#334155")
+        textSize = 11f
+        typeface = timesTypeface
+    }
+    val correctOptionPaint = Paint().apply {
+        color = Color.parseColor("#059669")
+        textSize = 11f
+        typeface = timesBoldTypeface
+    }
+
+    canvas.drawText("Vastavik Computers — Practice Quiz Questions", leftMargin, y, titlePaint)
+    y += 20f
+    val dateStr = "Generated on: ${java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a", java.util.Locale.getDefault()).format(java.util.Date())} • Total Questions: ${questions.size}"
+    canvas.drawText(dateStr, leftMargin, y, metaPaint)
+    y += 14f
+
+    // Dividing rule
+    val dividerPaint = Paint().apply { color = Color.parseColor("#CBD5E1"); strokeWidth = 1f }
+    canvas.drawLine(leftMargin, y, rightMargin, y, dividerPaint)
+    y += 18f
 
     questions.forEachIndexed { i, q ->
-        if (y > 780f) {
+        val qLines = wrapPdfText("Q${i + 1}. ${q.question}", questionPaint, contentWidth)
+        val optionLinesList = q.options.mapIndexed { j, opt ->
+            val marker = if (j == q.correctIndex) "  [✓ Correct Answer]" else ""
+            val paintToUse = if (j == q.correctIndex) correctOptionPaint else optionPaint
+            val prefix = "   (${('A' + j)}) "
+            val prefixWidth = paintToUse.measureText(prefix)
+            val optWrapped = wrapPdfText(opt + marker, paintToUse, contentWidth - prefixWidth)
+            Pair(prefix, optWrapped)
+        }
+
+        val totalOptLines = optionLinesList.sumOf { it.second.size }
+        val neededHeight = (qLines.size * 15f) + (totalOptLines * 15f) + 20f
+
+        if (y + neededHeight > bottomMargin) {
             document.finishPage(page)
-            val newPageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
+            pageNumber++
+            val newPageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
             page = document.startPage(newPageInfo)
             canvas = page.canvas
-            y = 40f
+            drawPdfPageFrame(canvas, pageNumber, "QUIZ QUESTIONS")
+            y = 84f
         }
-        boldPaint.color = Color.BLACK
-        canvas.drawText("Q${i + 1}. ${q.question}", 40f, y, boldPaint)
-        y += 22f
-        q.options.forEachIndexed { j, opt ->
-            val marker = if (j == q.correctIndex) " ✓" else ""
-            paint.color = if (j == q.correctIndex) Color.parseColor("#10B981") else Color.DKGRAY
-            canvas.drawText("  ${('A' + j)}) $opt$marker", 50f, y, paint)
-            y += 18f
+
+        // Draw Question text
+        for (qLine in qLines) {
+            canvas.drawText(qLine, leftMargin, y, questionPaint)
+            y += 15f
+        }
+        y += 4f
+
+        // Draw Options
+        optionLinesList.forEachIndexed { j, (prefix, optLines) ->
+            val paintToUse = if (j == q.correctIndex) correctOptionPaint else optionPaint
+            optLines.forEachIndexed { lineIdx, optLine ->
+                if (lineIdx == 0) {
+                    canvas.drawText(prefix + optLine, leftMargin, y, paintToUse)
+                } else {
+                    canvas.drawText("         $optLine", leftMargin, y, paintToUse)
+                }
+                y += 15f
+            }
         }
         y += 12f
     }
@@ -174,64 +313,195 @@ private fun saveReviewAndOpenPdf(
 ): File? {
     val document = PdfDocument()
     val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
+    var pageNumber = 1
     var page = document.startPage(pageInfo)
     var canvas: Canvas = page.canvas
-    val paint = Paint().apply { color = Color.BLACK; textSize = 11f; typeface = android.graphics.Typeface.DEFAULT }
-    val boldPaint = Paint(paint).apply { isFakeBoldText = true; textSize = 13f }
-    val titlePaint = Paint(paint).apply { isFakeBoldText = true; textSize = 16f }
-    val smallPaint = Paint(paint).apply { textSize = 10f }
-    var y = 40f
 
-    canvas.drawText("Vastavik Computer - Quiz Review", 40f, y, titlePaint)
-    y += 25f
-    val correct = userAnswers.entries.count { (idx, ans) -> ans == questions[idx].correctIndex }
-    canvas.drawText("Score: $correct / ${questions.size}", 40f, y, boldPaint)
-    y += 30f
+    // Fonts: Times New Roman for questions/options, Roboto Slab from resources for AI explanation
+    val timesTypeface = try {
+        Typeface.create("Times New Roman", Typeface.NORMAL) ?: Typeface.SERIF
+    } catch (_: Exception) {
+        Typeface.SERIF
+    }
+    val timesBoldTypeface = Typeface.create(timesTypeface, Typeface.BOLD)
+
+    val robotoSlabTypeface = try {
+        ResourcesCompat.getFont(context, R.font.roboto_slab_regular) ?: Typeface.DEFAULT
+    } catch (_: Exception) {
+        Typeface.DEFAULT
+    }
+    val robotoSlabBoldTypeface = try {
+        ResourcesCompat.getFont(context, R.font.roboto_slab_bold) ?: Typeface.DEFAULT_BOLD
+    } catch (_: Exception) {
+        Typeface.DEFAULT_BOLD
+    }
+
+    // 1-inch safe margin: left 72, right 523, top 72, bottom 760 (width: 451 pt)
+    val leftMargin = 72f
+    val rightMargin = 523f
+    val contentWidth = rightMargin - leftMargin
+    val bottomMargin = 760f
+    var y = 84f
+
+    drawPdfPageFrame(canvas, pageNumber, "REVIEW & ANSWERS")
+
+    val titlePaint = Paint().apply {
+        color = Color.parseColor("#0F172A")
+        textSize = 15f
+        typeface = timesBoldTypeface
+    }
+    val scorePaint = Paint().apply {
+        color = Color.parseColor("#059669")
+        textSize = 12f
+        typeface = timesBoldTypeface
+    }
+    val metaPaint = Paint().apply {
+        color = Color.parseColor("#64748B")
+        textSize = 9.5f
+        typeface = timesTypeface
+    }
+    val questionPaint = Paint().apply {
+        color = Color.parseColor("#0F172A")
+        textSize = 11f
+        typeface = timesBoldTypeface
+    }
+    val optionPaint = Paint().apply {
+        color = Color.parseColor("#334155")
+        textSize = 11f
+        typeface = timesTypeface
+    }
+    val correctPaint = Paint().apply {
+        color = Color.parseColor("#059669")
+        textSize = 11f
+        typeface = timesBoldTypeface
+    }
+    val wrongPaint = Paint().apply {
+        color = Color.parseColor("#DC2626")
+        textSize = 11f
+        typeface = timesBoldTypeface
+    }
+    val aiHeaderPaint = Paint().apply {
+        color = Color.parseColor("#1D4ED8")
+        textSize = 10f
+        typeface = robotoSlabBoldTypeface
+    }
+    val aiTextPaint = Paint().apply {
+        color = Color.parseColor("#1E293B")
+        textSize = 10.5f
+        typeface = robotoSlabTypeface
+    }
+    val aiBoxBgPaint = Paint().apply {
+        color = Color.parseColor("#F1F5F9")
+        style = Paint.Style.FILL
+    }
+    val aiBoxBorderPaint = Paint().apply {
+        color = Color.parseColor("#93C5FD")
+        style = Paint.Style.STROKE
+        strokeWidth = 1f
+    }
+
+    val correctCount = userAnswers.entries.count { (idx, ans) -> ans == questions[idx].correctIndex }
+    val percentage = if (questions.isNotEmpty()) (correctCount * 100) / questions.size else 0
+
+    canvas.drawText("Vastavik Computers — Quiz Review & Analysis", leftMargin, y, titlePaint)
+    y += 18f
+    canvas.drawText("Final Score: $correctCount / ${questions.size} ($percentage% Accuracy)", leftMargin, y, scorePaint)
+    y += 14f
+    val dateStr = "Attempted on: ${java.text.SimpleDateFormat("dd MMM yyyy, hh:mm a", java.util.Locale.getDefault()).format(java.util.Date())}"
+    canvas.drawText(dateStr, leftMargin, y, metaPaint)
+    y += 12f
+
+    val dividerPaint = Paint().apply { color = Color.parseColor("#CBD5E1"); strokeWidth = 1f }
+    canvas.drawLine(leftMargin, y, rightMargin, y, dividerPaint)
+    y += 16f
 
     questions.forEachIndexed { i, q ->
-        if (y > 720f) {
-            document.finishPage(page)
-            val newPageInfo = PdfDocument.PageInfo.Builder(595, 842, document.pages.size + 1).create()
-            page = document.startPage(newPageInfo)
-            canvas = page.canvas
-            y = 40f
-        }
         val userAns = userAnswers[i] ?: -1
         val isCorrect = userAns == q.correctIndex
+        val statusBadge = if (isCorrect) "✓ Correct" else if (userAns == -1) "• Unanswered" else "✗ Incorrect"
 
-        boldPaint.color = if (isCorrect) Color.parseColor("#10B981") else Color.parseColor("#EF4444")
-        val checkMark = if (isCorrect) " ✓" else " ✗"
-        canvas.drawText("Q${i + 1}.$checkMark", 40f, y, boldPaint)
-        y += 16f
-        paint.color = Color.BLACK
-        canvas.drawText(q.question, 50f, y, paint)
-        y += 16f
+        val qLines = wrapPdfText("Q${i + 1}. [${statusBadge}] ${q.question}", questionPaint, contentWidth)
 
-        q.options.forEachIndexed { j, opt ->
-            val marker = if (j == q.correctIndex) " [Correct]" else if (j == userAns && j != correct) " [Your answer]" else ""
-            smallPaint.color = when { j == q.correctIndex -> Color.parseColor("#10B981"); j == userAns && j != q.correctIndex -> Color.parseColor("#EF4444"); else -> Color.DKGRAY }
-            canvas.drawText("  ${('A' + j)}) $opt$marker", 55f, y, smallPaint)
-            y += 14f
-        }
-
-        explanations[i]?.let { exp ->
-            y += 4f
-            smallPaint.color = Color.parseColor("#2563EB")
-            val cleanExp = exp.replace("**", "").replace("*", "").replace("`", "")
-            val words = cleanExp.split(" ")
-            var line = "AI: "
-            for (word in words) {
-                if (smallPaint.measureText(line + word) > 490f) {
-                    canvas.drawText(line.trim(), 55f, y, smallPaint)
-                    y += 12f
-                    line = "  $word "
-                } else {
-                    line += "$word "
-                }
+        val optionLinesList = q.options.mapIndexed { j, opt ->
+            val isOptionCorrect = j == q.correctIndex
+            val isUserChoice = j == userAns
+            val marker = when {
+                isOptionCorrect && isUserChoice -> "  [✓ Your Answer - Correct]"
+                isOptionCorrect -> "  [✓ Correct Answer]"
+                isUserChoice -> "  [✗ Your Answer]"
+                else -> ""
             }
-            if (line.isNotBlank()) { canvas.drawText(line.trim(), 55f, y, smallPaint); y += 12f }
+            val paintToUse = when {
+                isOptionCorrect -> correctPaint
+                isUserChoice -> wrongPaint
+                else -> optionPaint
+            }
+            val prefix = "   (${('A' + j)}) "
+            val prefixWidth = paintToUse.measureText(prefix)
+            val optWrapped = wrapPdfText(opt + marker, paintToUse, contentWidth - prefixWidth)
+            Pair(prefix, Pair(paintToUse, optWrapped))
         }
-        y += 10f
+
+        // Clean AI explanation
+        val rawExp = explanations[i] ?: ""
+        val cleanExp = rawExp.replace("**", "").replace("*", "").replace("`", "").trim()
+        val aiLines = if (cleanExp.isNotBlank()) wrapPdfText(cleanExp, aiTextPaint, contentWidth - 18f) else emptyList()
+
+        val totalOptLines = optionLinesList.sumOf { it.second.second.size }
+        val aiBoxHeight = if (aiLines.isNotEmpty()) (aiLines.size * 14f) + 26f else 0f
+        val neededHeight = (qLines.size * 15f) + (totalOptLines * 15f) + aiBoxHeight + 24f
+
+        if (y + neededHeight > bottomMargin) {
+            document.finishPage(page)
+            pageNumber++
+            val newPageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
+            page = document.startPage(newPageInfo)
+            canvas = page.canvas
+            drawPdfPageFrame(canvas, pageNumber, "REVIEW & ANSWERS")
+            y = 84f
+        }
+
+        // Draw Question header
+        for (qLine in qLines) {
+            canvas.drawText(qLine, leftMargin, y, questionPaint)
+            y += 15f
+        }
+        y += 4f
+
+        // Draw Options
+        for ((prefix, pair) in optionLinesList) {
+            val (optPaint, optLines) = pair
+            optLines.forEachIndexed { lineIdx, optLine ->
+                if (lineIdx == 0) {
+                    canvas.drawText(prefix + optLine, leftMargin, y, optPaint)
+                } else {
+                    canvas.drawText("         $optLine", leftMargin, y, optPaint)
+                }
+                y += 15f
+            }
+        }
+
+        // Draw AI Explanation callout box
+        if (aiLines.isNotEmpty()) {
+            y += 6f
+            val boxTop = y
+            val boxBottom = y + aiBoxHeight
+            // Draw background rectangle and outline
+            canvas.drawRoundRect(leftMargin, boxTop, rightMargin, boxBottom, 6f, 6f, aiBoxBgPaint)
+            canvas.drawRoundRect(leftMargin, boxTop, rightMargin, boxBottom, 6f, 6f, aiBoxBorderPaint)
+
+            y += 14f
+            canvas.drawText("✨ AI Explanation (Vastavik AI):", leftMargin + 8f, y, aiHeaderPaint)
+            y += 14f
+
+            for (aLine in aiLines) {
+                canvas.drawText(aLine, leftMargin + 8f, y, aiTextPaint)
+                y += 14f
+            }
+            y = boxBottom + 4f
+        }
+
+        y += 12f
     }
 
     document.finishPage(page)

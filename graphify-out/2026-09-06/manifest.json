@@ -1,9 +1,9 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788529020.2094405,
-    "seen": 1788530227.0355594,
-    "ast_hash": "0f5690b32b8c1f7c41d8ea2c8d26793a",
-    "semantic_hash": "0f5690b32b8c1f7c41d8ea2c8d26793a"
+    "mtime": 1788638771.458914,
+    "seen": 1788639074.6634493,
+    "ast_hash": "bcd7729867a5c53a2da2d81e4738b5fc",
+    "semantic_hash": ""
   },
   "app/google-services.json": {
     "mtime": 1787668783.4297817,
@@ -108,10 +108,10 @@
     "semantic_hash": "a0f4ea34abf70adf7260cc4ca70f4a5f"
   },
   "app/src/main/java/com/vastavik/computer/ui/navigation/AppNavHost.kt": {
-    "mtime": 1788493774.4403439,
-    "seen": 1788530227.0367725,
-    "ast_hash": "ef2904b0d0d939483e0a533a12954b06",
-    "semantic_hash": "ef2904b0d0d939483e0a533a12954b06"
+    "mtime": 1788638765.8175194,
+    "seen": 1788639074.663519,
+    "ast_hash": "54d3598417d2774446c88676d52ae08f",
+    "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/navigation/SystemBars.kt": {
     "mtime": 1788245943.0647593,
@@ -324,10 +324,10 @@
     "semantic_hash": "e6137d2b157bc2974b9349ec284165ae"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileScreen.kt": {
-    "mtime": 1788526216.5759768,
-    "seen": 1788530227.0378008,
-    "ast_hash": "adc02860b8a7e2f8a8c8f93cc8e1d947",
-    "semantic_hash": "adc02860b8a7e2f8a8c8f93cc8e1d947"
+    "mtime": 1788638759.43722,
+    "seen": 1788639074.663567,
+    "ast_hash": "6208389bec949eaad09cb573c9897179",
+    "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileViewModel.kt": {
     "mtime": 1788245943.1469717,
@@ -743,10 +743,10 @@
     "ast_hash": "874c32f377a9e070a4465efd4eb70c63",
     "semantic_hash": ""
   },
-  "delete.sh": {
-    "mtime": 1788532735.0331385,
-    "seen": 1788540922.4414506,
-    "ast_hash": "2eaec023321f08e63468e6fcf38d93a9",
+  "app/src/main/assets/RELEASE_NOTES_v1.0.27.md": {
+    "mtime": 1788638778.2316465,
+    "seen": 1788639074.6636174,
+    "ast_hash": "533e6f6ab2ae7de014597f4bbb33e2b4",
     "semantic_hash": ""
   }
 }
