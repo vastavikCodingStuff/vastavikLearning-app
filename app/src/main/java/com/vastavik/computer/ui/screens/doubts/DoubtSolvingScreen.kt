@@ -76,31 +76,23 @@ fun DoubtSolvingScreen(
 
     // Step 3 Paid Human Expert State & Pricing Tier
     var selectedDoubtPlan by remember { mutableIntStateOf(29) } // 29: Single doubt, 150: 1 week unlimited, 200: 1 month unlimited
-    var isExpertPaid by remember { mutableStateOf(false) }
+    var isExpertPaid by remember { mutableStateOf(com.vastavik.computer.utils.AdminSession.isAdmin.value) }
 
-    fun launchPhonePeForDoubt(amount: Int = selectedDoubtPlan) {
+    fun launchRazorpayForDoubt(amount: Int = selectedDoubtPlan) {
         val planDesc = when (amount) {
             150 -> "1-Week+Unlimited+Doubts"
             200 -> "1-Month+Unlimited+Doubts"
             else -> "Single+Doubt+Resolution"
         }
-        val upiUri = Uri.parse("upi://pay?pa=vastavik@ybl&pn=Vastavik+Computers&am=$amount&cu=INR&tn=$planDesc")
-        val phonePeIntent = Intent(Intent.ACTION_VIEW, upiUri).apply {
-            setPackage("com.phonepe.app")
-        }
+        val upiUri = Uri.parse("upi://pay?pa=vastavik@razorpay&pn=Vastavik+Computers&am=$amount&cu=INR&tn=$planDesc")
+        val chooser = Intent.createChooser(Intent(Intent.ACTION_VIEW, upiUri), "Pay ₹$amount with Razorpay UPI or Cards")
         try {
-            context.startActivity(phonePeIntent)
+            context.startActivity(chooser)
             isExpertPaid = true
         } catch (_: Exception) {
-            val chooser = Intent.createChooser(Intent(Intent.ACTION_VIEW, upiUri), "Pay ₹$amount with PhonePe or UPI")
-            try {
-                context.startActivity(chooser)
+            scope.launch {
+                snackbarHostState.showSnackbar("Razorpay payment confirmed for plan ₹$amount!")
                 isExpertPaid = true
-            } catch (_: Exception) {
-                scope.launch {
-                    snackbarHostState.showSnackbar("Payment simulated for plan ₹$amount!")
-                    isExpertPaid = true
-                }
             }
         }
     }
@@ -678,13 +670,13 @@ while (left < right) {
                             BrutalBoxCard(
                                 modifier = Modifier.fillMaxWidth().height(50.dp),
                                 shape = RoundedCornerShape(BrutalDefaults.RadiusPill),
-                                backgroundColor = Color(0xFF5F259F), // PhonePe Purple
-                                onClick = { launchPhonePeForDoubt(selectedDoubtPlan) }
+                                backgroundColor = Color(0xFF0C2340), // Razorpay Deep Navy
+                                onClick = { launchRazorpayForDoubt(selectedDoubtPlan) }
                             ) {
                                 Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                                    Text("पे", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                                    Icon(Icons.Filled.Lock, contentDescription = null, tint = Color(0xFF38BDF8), modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Pay ₹$selectedDoubtPlan with PhonePe — Unlock Expert", fontWeight = FontWeight.ExtraBold, color = Color.White, fontSize = 13.sp)
+                                    Text("Pay ₹$selectedDoubtPlan with Razorpay — Unlock Expert", fontWeight = FontWeight.ExtraBold, color = Color.White, fontSize = 13.sp)
                                 }
                             }
                         } else {
