@@ -19,25 +19,29 @@ enum class AiEngineModel(
     val id: String,
     val displayName: String,
     val badge: String,
-    val subtitle: String
+    val subtitle: String,
+    val mistralModel: String
 ) {
     MISTRAL_GOD(
         id = "mistral-god",
         displayName = "GOD",
         badge = "GOD",
-        subtitle = "Best and accurate performance"
+        subtitle = "Best and accurate performance",
+        mistralModel = "mistral-large-latest"
     ),
     GEMINI_37_DEMI_GOD(
-        id = "gemini-3.7-flash",
+        id = "mistral-demi-god",
         displayName = "Demi-God",
         badge = "Demi-God",
-        subtitle = "High speed & reasoning"
+        subtitle = "High speed & reasoning",
+        mistralModel = "mistral-medium-latest"
     ),
     GEMINI_36_HUMAN(
-        id = "gemini-3.6-flash",
+        id = "mistral-human",
         displayName = "Human AI",
         badge = "Human AI",
-        subtitle = "Compact everyday AI"
+        subtitle = "Compact everyday AI",
+        mistralModel = "mistral-small-latest"
     );
 
     companion object {
@@ -48,11 +52,13 @@ enum class AiEngineModel(
 /**
  * Unified "Vastavik AI" client.
  *
- * Defaults to Mistral ("Mistral is GOD") for all app features (Practice, Coding,
- * MCQ generator, Predict output). In AI Chat, students can freely switch between
- * "Mistral is GOD", "Gemini 3.7 flash is Demi-god", and "Gemini 3.6 flash is Human AI".
+ * In AI Chat:
+ * - GOD: Mistral Large (`mistral-large-latest`)
+ * - Demi-God: Mistral Medium (`mistral-medium-latest`)
+ * - Human AI: Mistral Small (`mistral-small-latest`)
  *
- * All Gemini models have thinking tokens disabled to maximize token budget and speed.
+ * All other app features (Practice, Coding, MCQ generator, Predict output, PYQs)
+ * run using Mistral Small (`mistral-small-latest`).
  */
 object VastavikAi {
 
@@ -82,7 +88,7 @@ object VastavikAi {
 
     /**
      * Standard chat entry point used by all pages across the app.
-     * Always uses Mistral Small ("GOD") by default.
+     * Always uses Mistral Small by default.
      */
     @Throws(VastavikAiException::class)
     suspend fun chat(
@@ -91,18 +97,26 @@ object VastavikAi {
         temperature: Double = 0.3,
         maxOutputTokens: Int = 1024
     ): String = chatWithModel(
-        engineModel = AiEngineModel.MISTRAL_GOD,
+        engineModel = AiEngineModel.GEMINI_36_HUMAN, // Mistral Small for all app features
         systemPrompt = systemPrompt,
         userPrompt = userPrompt,
         temperature = temperature,
         maxOutputTokens = maxOutputTokens
     )
 
+    @Throws(VastavikAiException::class)
+    suspend fun chat(
+        userPrompt: String
+    ): String = chat(
+        systemPrompt = "You are an expert computer science teacher and AI assistant for Indian students.",
+        userPrompt = userPrompt
+    )
+
     /**
      * Dispatches chat request to the specific selected engine model:
-     * - MISTRAL_GOD: Mistral Small ("Mistral is GOD")
-     * - GEMINI_37_DEMI_GOD: Gemini 3.7 Flash ("Gemini 3.7 flash is Demi-god")
-     * - GEMINI_36_HUMAN: Gemini 3.6 Flash ("Gemini 3.6 flash is Human AI")
+     * - GOD: Mistral Large ("mistral-large-latest")
+     * - Demi-God: Mistral Medium ("mistral-medium-latest")
+     * - Human AI: Mistral Small ("mistral-small-latest")
      */
     @Throws(VastavikAiException::class)
     suspend fun chatWithModel(
@@ -116,27 +130,27 @@ object VastavikAi {
 
         when (engineModel) {
             AiEngineModel.MISTRAL_GOD -> {
-                callMistralWithFallback(composedSystem, userPrompt, temperature, maxOutputTokens)
+                callMistralModelWithFallback("mistral-large-latest", composedSystem, userPrompt, temperature, maxOutputTokens, "GOD")
             }
             AiEngineModel.GEMINI_37_DEMI_GOD -> {
-                callGemini(GEMINI_FALLBACK, composedSystem, userPrompt, temperature, maxOutputTokens)
+                callMistralModelWithFallback("mistral-medium-latest", composedSystem, userPrompt, temperature, maxOutputTokens, "Demi-God")
             }
             AiEngineModel.GEMINI_36_HUMAN -> {
-                callGeminiWithFallback(GEMINI_PRIMARY, composedSystem, userPrompt, temperature, maxOutputTokens)
+                callMistralModelWithFallback("mistral-small-latest", composedSystem, userPrompt, temperature, maxOutputTokens, "Human AI")
             }
         }
     }
 
     /**
-     * Calls Mistral API. If mistral-small returns 429 (rate-limited/tier limit),
-     * automatically falls back to ministral-8b-latest / open-mistral-7b,
-     * and if needed fails over to Gemini.
+     * Calls Mistral API with tiered fallback.
      */
-    private fun callMistralWithFallback(
+    private fun callMistralModelWithFallback(
+        targetModel: String,
         composedSystem: String,
         userPrompt: String,
         temperature: Double,
-        maxOutputTokens: Int
+        maxOutputTokens: Int,
+        tag: String
     ): String {
         val apiKey = try {
             BuildConfig.MISTRAL_API_KEY
@@ -145,36 +159,37 @@ object VastavikAi {
         }
 
         if (apiKey.isBlank()) {
-            DebugLogBox.warn("Mistral", "Mistral API key not configured. Failing over to Gemini", model = "GOD")
+            DebugLogBox.warn("Mistral", "Mistral API key not configured. Failing over to Gemini", model = tag)
             return callGeminiWithFallback(GEMINI_PRIMARY, composedSystem, userPrompt, temperature, maxOutputTokens)
         }
 
-        DebugLogBox.activeModel = "GOD"
+        DebugLogBox.activeModel = tag
 
-        // 1. Primary Mistral attempt: mistral-small-latest
+        // 1. Primary target model attempt
         try {
-            return sendMistralRequest("mistral-small-latest", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
+            return sendMistralRequest(targetModel, composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
         } catch (e: Exception) {
-            val isRateLimitedOrNotFound = e.message?.contains("429") == true || e.message?.contains("404") == true
-            if (isRateLimitedOrNotFound) {
-                DebugLogBox.warn("Mistral", "mistral-small-latest 429. Falling back to ministral-8b-latest", model = "GOD")
+            DebugLogBox.warn("Mistral", "$targetModel returned ${e.message?.take(60)}. Trying fallback", model = tag)
+            // 2. Fallbacks depending on requested tier
+            if (targetModel != "mistral-small-latest") {
                 try {
-                    // 2. Mistral fallback: ministral-8b-latest (Mistral 8B Small)
-                    return sendMistralRequest("ministral-8b-latest", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
-                } catch (fallback2: Exception) {
-                    DebugLogBox.warn("Mistral", "ministral-8b-latest failed. Trying open-mistral-7b", model = "GOD")
-                    try {
-                        return sendMistralRequest("open-mistral-7b", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
-                    } catch (fallback3: Exception) {
-                        DebugLogBox.error("Mistral", "All Mistral models failed. Failing over to Gemini 3.6", fallback3, model = "GOD")
-                    }
+                    return sendMistralRequest("mistral-small-latest", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
+                } catch (e2: Exception) {
+                    DebugLogBox.warn("Mistral", "mistral-small-latest failed: ${e2.message?.take(60)}", model = tag)
                 }
-            } else {
-                DebugLogBox.warn("Mistral", "Mistral failed: ${e.message?.take(80)}. Failing over to Gemini", model = "GOD")
+            }
+            try {
+                return sendMistralRequest("ministral-8b-latest", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
+            } catch (fallback2: Exception) {
+                try {
+                    return sendMistralRequest("open-mistral-7b", composedSystem, userPrompt, apiKey, temperature, maxOutputTokens)
+                } catch (fallback3: Exception) {
+                    DebugLogBox.error("Mistral", "All Mistral models failed. Failing over to Gemini 3.6", fallback3, model = tag)
+                }
             }
         }
 
-        // 3. Failover to Gemini 3.6 Flash -> 3.7 Flash if Mistral is completely unavailable
+        // 3. Failover to Gemini if Mistral completely fails
         return callGeminiWithFallback(GEMINI_PRIMARY, composedSystem, userPrompt, temperature, maxOutputTokens)
     }
 

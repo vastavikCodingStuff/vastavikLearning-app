@@ -14,8 +14,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.Help
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.vastavik.computer.utils.VastavikAi
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -151,6 +159,19 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
     var question by remember { mutableStateOf(initialQuestion) }
     var showQuestion by remember { mutableStateOf(initialQuestion.isNotBlank()) }
     var isWordWrap by remember { mutableStateOf(false) }
+    var aiPromptText by remember { mutableStateOf("") }
+    var isGeneratingAiQuestion by remember { mutableStateOf(false) }
+
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val spoken = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+            if (!spoken.isNullOrBlank()) {
+                aiPromptText = spoken
+            }
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -177,12 +198,19 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                 title = { Text("Code Editor", fontWeight = FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = { onBack() }) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
-                    // Question Icon - Always accessible on top right
-                    IconButton(onClick = { showQuestion = !showQuestion }) {
+                    // Question Icon - Gray when empty with Toast feedback, active when question present
+                    val hasQuestion = question.isNotBlank()
+                    IconButton(onClick = {
+                        if (!hasQuestion) {
+                            Toast.makeText(context, "Question isn't available over here!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            showQuestion = !showQuestion
+                        }
+                    }) {
                         Icon(
-                            Icons.Filled.HelpOutline,
+                            Icons.AutoMirrored.Filled.Help,
                             contentDescription = "View question",
-                            tint = if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            tint = if (!hasQuestion) Color.Gray else if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     var expanded by remember { mutableStateOf(false) }
@@ -209,7 +237,7 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                 }
                                 Spacer(Modifier.width(8.dp))
                             }
-                            IconButton(onClick = { output = ""; executionMeta = "" }, modifier = Modifier.size(32.dp)) { Icon(Icons.Filled.Clear, contentDescription = "Clear") }
+                            IconButton(onClick = { output = ""; executionMeta = "" }, modifier = Modifier.size(32.dp)) { Icon(Icons.Filled.Close, contentDescription = "Clear") }
                         }
                         if (isRunning) {
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top=8.dp)) {
@@ -317,7 +345,7 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                         onClick = { showQuestion = false },
                                         modifier = Modifier.size(32.dp)
                                     ) {
-                                        Icon(Icons.Filled.Clear, contentDescription = "Close", modifier = Modifier.size(20.dp))
+                                        Icon(Icons.Filled.Close, contentDescription = "Close", modifier = Modifier.size(20.dp))
                                     }
                                 }
 
@@ -325,20 +353,224 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                 HorizontalDivider(color = brutalBorderColor().copy(alpha = 0.2f), thickness = 1.5.dp)
                                 Spacer(Modifier.height(10.dp))
 
-                                val displayQuestion = if (question.isNotBlank()) question else "Write and test your solution for this problem. Choose your preferred language from the dropdown menu and press 'Run' to see output and analysis."
+                                val parsedSections = remember(question) { parseProblemSections(question) }
                                 Column(
                                     modifier = Modifier
                                         .weight(1f)
                                         .fillMaxWidth()
                                         .verticalScroll(rememberScrollState())
                                 ) {
+                                    if (parsedSections.isEmpty()) {
+                                        Text(
+                                            text = "Write and test your solution for this problem. Choose your preferred language from the dropdown menu and press 'Run' to see output and analysis.",
+                                            fontSize = 15.sp,
+                                            lineHeight = 22.sp,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    } else {
+                                        parsedSections.forEach { sec ->
+                                            Surface(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 5.dp),
+                                                shape = RoundedCornerShape(10.dp),
+                                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                                border = BorderStroke(1.5.dp, brutalBorderColor().copy(alpha = 0.3f))
+                                            ) {
+                                                Column(modifier = Modifier.padding(12.dp)) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .clip(RoundedCornerShape(6.dp))
+                                                            .background(sec.badgeColor)
+                                                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = sec.title,
+                                                            color = Color.White,
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                    Spacer(Modifier.height(6.dp))
+                                                    Text(
+                                                        text = sec.content,
+                                                        fontSize = 13.5.sp,
+                                                        lineHeight = 20.sp,
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                        fontWeight = FontWeight.Normal
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // NeoBrutalistic AI Problem Generator Bar (When empty or on-demand)
+            var showGeneratorBar by remember { mutableStateOf(question.isBlank()) }
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(2.dp, brutalBorderColor())
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showGeneratorBar = !showGeneratorBar },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Filled.AutoAwesome,
+                                contentDescription = null,
+                                tint = Color(0xFF2563EB),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = if (question.isBlank()) "Generate Problem via AI (Mistral)" else "Generate New Problem via AI",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Text(
+                            text = if (showGeneratorBar) "▲ Hide" else "▼ Expand",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF2563EB)
+                        )
+                    }
+
+                    if (showGeneratorBar) {
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = aiPromptText,
+                                onValueChange = { aiPromptText = it },
+                                placeholder = {
                                     Text(
-                                        text = displayQuestion,
-                                        fontSize = 15.sp,
-                                        lineHeight = 22.sp,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = FontWeight.Medium
+                                        "Topic or question (e.g. Palindrome in Java, Binary Search)...",
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
                                     )
+                                },
+                                singleLine = true,
+                                textStyle = TextStyle(fontSize = 12.sp),
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = brutalBorderColor().copy(alpha = 0.4f),
+                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                                )
+                            )
+
+                            Spacer(Modifier.width(6.dp))
+
+                            // Speech-to-text mic button
+                            IconButton(
+                                onClick = {
+                                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                                        putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak coding problem topic...")
+                                    }
+                                    try {
+                                        speechRecognizerLauncher.launch(intent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Voice input not supported", Toast.LENGTH_SHORT).show()
+                                    }
+                                },
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(8.dp))
+                            ) {
+                                Icon(
+                                    Icons.Filled.Mic,
+                                    contentDescription = "Speak topic",
+                                    tint = Color(0xFFDC2626),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.width(6.dp))
+
+                            // Generate Button
+                            Button(
+                                onClick = {
+                                    if (aiPromptText.isBlank()) {
+                                        Toast.makeText(context, "Please enter or speak a topic!", Toast.LENGTH_SHORT).show()
+                                        return@Button
+                                    }
+                                    isGeneratingAiQuestion = true
+                                    coroutineScope.launch {
+                                        try {
+                                            val prompt = """
+                                                You are an expert computer science teacher and coding interviewer.
+                                                Generate a comprehensive coding challenge for language $language on the topic or prompt: "$aiPromptText".
+                                                You MUST strictly structure your output with the following 4 distinct numbered sections:
+
+                                                1. Question
+                                                [Provide a clear, detailed problem statement, constraints, and requirements]
+
+                                                2. Explanation
+                                                [Explain the core logic, concepts, mathematical foundations, and approach needed]
+
+                                                3. Input / Output
+                                                [Provide 2 to 3 concrete sample test cases with sample input, expected output, and step-by-step walkthrough]
+
+                                                4. Algorithm
+                                                [Provide clear, step-by-step algorithmic steps to solve this problem]
+                                            """.trimIndent()
+                                            val generated = VastavikAi.chat(prompt)
+                                            if (generated.isNotBlank()) {
+                                                question = generated
+                                                showQuestion = true
+                                                Toast.makeText(context, "Problem generated successfully!", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(context, "Could not generate problem. Try again.", Toast.LENGTH_SHORT).show()
+                                            }
+                                        } catch (e: Exception) {
+                                            Toast.makeText(context, "Error: ${e.localizedMessage ?: "Unknown"}", Toast.LENGTH_SHORT).show()
+                                        } finally {
+                                            isGeneratingAiQuestion = false
+                                        }
+                                    }
+                                },
+                                enabled = !isGeneratingAiQuestion,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                                modifier = Modifier.height(38.dp),
+                                contentPadding = PaddingValues(horizontal = 10.dp)
+                            ) {
+                                if (isGeneratingAiQuestion) {
+                                    CircularProgressIndicator(
+                                        color = Color.White,
+                                        strokeWidth = 2.dp,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                } else {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
+                                        Spacer(Modifier.width(4.dp))
+                                        Text("Generate", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                    }
                                 }
                             }
                         }
@@ -351,7 +583,7 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("Input (stdin):", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 8.dp))
                     OutlinedTextField(value = stdin, onValueChange = { stdin = it }, placeholder = { Text("e.g. 12 28 for Scanner input", fontSize = 12.sp, color = Color.Gray) }, singleLine = false, maxLines = 3, textStyle = TextStyle(fontFamily = mono, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface), modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary, unfocusedBorderColor = brutalBorderColor().copy(alpha = 0.3f), focusedContainerColor = MaterialTheme.colorScheme.surface, unfocusedContainerColor = MaterialTheme.colorScheme.surface))
-                    if (stdin.isNotEmpty()) { Spacer(Modifier.width(6.dp)); IconButton(onClick = { stdin = "" }, modifier = Modifier.size(28.dp)) { Icon(Icons.Filled.Clear, contentDescription = "Clear stdin", modifier = Modifier.size(16.dp)) } }
+                    if (stdin.isNotEmpty()) { Spacer(Modifier.width(6.dp)); IconButton(onClick = { stdin = "" }, modifier = Modifier.size(28.dp)) { Icon(Icons.Filled.Close, contentDescription = "Clear stdin", modifier = Modifier.size(16.dp)) } }
                 }
             }
 
@@ -512,4 +744,32 @@ private fun defaultCode(lang: String) = when(lang) {
     else -> ""
 }
 
+private data class ProblemSection(val title: String, val content: String, val badgeColor: Color)
 
+private fun parseProblemSections(text: String): List<ProblemSection> {
+    if (text.isBlank()) return emptyList()
+    val pattern = Regex("(?im)^[#*\\s]*(1\\.\\s*Question|2\\.\\s*Explanation|3\\.\\s*Input\\s*(?:\\/|and)\\s*Output|4\\.\\s*Algorithm)[:*\\s]*")
+    val matches = pattern.findAll(text).toList()
+    if (matches.size < 2) {
+        return listOf(ProblemSection("Question Details", text.trim(), Color(0xFF2563EB)))
+    }
+    val sections = mutableListOf<ProblemSection>()
+    for (i in matches.indices) {
+        val currentMatch = matches[i]
+        val header = currentMatch.groupValues[1].trim()
+        val startIndex = currentMatch.range.last + 1
+        val endIndex = if (i + 1 < matches.size) matches[i + 1].range.first else text.length
+        val sectionContent = text.substring(startIndex, endIndex).trim()
+        val (title, color) = when {
+            header.contains("Question", ignoreCase = true) -> "1. Question" to Color(0xFF2563EB)
+            header.contains("Explanation", ignoreCase = true) -> "2. Explanation" to Color(0xFF059669)
+            header.contains("Input", ignoreCase = true) -> "3. Input / Output" to Color(0xFFD97706)
+            header.contains("Algorithm", ignoreCase = true) -> "4. Algorithm" to Color(0xFF7C3AED)
+            else -> header to Color(0xFF2563EB)
+        }
+        if (sectionContent.isNotBlank()) {
+            sections.add(ProblemSection(title, sectionContent, color))
+        }
+    }
+    return if (sections.isEmpty()) listOf(ProblemSection("Question Details", text.trim(), Color(0xFF2563EB))) else sections
+}

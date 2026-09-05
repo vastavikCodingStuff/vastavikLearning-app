@@ -58,6 +58,9 @@ class MainActivity : ComponentActivity() {
             com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(this@MainActivity)
         }
 
+        // Schedule periodic background GenZ teacher notifications via WorkManager
+        com.vastavik.computer.utils.VastavikEngagementWorker.enqueue(this@MainActivity)
+
         // Request the highest supported refresh rate (60/90/120 FPS) so the
         // Compose UI renders at the device's full display capability.
         setHighRefreshRate()
@@ -166,6 +169,7 @@ class MainActivity : ComponentActivity() {
             } else "home"
             "chat" -> "chat"
             "profile" -> "profile"
+            "code_editor" -> "code_editor"
             "pyq" -> "pyq"
             "practice" -> "practice"
             "meeting_lobby" -> if (!screenId.isNullOrEmpty()) "meeting_lobby/$screenId" else if (!intent?.getStringExtra("class_id").isNullOrEmpty()) "meeting_lobby/${intent.getStringExtra("class_id")}" else "home"

@@ -487,17 +487,7 @@ object AppUpdater {
         val info = checkGitHubRelease(currentVersion)
         if (info != null && info.isUpdateAvailable) {
             postUpdateNotification(context, info)
-            TelegramNotificationManager.showUpdateAlert(
-                version = info.latestVersion,
-                title = info.releaseTitle,
-                onUpdateClick = {
-                    val intent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        putExtra("navigate_to", "app_update")
-                    }
-                    context.startActivity(intent)
-                }
-            )
+            // In-app popup banner is suppressed when system notification is posted to avoid double notifications
         }
         info
     }

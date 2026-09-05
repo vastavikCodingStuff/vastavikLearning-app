@@ -18,8 +18,8 @@ android {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 27
-        versionName = "1.0.27"
+        versionCode = 29
+        versionName = "1.0.29"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
