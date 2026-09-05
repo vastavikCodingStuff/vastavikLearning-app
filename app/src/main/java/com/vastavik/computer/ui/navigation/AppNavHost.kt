@@ -36,6 +36,7 @@ import com.vastavik.computer.ui.screens.meeting.MeetingViewModel
 import com.vastavik.computer.ui.screens.notifications.NotificationsScreen
 import com.vastavik.computer.ui.screens.notifications.AppUpdateScreen
 import com.vastavik.computer.ui.screens.practice.PracticeScreen
+import com.vastavik.computer.ui.screens.practice.PredictOutputSetScreen
 import com.vastavik.computer.ui.screens.profile.ProfileScreen
 import com.vastavik.computer.ui.screens.profile.BugReportScreen
 import com.vastavik.computer.ui.screens.quiz.QuizSetupScreen
@@ -278,6 +279,18 @@ fun AppNavHost(
         }
         composable("course") {
             LearningPathScreen(onNavigate = { route -> navController.navigate(route) })
+        }
+        composable(
+            route = "predict_output_set/{setTitle}",
+            arguments = listOf(navArgument("setTitle") { type = NavType.StringType; defaultValue = "" })
+        ) { backStackEntry ->
+            val rawTitle = backStackEntry.arguments?.getString("setTitle") ?: ""
+            val setTitle = try { URLDecoder.decode(rawTitle, "UTF-8") } catch (_: Exception) { rawTitle }
+            PredictOutputSetScreen(
+                setTitle = setTitle,
+                onNavigate = { route -> navController.navigate(route) },
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(route = "meeting_lobby/{classId}", arguments = listOf(navArgument("classId") { type = NavType.StringType })) { backStackEntry ->
             val classId = backStackEntry.arguments?.getString("classId") ?: ""
