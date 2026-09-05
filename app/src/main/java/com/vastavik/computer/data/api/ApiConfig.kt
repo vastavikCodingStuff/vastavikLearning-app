@@ -7,9 +7,25 @@ object ApiConfig {
     const val READ_TIMEOUT_SEC = 30L
     const val WRITE_TIMEOUT_SEC = 30L
 
+    // Environment Presets
+    const val URL_LOCAL_EMULATOR = "http://10.0.2.2:8000/"
+    const val URL_RENDER_CLOUD = "https://vastavik-backend.onrender.com/"
+    const val URL_RAILWAY_CLOUD = "https://vastavik-backend.up.railway.app/"
+    const val URL_PRODUCTION = "https://api.vastaviklearning.com/"
+
     val BASE_URL: String
         get() {
-            val raw = BuildConfig.BACKEND_BASE_URL
+            val raw = BuildConfig.BACKEND_BASE_URL.ifBlank { URL_RENDER_CLOUD }
             return if (raw.endsWith("/")) raw else "$raw/"
+        }
+
+    val WS_BASE_URL: String
+        get() {
+            val base = BASE_URL.removeSuffix("/")
+            return when {
+                base.startsWith("https://") -> "wss://${base.removePrefix("https://")}"
+                base.startsWith("http://") -> "ws://${base.removePrefix("http://")}"
+                else -> "wss://$base"
+            }
         }
 }

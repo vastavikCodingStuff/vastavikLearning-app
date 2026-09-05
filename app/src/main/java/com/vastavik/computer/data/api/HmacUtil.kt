@@ -14,6 +14,14 @@ object HmacUtil {
         return Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
 
+    fun hmacSha256Hex(secret: String, message: String): String {
+        val sha256Hmac = Mac.getInstance(HMAC_ALGO)
+        val secretKey = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), HMAC_ALGO)
+        sha256Hmac.init(secretKey)
+        val hash = sha256Hmac.doFinal(message.toByteArray(Charsets.UTF_8))
+        return hash.joinToString("") { "%02x".format(it) }
+    }
+
     fun extractVideoId(url: String): String? {
         if (url.length == 11 && !url.contains("/") && !url.contains("?")) return url
         val regex = Regex("""(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([A-Za-z0-9_-]{11})""")

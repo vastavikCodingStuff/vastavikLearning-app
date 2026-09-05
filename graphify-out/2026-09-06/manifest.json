@@ -1,0 +1,752 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1788529020.2094405,
+    "seen": 1788530227.0355594,
+    "ast_hash": "0f5690b32b8c1f7c41d8ea2c8d26793a",
+    "semantic_hash": "0f5690b32b8c1f7c41d8ea2c8d26793a"
+  },
+  "app/google-services.json": {
+    "mtime": 1787668783.4297817,
+    "seen": 1788377409.163242,
+    "ast_hash": "a684bab956cc13dedf16e5176eb18be0",
+    "semantic_hash": "a684bab956cc13dedf16e5176eb18be0"
+  },
+  "app/src/main/java/com/vastavik/computer/MainActivity.kt": {
+    "mtime": 1788526216.5718317,
+    "seen": 1788530227.035831,
+    "ast_hash": "33918f4e8584f728fd5b7def96f64ba0",
+    "semantic_hash": "33918f4e8584f728fd5b7def96f64ba0"
+  },
+  "app/src/main/java/com/vastavik/computer/VastavikApplication.kt": {
+    "mtime": 1788245942.8469408,
+    "seen": 1788377409.1632442,
+    "ast_hash": "86920e0c5b7bfcf162525599fb7ec660",
+    "semantic_hash": "86920e0c5b7bfcf162525599fb7ec660"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/BannerModel.kt": {
+    "mtime": 1788245942.9412527,
+    "seen": 1788377409.1632452,
+    "ast_hash": "075c8609d9f22e0c39247206c10adc28",
+    "semantic_hash": "075c8609d9f22e0c39247206c10adc28"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/ChatModel.kt": {
+    "mtime": 1788245942.944299,
+    "seen": 1788377409.1632462,
+    "ast_hash": "27d51a200036bba5a9a0a058bbdae5d4",
+    "semantic_hash": "27d51a200036bba5a9a0a058bbdae5d4"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/CourseModel.kt": {
+    "mtime": 1788245942.9467719,
+    "seen": 1788377409.1632466,
+    "ast_hash": "a4614411faf7ec5cb2eab7ae1576d4af",
+    "semantic_hash": "a4614411faf7ec5cb2eab7ae1576d4af"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt": {
+    "mtime": 1788246400.4183712,
+    "seen": 1788377409.1632473,
+    "ast_hash": "72883876dd6d9bb89edb72b939b660c7",
+    "semantic_hash": "72883876dd6d9bb89edb72b939b660c7"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/QuizModel.kt": {
+    "mtime": 1788245942.953901,
+    "seen": 1788377409.1632478,
+    "ast_hash": "0ec3328635c88307d6ce555a41e27278",
+    "semantic_hash": "0ec3328635c88307d6ce555a41e27278"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt": {
+    "mtime": 1788245942.957474,
+    "seen": 1788377409.1632483,
+    "ast_hash": "93448ef287d08e8807d260bc51e8e141",
+    "semantic_hash": "93448ef287d08e8807d260bc51e8e141"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/UserModel.kt": {
+    "mtime": 1788490079.4573843,
+    "seen": 1788530227.0365427,
+    "ast_hash": "64b34688fff4026464e8c9dac46940e8",
+    "semantic_hash": "64b34688fff4026464e8c9dac46940e8"
+  },
+  "app/src/main/java/com/vastavik/computer/di/AppModule.kt": {
+    "mtime": 1788540525.1321275,
+    "seen": 1788540922.441364,
+    "ast_hash": "1d57698b7f9f03933644e3412b3d4b82",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/CommonComponents.kt": {
+    "mtime": 1788429519.28547,
+    "seen": 1788530227.0366585,
+    "ast_hash": "42a1190fe2b246edb787001e45e35b9f",
+    "semantic_hash": "42a1190fe2b246edb787001e45e35b9f"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/MeetingComponents.kt": {
+    "mtime": 1788429472.5168824,
+    "seen": 1788530227.0366623,
+    "ast_hash": "1999a15ac64eb3e0f124f650e4ad3cfb",
+    "semantic_hash": "1999a15ac64eb3e0f124f650e4ad3cfb"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/PromoPopup.kt": {
+    "mtime": 1788429416.874726,
+    "seen": 1788530227.0366635,
+    "ast_hash": "874646975c1b357f45a6b4e0595fc8b2",
+    "semantic_hash": "874646975c1b357f45a6b4e0595fc8b2"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/VastavikTopBar.kt": {
+    "mtime": 1788490079.4648764,
+    "seen": 1788530227.0366673,
+    "ast_hash": "9ce7608139510efacd5baf70696a566b",
+    "semantic_hash": "9ce7608139510efacd5baf70696a566b"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/VastavikYouTubePlayer.kt": {
+    "mtime": 1788245943.0550995,
+    "seen": 1788377409.163254,
+    "ast_hash": "c8208c633527c3c894d5360891ee6766",
+    "semantic_hash": "c8208c633527c3c894d5360891ee6766"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt": {
+    "mtime": 1788429491.467345,
+    "seen": 1788530227.0367713,
+    "ast_hash": "a0f4ea34abf70adf7260cc4ca70f4a5f",
+    "semantic_hash": "a0f4ea34abf70adf7260cc4ca70f4a5f"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/navigation/AppNavHost.kt": {
+    "mtime": 1788493774.4403439,
+    "seen": 1788530227.0367725,
+    "ast_hash": "ef2904b0d0d939483e0a533a12954b06",
+    "semantic_hash": "ef2904b0d0d939483e0a533a12954b06"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/navigation/SystemBars.kt": {
+    "mtime": 1788245943.0647593,
+    "seen": 1788377409.1632557,
+    "ast_hash": "89b6095013894a4a9346dd115da37fda",
+    "semantic_hash": "89b6095013894a4a9346dd115da37fda"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/AuthViewModel.kt": {
+    "mtime": 1788490079.4676554,
+    "seen": 1788530227.0368712,
+    "ast_hash": "db350a4d63aeccfffcd6ba8e0869d018",
+    "semantic_hash": "db350a4d63aeccfffcd6ba8e0869d018"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/ForgotPasswordScreen.kt": {
+    "mtime": 1788430884.399244,
+    "seen": 1788530227.0368724,
+    "ast_hash": "9640b2b21701b1f681c57db0388d626c",
+    "semantic_hash": "9640b2b21701b1f681c57db0388d626c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/LoginScreen.kt": {
+    "mtime": 1788444151.5493052,
+    "seen": 1788530227.0368738,
+    "ast_hash": "72b9565dfd8d9eb9764f0c0963b9b8b7",
+    "semantic_hash": "72b9565dfd8d9eb9764f0c0963b9b8b7"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SecurityCheckScreen.kt": {
+    "mtime": 1788245943.0773687,
+    "seen": 1788377409.1632583,
+    "ast_hash": "ed4dd38659ea60cefa8ad5fcccf59c41",
+    "semantic_hash": "ed4dd38659ea60cefa8ad5fcccf59c41"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SignupScreen.kt": {
+    "mtime": 1788444155.9653547,
+    "seen": 1788530227.0369759,
+    "ast_hash": "14593f04745944ba5d1dcd5e5ce9b8d3",
+    "semantic_hash": "14593f04745944ba5d1dcd5e5ce9b8d3"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SplashScreen.kt": {
+    "mtime": 1788504398.2361104,
+    "seen": 1788530227.0369768,
+    "ast_hash": "aad567426dba9fadd8384a04c2af8246",
+    "semantic_hash": "aad567426dba9fadd8384a04c2af8246"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt": {
+    "mtime": 1788529021.2940862,
+    "seen": 1788530227.0369794,
+    "ast_hash": "83d25535bb4029e220c28bc34953e0ca",
+    "semantic_hash": "83d25535bb4029e220c28bc34953e0ca"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatViewModel.kt": {
+    "mtime": 1788498026.1553779,
+    "seen": 1788530227.0369804,
+    "ast_hash": "0966bdacd6a9fbedd2aa229d63f87e89",
+    "semantic_hash": "0966bdacd6a9fbedd2aa229d63f87e89"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/editor/CodeEditorScreen.kt": {
+    "mtime": 1788504398.2396247,
+    "seen": 1788530227.0369842,
+    "ast_hash": "d4821c0aa2769b07013086332b7c3566",
+    "semantic_hash": "d4821c0aa2769b07013086332b7c3566"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/editor/OcrExerciseScreen.kt": {
+    "mtime": 1788430651.7786324,
+    "seen": 1788530227.0369852,
+    "ast_hash": "29020f4f37520078b8b8e44baa283d4d",
+    "semantic_hash": "29020f4f37520078b8b8e44baa283d4d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/ComingSoonScreen.kt": {
+    "mtime": 1788430494.4139712,
+    "seen": 1788530227.0369864,
+    "ast_hash": "fba3d47813a10256c25ba950557d079d",
+    "semantic_hash": "fba3d47813a10256c25ba950557d079d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/HomeScreen.kt": {
+    "mtime": 1788504398.2416239,
+    "seen": 1788530227.0369873,
+    "ast_hash": "34cab4bac208c7f36ff11ef244246364",
+    "semantic_hash": "34cab4bac208c7f36ff11ef244246364"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/HomeViewModel.kt": {
+    "mtime": 1788245943.096185,
+    "seen": 1788377409.163264,
+    "ast_hash": "5ca8eb97f121eeddbe63f33339da7d58",
+    "semantic_hash": "5ca8eb97f121eeddbe63f33339da7d58"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/learning/LearningPathScreen.kt": {
+    "mtime": 1788490079.4749067,
+    "seen": 1788530227.0371218,
+    "ast_hash": "cb32f6c2152ea2f7ceac0ba997292344",
+    "semantic_hash": "cb32f6c2152ea2f7ceac0ba997292344"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/learning/LearningViewModel.kt": {
+    "mtime": 1788245943.1022415,
+    "seen": 1788377409.1632655,
+    "ast_hash": "421da7617ce1b00a249516a079f50662",
+    "semantic_hash": "421da7617ce1b00a249516a079f50662"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingScreens.kt": {
+    "mtime": 1788430756.9586625,
+    "seen": 1788530227.0372639,
+    "ast_hash": "67aa052fdba2a22350ae7a45ea4a53af",
+    "semantic_hash": "67aa052fdba2a22350ae7a45ea4a53af"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt": {
+    "mtime": 1788490079.4769073,
+    "seen": 1788530227.0372653,
+    "ast_hash": "82b8cdacb1a49014b4d152daeb4eeb08",
+    "semantic_hash": "82b8cdacb1a49014b4d152daeb4eeb08"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/notifications/AppUpdateScreen.kt": {
+    "mtime": 1788516892.416981,
+    "seen": 1788530227.0372672,
+    "ast_hash": "b4071071563942ac6e3c5bff9286a26c",
+    "semantic_hash": "b4071071563942ac6e3c5bff9286a26c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/notifications/NotificationsScreen.kt": {
+    "mtime": 1788490079.4799066,
+    "seen": 1788530227.0372684,
+    "ast_hash": "953576f5cad875bb7f067483e53c3489",
+    "semantic_hash": "953576f5cad875bb7f067483e53c3489"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/AccountDeletedScreen.kt": {
+    "mtime": 1788245943.1182146,
+    "seen": 1788377409.1632686,
+    "ast_hash": "6ecb6c5229d38b83da8d651c27266c93",
+    "semantic_hash": "6ecb6c5229d38b83da8d651c27266c93"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/AdminDashboardScreen.kt": {
+    "mtime": 1788526216.5739684,
+    "seen": 1788530227.037378,
+    "ast_hash": "c1bce3ed89e7ff01eae0b0477df37158",
+    "semantic_hash": "c1bce3ed89e7ff01eae0b0477df37158"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/EditProfileScreen.kt": {
+    "mtime": 1788430796.3835058,
+    "seen": 1788530227.0373793,
+    "ast_hash": "b0cffec6de2dd9e50c6ec9ad018c9669",
+    "semantic_hash": "b0cffec6de2dd9e50c6ec9ad018c9669"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/MyNotesScreen.kt": {
+    "mtime": 1788430810.1669686,
+    "seen": 1788530227.0373807,
+    "ast_hash": "6d7530e207cdf0110aedf6039e5b513e",
+    "semantic_hash": "6d7530e207cdf0110aedf6039e5b513e"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/OnboardingViewModel.kt": {
+    "mtime": 1788245943.1252408,
+    "seen": 1788377409.1632717,
+    "ast_hash": "5869adb1bca64b05bd951d22c455266c",
+    "semantic_hash": "5869adb1bca64b05bd951d22c455266c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PYQScreen.kt": {
+    "mtime": 1788430600.0748656,
+    "seen": 1788530227.0374784,
+    "ast_hash": "b5d6705f4b1d4557f6d5b8e0ca0342e3",
+    "semantic_hash": "b5d6705f4b1d4557f6d5b8e0ca0342e3"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt": {
+    "mtime": 1788430827.3139129,
+    "seen": 1788530227.0374796,
+    "ast_hash": "a8089fecd597b0fe1cea75707838842d",
+    "semantic_hash": "a8089fecd597b0fe1cea75707838842d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt": {
+    "mtime": 1788492891.2489927,
+    "seen": 1788530227.037481,
+    "ast_hash": "67793ce8c8d54182c3ac8f3643be0767",
+    "semantic_hash": "67793ce8c8d54182c3ac8f3643be0767"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SearchResultsScreen.kt": {
+    "mtime": 1788430584.279817,
+    "seen": 1788530227.037482,
+    "ast_hash": "d86cde39fec2b1fef3af84ee3946405d",
+    "semantic_hash": "d86cde39fec2b1fef3af84ee3946405d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt": {
+    "mtime": 1788450514.5151885,
+    "seen": 1788530227.0374832,
+    "ast_hash": "9c014e7aba22929ebf1b1379de48991d",
+    "semantic_hash": "9c014e7aba22929ebf1b1379de48991d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsViewModel.kt": {
+    "mtime": 1788246091.3760946,
+    "seen": 1788377409.1632752,
+    "ast_hash": "cf31996658f7a262bc8f5cbd0835dc99",
+    "semantic_hash": "cf31996658f7a262bc8f5cbd0835dc99"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/UserSetupScreen.kt": {
+    "mtime": 1788490079.4809036,
+    "seen": 1788530227.0375855,
+    "ast_hash": "7c242e48983aee84ed117589d420c2d5",
+    "semantic_hash": "7c242e48983aee84ed117589d420c2d5"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/WelcomeScreen.kt": {
+    "mtime": 1788245943.1394632,
+    "seen": 1788377409.1632764,
+    "ast_hash": "97a5a8c434aeec5dd92a960ea4a9bd0d",
+    "semantic_hash": "97a5a8c434aeec5dd92a960ea4a9bd0d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeScreen.kt": {
+    "mtime": 1788526216.5759768,
+    "seen": 1788530227.0376837,
+    "ast_hash": "1d20bc1ed5b206673d86c4bacf13a087",
+    "semantic_hash": "1d20bc1ed5b206673d86c4bacf13a087"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeViewModel.kt": {
+    "mtime": 1788245943.1434655,
+    "seen": 1788377409.1632776,
+    "ast_hash": "e6137d2b157bc2974b9349ec284165ae",
+    "semantic_hash": "e6137d2b157bc2974b9349ec284165ae"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileScreen.kt": {
+    "mtime": 1788526216.5759768,
+    "seen": 1788530227.0378008,
+    "ast_hash": "adc02860b8a7e2f8a8c8f93cc8e1d947",
+    "semantic_hash": "adc02860b8a7e2f8a8c8f93cc8e1d947"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileViewModel.kt": {
+    "mtime": 1788245943.1469717,
+    "seen": 1788377409.1632788,
+    "ast_hash": "95cbff6e3a4b746bd29fd58aca6c1a05",
+    "semantic_hash": "95cbff6e3a4b746bd29fd58aca6c1a05"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizManager.kt": {
+    "mtime": 1788504398.246137,
+    "seen": 1788530227.037902,
+    "ast_hash": "c4d0fac191e8a86d4f9551f426916ed6",
+    "semantic_hash": "c4d0fac191e8a86d4f9551f426916ed6"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizSetupScreen.kt": {
+    "mtime": 1788490079.4863718,
+    "seen": 1788530227.0379035,
+    "ast_hash": "bc4fc67344cb1212b603ade8c3375a62",
+    "semantic_hash": "bc4fc67344cb1212b603ade8c3375a62"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizTakingScreen.kt": {
+    "mtime": 1788504398.2481077,
+    "seen": 1788530227.037905,
+    "ast_hash": "e591763e0220b0fd0df6b66d0f851d7d",
+    "semantic_hash": "e591763e0220b0fd0df6b66d0f851d7d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizViewModel.kt": {
+    "mtime": 1788245943.153998,
+    "seen": 1788377409.1632838,
+    "ast_hash": "d7969455b21f9e2c1546a00962571703",
+    "semantic_hash": "d7969455b21f9e2c1546a00962571703"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/video/VideoLessonScreen.kt": {
+    "mtime": 1788504398.249124,
+    "seen": 1788530227.0380068,
+    "ast_hash": "c4eb385edf9c1cbbb0956bdfee2ce698",
+    "semantic_hash": "c4eb385edf9c1cbbb0956bdfee2ce698"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/video/VideoLessonViewModel.kt": {
+    "mtime": 1788245943.1565058,
+    "seen": 1788377409.163285,
+    "ast_hash": "ad6d188545ad9179561dc47751001642",
+    "semantic_hash": "ad6d188545ad9179561dc47751001642"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Brutalism.kt": {
+    "mtime": 1788429156.160829,
+    "seen": 1788530227.0381107,
+    "ast_hash": "dcbf150ac281244f71e027249314aa90",
+    "semantic_hash": "dcbf150ac281244f71e027249314aa90"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Color.kt": {
+    "mtime": 1788245943.1620736,
+    "seen": 1788377409.163286,
+    "ast_hash": "58ec69284b2056105fc71ce75fb565d8",
+    "semantic_hash": "58ec69284b2056105fc71ce75fb565d8"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/NeoBrutalistColors.kt": {
+    "mtime": 1788245943.163078,
+    "seen": 1788377409.1632867,
+    "ast_hash": "be305e0946f48bd91a5866fab7d0e4a4",
+    "semantic_hash": "be305e0946f48bd91a5866fab7d0e4a4"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/NeoShapes.kt": {
+    "mtime": 1788245943.1656203,
+    "seen": 1788377409.1632874,
+    "ast_hash": "5dfacc4dcd468d6e7225fd719c2c6c15",
+    "semantic_hash": "5dfacc4dcd468d6e7225fd719c2c6c15"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Theme.kt": {
+    "mtime": 1788429123.2460341,
+    "seen": 1788530227.0384076,
+    "ast_hash": "032a10d241ea176acd311dbc8584bd4b",
+    "semantic_hash": "032a10d241ea176acd311dbc8584bd4b"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Type.kt": {
+    "mtime": 1788498026.1553779,
+    "seen": 1788530227.0384092,
+    "ast_hash": "1fe3b1827011a48974db1c9f5b6e8a9c",
+    "semantic_hash": "1fe3b1827011a48974db1c9f5b6e8a9c"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Constants.kt": {
+    "mtime": 1788431151.0824764,
+    "seen": 1788530227.0384128,
+    "ast_hash": "16947ce8550409d681922475ea3e2cda",
+    "semantic_hash": "16947ce8550409d681922475ea3e2cda"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DeviceSecurityChecker.kt": {
+    "mtime": 1788245943.1751819,
+    "seen": 1788377409.1632898,
+    "ast_hash": "1017911a375827301eaeff8aff24be29",
+    "semantic_hash": "1017911a375827301eaeff8aff24be29"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/FirebaseMessagingService.kt": {
+    "mtime": 1788490771.075578,
+    "seen": 1788530227.0385513,
+    "ast_hash": "4e51a8c46b114768c180089f14ed01c0",
+    "semantic_hash": "4e51a8c46b114768c180089f14ed01c0"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/MeetingForegroundService.kt": {
+    "mtime": 1788490771.0761075,
+    "seen": 1788530227.0385537,
+    "ast_hash": "315c8464def7fbf02e457384d04a9dac",
+    "semantic_hash": "315c8464def7fbf02e457384d04a9dac"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/NotificationDismissReceiver.kt": {
+    "mtime": 1788246292.6566732,
+    "seen": 1788377409.1632926,
+    "ast_hash": "fbb5f3091a762b6178213af7a0999274",
+    "semantic_hash": "fbb5f3091a762b6178213af7a0999274"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Resource.kt": {
+    "mtime": 1788245943.2392762,
+    "seen": 1788377409.1632931,
+    "ast_hash": "6f5ba6f454691bd66ae5f19bc9e0bc72",
+    "semantic_hash": "6f5ba6f454691bd66ae5f19bc9e0bc72"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/ThemePreferences.kt": {
+    "mtime": 1788246091.3760946,
+    "seen": 1788377409.1632938,
+    "ast_hash": "0e51b430d164f544f9e592c7b9369163",
+    "semantic_hash": "0e51b430d164f544f9e592c7b9369163"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1787566030.2194643,
+    "seen": 1788377409.1632948,
+    "ast_hash": "7203ac9e2649f9a1dc41615c5a95c04b",
+    "semantic_hash": "7203ac9e2649f9a1dc41615c5a95c04b"
+  },
+  "README.md": {
+    "mtime": 1788504398.23411,
+    "seen": 1788530227.0389302,
+    "ast_hash": "6cacba0be86b17e763c5fd600f620fc0",
+    "semantic_hash": "6cacba0be86b17e763c5fd600f620fc0"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/UnderDevelopmentBanner.kt": {
+    "mtime": 1788429511.5134318,
+    "seen": 1788530227.0366662,
+    "ast_hash": "8bf98568a0262cb39f3a991729becc4f",
+    "semantic_hash": "8bf98568a0262cb39f3a991729becc4f"
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt": {
+    "mtime": 1788540449.2450905,
+    "seen": 1788540922.4413302,
+    "ast_hash": "6307de883f87364e5dd301236eb46f00",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/AuthInterceptor.kt": {
+    "mtime": 1788540471.6647687,
+    "seen": 1788540922.4413319,
+    "ast_hash": "16286dafbae85395a6d6e13befda2bfc",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/HmacUtil.kt": {
+    "mtime": 1788540460.9121356,
+    "seen": 1788540922.4413354,
+    "ast_hash": "60e5e050e08efadf037158a045112b3d",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/VastavikApiService.kt": {
+    "mtime": 1788540491.6246457,
+    "seen": 1788540922.4413388,
+    "ast_hash": "89f22f8aaed71d63b6c7f9e93197e2d7",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/AppUpdateInfo.kt": {
+    "mtime": 1788490079.4561186,
+    "seen": 1788530227.035957,
+    "ast_hash": "79bdb9410deb50829c7bb46226c25c62",
+    "semantic_hash": "79bdb9410deb50829c7bb46226c25c62"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt": {
+    "mtime": 1788421547.9210062,
+    "seen": 1788530227.0365446,
+    "ast_hash": "adf3a5a106f5488a8db8e40e1723c9f0",
+    "semantic_hash": "adf3a5a106f5488a8db8e40e1723c9f0"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt": {
+    "mtime": 1788421547.9210062,
+    "seen": 1788530227.0365458,
+    "ast_hash": "4be3e761f8831a569d92fde2040fdfea",
+    "semantic_hash": "4be3e761f8831a569d92fde2040fdfea"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/RealtimeProtocol.kt": {
+    "mtime": 1788490079.457929,
+    "seen": 1788530227.0365472,
+    "ast_hash": "6bdb0eef5d8ab130f25b7eb86c43f30c",
+    "semantic_hash": "6bdb0eef5d8ab130f25b7eb86c43f30c"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt": {
+    "mtime": 1788490079.458993,
+    "seen": 1788530227.0365512,
+    "ast_hash": "a1b70ee1f8a23e3729db8e16a6436cbd",
+    "semantic_hash": "a1b70ee1f8a23e3729db8e16a6436cbd"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt": {
+    "mtime": 1788490079.4603117,
+    "seen": 1788530227.0365524,
+    "ast_hash": "6ba2ea73da2c5d6064bb0baf31f0efeb",
+    "semantic_hash": "6ba2ea73da2c5d6064bb0baf31f0efeb"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/AuthRepository.kt": {
+    "mtime": 1788421531.0534596,
+    "seen": 1788530227.0365534,
+    "ast_hash": "7ce66fc924cb6ea768e26dceb25fbbc5",
+    "semantic_hash": "7ce66fc924cb6ea768e26dceb25fbbc5"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt": {
+    "mtime": 1788490079.461385,
+    "seen": 1788530227.0365546,
+    "ast_hash": "8bc70ae71187829430017118b0297c9f",
+    "semantic_hash": "8bc70ae71187829430017118b0297c9f"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/VastavikApiRepository.kt": {
+    "mtime": 1788540536.7823367,
+    "seen": 1788540922.4413629,
+    "ast_hash": "bd7c65cec4a1f13e9a8f4a5bce90c088",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/BannersPagerOverlay.kt": {
+    "mtime": 1788504398.2361104,
+    "seen": 1788530227.0366566,
+    "ast_hash": "cf871d4c0e2a021cffd3bdd32d1d518c",
+    "semantic_hash": "cf871d4c0e2a021cffd3bdd32d1d518c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/DebugLogBoxOverlay.kt": {
+    "mtime": 1788512430.916708,
+    "seen": 1788530227.0366597,
+    "ast_hash": "8e9e8e5a82c2d845045f0c2b8f1f296d",
+    "semantic_hash": "8e9e8e5a82c2d845045f0c2b8f1f296d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/MarkdownContent.kt": {
+    "mtime": 1788490079.462565,
+    "seen": 1788530227.036661,
+    "ast_hash": "68a1edfabc2b36efca7b811d8cb9b354",
+    "semantic_hash": "68a1edfabc2b36efca7b811d8cb9b354"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/TelegramNotificationBanner.kt": {
+    "mtime": 1788491950.2990234,
+    "seen": 1788530227.0366647,
+    "ast_hash": "fe5999cdfe80bb0631a0b01468666fb2",
+    "semantic_hash": "fe5999cdfe80bb0631a0b01468666fb2"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/AiConversationManager.kt": {
+    "mtime": 1788526216.5728345,
+    "seen": 1788530227.0369782,
+    "ast_hash": "a4579238f1539c938bb7f008e9ad6fa1",
+    "semantic_hash": "a4579238f1539c938bb7f008e9ad6fa1"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/PeerChatScreen.kt": {
+    "mtime": 1788491950.3011808,
+    "seen": 1788530227.0369816,
+    "ast_hash": "beec6c9cb74dbc8e98539fdcab39e9d3",
+    "semantic_hash": "beec6c9cb74dbc8e98539fdcab39e9d3"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/doubts/DoubtSolvingScreen.kt": {
+    "mtime": 1788490079.4716702,
+    "seen": 1788530227.036983,
+    "ast_hash": "8e4d935679efff25a0f60f3acb0ae49f",
+    "semantic_hash": "8e4d935679efff25a0f60f3acb0ae49f"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/BugReportScreen.kt": {
+    "mtime": 1788493774.4416587,
+    "seen": 1788530227.0377994,
+    "ast_hash": "e21fceb478474c29ed9a9a7ee95f2667",
+    "semantic_hash": "e21fceb478474c29ed9a9a7ee95f2667"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/AdminSession.kt": {
+    "mtime": 1788526216.57698,
+    "seen": 1788530227.0384104,
+    "ast_hash": "8908e7ae994c01b3a650245394819506",
+    "semantic_hash": "8908e7ae994c01b3a650245394819506"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/AppUpdater.kt": {
+    "mtime": 1788520443.4068978,
+    "seen": 1788530227.0384116,
+    "ast_hash": "d281fb33729f885bfce54bdbd7182ad2",
+    "semantic_hash": "d281fb33729f885bfce54bdbd7182ad2"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DebugLogBox.kt": {
+    "mtime": 1788529021.295685,
+    "seen": 1788530227.038414,
+    "ast_hash": "7bba145c1cc1e55acfef6a92f37c95af",
+    "semantic_hash": "7bba145c1cc1e55acfef6a92f37c95af"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DownloadProgressReceiver.kt": {
+    "mtime": 1788516892.4191988,
+    "seen": 1788530227.0385494,
+    "ast_hash": "4e6acc8033f2634e821bbd208728e7f5",
+    "semantic_hash": "4e6acc8033f2634e821bbd208728e7f5"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt": {
+    "mtime": 1788504398.251126,
+    "seen": 1788530227.0385523,
+    "ast_hash": "e9ddab686a54e76c85b0415c450576f5",
+    "semantic_hash": "e9ddab686a54e76c85b0415c450576f5"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/TelegramNotificationManager.kt": {
+    "mtime": 1788490771.076624,
+    "seen": 1788530227.0387433,
+    "ast_hash": "7e696da81ff604f7afe684be775d2c2d",
+    "semantic_hash": "7e696da81ff604f7afe684be775d2c2d"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/VastavikAi.kt": {
+    "mtime": 1788529021.296756,
+    "seen": 1788530227.0388377,
+    "ast_hash": "fa0671cf5d9503703799b0479c8debff",
+    "semantic_hash": "fa0671cf5d9503703799b0479c8debff"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/VastavikAiDiskCache.kt": {
+    "mtime": 1788504398.2521224,
+    "seen": 1788530227.038839,
+    "ast_hash": "061b58f19c6de8e2ce4c888a5b3f3d2d",
+    "semantic_hash": "061b58f19c6de8e2ce4c888a5b3f3d2d"
+  },
+  "build.gradle.kts": {
+    "mtime": 1788419235.525977,
+    "seen": 1788530227.0388403,
+    "ast_hash": "4d06c7c0d67c4f8e5f1b9a5018223897",
+    "semantic_hash": "4d06c7c0d67c4f8e5f1b9a5018223897"
+  },
+  "tools/publish_release.ps1": {
+    "mtime": 1788490079.4935548,
+    "seen": 1788530227.0389273,
+    "ast_hash": "e357c16986c4c7ce7b9f19dd7830c783",
+    "semantic_hash": "e357c16986c4c7ce7b9f19dd7830c783"
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1788529981.860098,
+    "seen": 1788530227.038929,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": "a0e4d192b9e2e17256124dbfc8e24e6a"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.22.md": {
+    "mtime": 1788512429.8443525,
+    "seen": 1788530227.0389314,
+    "ast_hash": "aa79a652ecc530069150bc404967ad72",
+    "semantic_hash": "aa79a652ecc530069150bc404967ad72"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.24.md": {
+    "mtime": 1788520442.236401,
+    "seen": 1788530227.0389326,
+    "ast_hash": "ded944e303e3d503a8428d350525952f",
+    "semantic_hash": "ded944e303e3d503a8428d350525952f"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.25.md": {
+    "mtime": 1788526215.6128807,
+    "seen": 1788530227.0389338,
+    "ast_hash": "3cdabd072c86a9e53f72a6a15bd2a8ff",
+    "semantic_hash": "3cdabd072c86a9e53f72a6a15bd2a8ff"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.26.md": {
+    "mtime": 1788529407.196925,
+    "seen": 1788530227.0389347,
+    "ast_hash": "54db3b99a9344f1292c2582b1f11c386",
+    "semantic_hash": "54db3b99a9344f1292c2582b1f11c386"
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1788529981.860998,
+    "seen": 1788530936.22664,
+    "ast_hash": "a831cf3669f1e6ab85d8a80ebe655f99",
+    "semantic_hash": ""
+  },
+  "BACKEND_SPECIFICATION.md": {
+    "mtime": 1788530888.3647518,
+    "seen": 1788530936.2266424,
+    "ast_hash": "5d5fe0ae05f1946c8ef78ac22dd6063f",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.23.md": {
+    "mtime": 1788516891.239758,
+    "seen": 1788530936.226648,
+    "ast_hash": "2a542fc2ea95a37d6e4516cf91ec4130",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/CircuitBreaker.kt": {
+    "mtime": 1788540501.6902385,
+    "seen": 1788540922.441334,
+    "ast_hash": "0af0bbe6079f173760a9274616774b24",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/TokenAuthenticator.kt": {
+    "mtime": 1788540497.1791387,
+    "seen": 1788540922.4413366,
+    "ast_hash": "9ee70c0bd2446e0e379d2263b3842039",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/TokenManager.kt": {
+    "mtime": 1788540453.485947,
+    "seen": 1788540922.4413376,
+    "ast_hash": "1182483cdf1aefd6408f1fb5d6dbab18",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/model/BackendModels.kt": {
+    "mtime": 1788540481.7695024,
+    "seen": 1788540922.4413404,
+    "ast_hash": "c223138714819478b6c70274340692a9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/PeerChatClient.kt": {
+    "mtime": 1788540513.3040588,
+    "seen": 1788540922.4413412,
+    "ast_hash": "e920af90a43cb30f8fb55e51fd766ea4",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/VastavikAiStreamer.kt": {
+    "mtime": 1788540507.3238876,
+    "seen": 1788540922.441342,
+    "ast_hash": "606ee305060e4ee0bccff4162befdd3e",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/WebRtcSignalingClient.kt": {
+    "mtime": 1788540518.6872208,
+    "seen": 1788540922.441343,
+    "ast_hash": "874c32f377a9e070a4465efd4eb70c63",
+    "semantic_hash": ""
+  },
+  "delete.sh": {
+    "mtime": 1788532735.0331385,
+    "seen": 1788540922.4414506,
+    "ast_hash": "2eaec023321f08e63468e6fcf38d93a9",
+    "semantic_hash": ""
+  }
+}
