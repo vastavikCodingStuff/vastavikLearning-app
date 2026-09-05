@@ -4,6 +4,19 @@
   "graph": {},
   "nodes": [
     {
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_classsession",
+      "label": "ClassSession",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "classsession",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
+      "source_location": "L62"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_bannerspageroverlay_banneraccent",
       "label": "BannerAccent",
       "_callable": true,
@@ -82,6 +95,19 @@
       "source_location": "L27"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryitem",
+      "label": "PaymentHistoryItem",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymenthistoryitem",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L34"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_profile_profilescreen_quadruple",
       "label": "Quadruple",
       "_callable": true,
@@ -119,6 +145,32 @@
       "norm_label": "neobrutalistcolors",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/theme/NeoBrutalistColors.kt",
       "source_location": "L5"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "label": "PaymentReceiptData",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymentreceiptdata",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L20"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "label": "PaymentReceiptPdf",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymentreceiptpdf",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L37"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_authinterceptor_authinterceptor",
@@ -290,30 +342,30 @@
       "source_location": "L9"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_classsession",
-      "label": "ClassSession",
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_whiteboardelement",
+      "label": "WhiteboardElement",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 12,
       "community_name": "MeetingClient",
       "file_type": "code",
-      "norm_label": "classsession",
+      "norm_label": "whiteboardelement",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
-      "source_location": "L62"
+      "source_location": "L86"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_participant",
-      "label": "Participant",
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_whiteboardstate",
+      "label": "WhiteboardState",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 12,
       "community_name": "MeetingClient",
       "file_type": "code",
-      "norm_label": "participant",
+      "norm_label": "whiteboardstate",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
-      "source_location": "L18"
+      "source_location": "L80"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient",
@@ -327,6 +379,19 @@
       "norm_label": "meetingclient",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
       "source_location": "L14"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_participant",
+      "label": "Participant",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "WebRtcMeetingClient",
+      "file_type": "code",
+      "norm_label": "participant",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
+      "source_location": "L18"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_realtimeprotocol_webrtcsignal",
@@ -433,6 +498,19 @@
       "source_location": "L237"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_livechatmessage",
+      "label": "LiveChatMessage",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "MeetingModels.kt",
+      "file_type": "code",
+      "norm_label": "livechatmessage",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
+      "source_location": "L35"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_mediastate",
       "label": "MediaState",
       "_callable": true,
@@ -485,6 +563,19 @@
       "source_location": "L106"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_replypreview",
+      "label": "ReplyPreview",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "MeetingModels.kt",
+      "file_type": "code",
+      "norm_label": "replypreview",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
+      "source_location": "L52"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_viewport",
       "label": "Viewport",
       "_callable": true,
@@ -496,32 +587,6 @@
       "norm_label": "viewport",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
       "source_location": "L109"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_whiteboardelement",
-      "label": "WhiteboardElement",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 15,
-      "community_name": "MeetingModels.kt",
-      "file_type": "code",
-      "norm_label": "whiteboardelement",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
-      "source_location": "L86"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_whiteboardstate",
-      "label": "WhiteboardState",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 15,
-      "community_name": "MeetingModels.kt",
-      "file_type": "code",
-      "norm_label": "whiteboardstate",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
-      "source_location": "L80"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_realtimeprotocol_studenttypingevent",
@@ -849,17 +914,17 @@
       "source_location": "L221"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool",
-      "label": "WhiteboardTool",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate",
+      "label": "ConnectionState",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "whiteboardtool",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "connectionstate",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel",
@@ -1044,6 +1109,19 @@
       "source_location": "L24"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_utils_constants_constants",
+      "label": "Constants",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "FirestoreRepository",
+      "file_type": "code",
+      "norm_label": "constants",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Constants.kt",
+      "source_location": "L3"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient",
       "label": "LocalMeetingClient",
       "_callable": true,
@@ -1184,7 +1262,7 @@
       "file_type": "code",
       "norm_label": "subscriptionmodel",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L51"
+      "source_location": "L60"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionplan",
@@ -1197,7 +1275,7 @@
       "file_type": "code",
       "norm_label": "subscriptionplan",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L95"
+      "source_location": "L104"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_transactionmodel",
@@ -1616,6 +1694,19 @@
       "source_location": "L6"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_data_api_apiconfig_apiconfig",
+      "label": "ApiConfig",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "WebRtcSignalingClient",
+      "file_type": "code",
+      "norm_label": "apiconfig",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt",
+      "source_location": "L5"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_api_realtime_webrtcsignalingclient_webrtcsignalingclient",
       "label": "WebRtcSignalingClient",
       "_callable": true,
@@ -1666,58 +1757,6 @@
       "norm_label": "lessonmodel",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/CourseModel.kt",
       "source_location": "L115"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatmessage",
-      "label": "ChatMessage",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "chatmessage",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L74"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatsyntaxcolors",
-      "label": "ChatSyntaxColors",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "chatsyntaxcolors",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1559"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_markdownsegment",
-      "label": "MarkdownSegment",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "markdownsegment",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1340"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype",
-      "label": "SegmentType",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "segmenttype",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1334"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_practice_practicescreen_codingitem",
@@ -1928,19 +1967,6 @@
       "source_location": "L9"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_api_apiconfig_apiconfig",
-      "label": "ApiConfig",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "VastavikAiStreamer.kt",
-      "file_type": "code",
-      "norm_label": "apiconfig",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt",
-      "source_location": "L5"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_data_api_circuitbreaker_circuitbreaker",
       "label": "CircuitBreaker",
       "_callable": true,
@@ -2058,30 +2084,17 @@
       "source_location": "L7"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_livechatmessage",
-      "label": "LiveChatMessage",
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool",
+      "label": "WhiteboardTool",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 58,
-      "community_name": "LiveChatMessage",
+      "community_name": "WhiteboardTool",
       "file_type": "code",
-      "norm_label": "livechatmessage",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
+      "norm_label": "whiteboardtool",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
       "source_location": "L35"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_model_meetingmodels_replypreview",
-      "label": "ReplyPreview",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "LiveChatMessage",
-      "file_type": "code",
-      "norm_label": "replypreview",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt",
-      "source_location": "L52"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_model_backendmodels_ocrcleanrequest",
@@ -2149,19 +2162,6 @@
       "source_location": "L33"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_utils_constants_constants",
-      "label": "Constants",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "AppUpdater",
-      "file_type": "code",
-      "norm_label": "constants",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Constants.kt",
-      "source_location": "L3"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_utils_firebasemessagingservice_firebasemessagingservice",
       "label": "FirebaseMessagingService",
       "_callable": true,
@@ -2199,19 +2199,6 @@
       "norm_label": "quizviewmodel",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizViewModel.kt",
       "source_location": "L11"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate",
-      "label": "ConnectionState",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "connectionstate",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_model_backendmodels_notecreaterequest",
@@ -2253,6 +2240,19 @@
       "source_location": "L14"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "label": "RazorpayPaymentMethod",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "RazorpayPaymentMethod",
+      "file_type": "code",
+      "norm_label": "razorpaypaymentmethod",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L49"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_editor_codeeditorscreen_problemsection",
       "label": "ProblemSection",
       "_callable": true,
@@ -2290,32 +2290,6 @@
       "norm_label": "pyqitem",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PYQScreen.kt",
       "source_location": "L37"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_executionresult",
-      "label": "ExecutionResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 69,
-      "community_name": "VastavikAi",
-      "file_type": "code",
-      "norm_label": "executionresult",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
-      "source_location": "L26"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service",
-      "label": "Judge0Service",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 69,
-      "community_name": "VastavikAi",
-      "file_type": "code",
-      "norm_label": "judge0service",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
-      "source_location": "L14"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_utils_vastavikai_aienginemodel",
@@ -2435,6 +2409,32 @@
       "source_location": "L164"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_executionresult",
+      "label": "ExecutionResult",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "Judge0Service",
+      "file_type": "code",
+      "norm_label": "executionresult",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
+      "source_location": "L26"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service",
+      "label": "Judge0Service",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "Judge0Service",
+      "file_type": "code",
+      "norm_label": "judge0service",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
+      "source_location": "L14"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_commoncomponents_buttonvariant",
       "label": "ButtonVariant",
       "_callable": true,
@@ -2454,7 +2454,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "studentchatmessage",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/RealtimeProtocol.kt",
@@ -2467,7 +2467,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "studentconversationmanager",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -2480,11 +2480,63 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "websocketlistener",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
       "source_location": "L249"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatmessage",
+      "label": "ChatMessage",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "chatmessage",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L74"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatsyntaxcolors",
+      "label": "ChatSyntaxColors",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "chatsyntaxcolors",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1559"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_markdownsegment",
+      "label": "MarkdownSegment",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "markdownsegment",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1340"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype",
+      "label": "SegmentType",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "segmenttype",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1334"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_bannerspageroverlay_arrowbutton",
@@ -2643,6 +2695,18 @@
       "source_location": "L198"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay_ninjacelebrationoverlay",
+      "label": "NinjaCelebrationOverlay()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "ninjacelebrationoverlay()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt",
+      "source_location": "L42"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_promopopup_promopopup",
       "label": "PromoPopup()",
       "_callable": true,
@@ -2761,30 +2825,6 @@
       "norm_label": "splashscreen()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/auth/SplashScreen.kt",
       "source_location": "L30"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatscreen",
-      "label": "ChatScreen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "brutalBorderColor",
-      "file_type": "code",
-      "norm_label": "chatscreen()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L117"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_voiceinputoverlay",
-      "label": "VoiceInputOverlay()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "brutalBorderColor",
-      "file_type": "code",
-      "norm_label": "voiceinputoverlay()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1151"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_peerchatscreen_peerchatscreen",
@@ -3087,6 +3127,18 @@
       "source_location": "L27"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
+      "label": "PaymentHistoryScreen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymenthistoryscreen()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L47"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_brutalplancard",
       "label": "BrutalPlanCard()",
       "_callable": true,
@@ -3096,7 +3148,7 @@
       "file_type": "code",
       "norm_label": "brutalplancard()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L397"
+      "source_location": "L874"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
@@ -3108,7 +3160,7 @@
       "file_type": "code",
       "norm_label": "paymentscreen()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L37"
+      "source_location": "L56"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_profile_bugreportscreen_bugreportscreen",
@@ -3229,6 +3281,30 @@
       "norm_label": ".accentbyindex()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/theme/NeoBrutalistColors.kt",
       "source_location": "L32"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_generatereceipt",
+      "label": ".generateReceipt()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": ".generatereceipt()",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L39"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_openpdf",
+      "label": ".openPdf()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": ".openpdf()",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L446"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_authinterceptor_authinterceptor_intercept",
@@ -3867,16 +3943,16 @@
       "source_location": "L43"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_joinclass",
-      "label": ".joinClass()",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_updatewhiteboard",
+      "label": ".updateWhiteboard()",
       "_callable": true,
       "_origin": "ast",
       "community": 12,
       "community_name": "MeetingClient",
       "file_type": "code",
-      "norm_label": ".joinclass()",
+      "norm_label": ".updatewhiteboard()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt",
-      "source_location": "L27"
+      "source_location": "L75"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient_assignstarcast",
@@ -4047,16 +4123,40 @@
       "source_location": "L31"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_listentoparticipants",
-      "label": ".listenToParticipants()",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient_updatewhiteboard",
+      "label": ".updateWhiteboard()",
       "_callable": true,
       "_origin": "ast",
       "community": 12,
       "community_name": "MeetingClient",
       "file_type": "code",
-      "norm_label": ".listentoparticipants()",
+      "norm_label": ".updatewhiteboard()",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L34"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_updatewhiteboard",
+      "label": ".updateWhiteboard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "MeetingClient",
+      "file_type": "code",
+      "norm_label": ".updatewhiteboard()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt",
-      "source_location": "L340"
+      "source_location": "L217"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_updatewhiteboard",
+      "label": ".updateWhiteboard()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "MeetingClient",
+      "file_type": "code",
+      "norm_label": ".updatewhiteboard()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
+      "source_location": "L74"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_assignstarcast",
@@ -4141,6 +4241,18 @@
       "norm_label": ".listentochat()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt",
       "source_location": "L395"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_listentoparticipants",
+      "label": ".listenToParticipants()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 13,
+      "community_name": "WebRtcMeetingClient",
+      "file_type": "code",
+      "norm_label": ".listentoparticipants()",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt",
+      "source_location": "L340"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_listentosignals",
@@ -4455,52 +4567,64 @@
       "source_location": "L50"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_updatewhiteboard",
-      "label": ".updateWhiteboard()",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_sendchatmessage",
+      "label": ".sendChatMessage()",
       "_callable": true,
       "_origin": "ast",
       "community": 15,
       "community_name": "MeetingModels.kt",
       "file_type": "code",
-      "norm_label": ".updatewhiteboard()",
+      "norm_label": ".sendchatmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt",
-      "source_location": "L75"
+      "source_location": "L62"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient_updatewhiteboard",
-      "label": ".updateWhiteboard()",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient_sendchatmessage",
+      "label": ".sendChatMessage()",
       "_callable": true,
       "_origin": "ast",
       "community": 15,
       "community_name": "MeetingModels.kt",
       "file_type": "code",
-      "norm_label": ".updatewhiteboard()",
+      "norm_label": ".sendchatmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L34"
+      "source_location": "L33"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_updatewhiteboard",
-      "label": ".updateWhiteboard()",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_sendchatmessage",
+      "label": ".sendChatMessage()",
       "_callable": true,
       "_origin": "ast",
       "community": 15,
       "community_name": "MeetingModels.kt",
       "file_type": "code",
-      "norm_label": ".updatewhiteboard()",
+      "norm_label": ".sendchatmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt",
-      "source_location": "L217"
+      "source_location": "L178"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_updatewhiteboard",
-      "label": ".updateWhiteboard()",
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_onmessagereplyclick",
+      "label": ".onMessageReplyClick()",
       "_callable": true,
       "_origin": "ast",
       "community": 15,
       "community_name": "MeetingModels.kt",
       "file_type": "code",
-      "norm_label": ".updatewhiteboard()",
+      "norm_label": ".onmessagereplyclick()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
-      "source_location": "L74"
+      "source_location": "L59"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_setreplyto",
+      "label": ".setReplyTo()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 15,
+      "community_name": "MeetingModels.kt",
+      "file_type": "code",
+      "norm_label": ".setreplyto()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
+      "source_location": "L58"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_coursemodel_coursemodel_fromsnapshot",
@@ -4765,18 +4889,6 @@
       "norm_label": ".sendchatmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
       "source_location": "L54"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_setwhiteboardtool",
-      "label": ".setWhiteboardTool()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "MeetingViewModel",
-      "file_type": "code",
-      "norm_label": ".setwhiteboardtool()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
-      "source_location": "L73"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_startrecording",
@@ -5367,18 +5479,6 @@
       "source_location": "L181"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_repository_firestorerepository_firestorerepository_createuserprofile",
-      "label": ".createUserProfile()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "FirestoreRepository",
-      "file_type": "code",
-      "norm_label": ".createuserprofile()",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt",
-      "source_location": "L163"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_data_repository_firestorerepository_firestorerepository_getappupdateinfo",
       "label": ".getAppUpdateInfo()",
       "_callable": true,
@@ -5463,18 +5563,6 @@
       "source_location": "L100"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_repository_firestorerepository_firestorerepository_streamuserprofile",
-      "label": ".streamUserProfile()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "FirestoreRepository",
-      "file_type": "code",
-      "norm_label": ".streamuserprofile()",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt",
-      "source_location": "L154"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_di_appmodule_appmodule_providefirestorerepository",
       "label": ".provideFirestoreRepository()",
       "_callable": true,
@@ -5509,6 +5597,18 @@
       "norm_label": ".grantscreenshare()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt",
       "source_location": "L82"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_joinclass",
+      "label": ".joinClass()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "LocalMeetingClient",
+      "file_type": "code",
+      "norm_label": ".joinclass()",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt",
+      "source_location": "L27"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_kickparticipant",
@@ -6012,7 +6112,7 @@
       "file_type": "code",
       "norm_label": ".fromsnapshot()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L77"
+      "source_location": "L86"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionmodel_tomap",
@@ -6024,7 +6124,7 @@
       "file_type": "code",
       "norm_label": ".tomap()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L64"
+      "source_location": "L73"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionplan_fromsnapshot",
@@ -6036,7 +6136,7 @@
       "file_type": "code",
       "norm_label": ".fromsnapshot()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L117"
+      "source_location": "L126"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionplan_tomap",
@@ -6048,7 +6148,7 @@
       "file_type": "code",
       "norm_label": ".tomap()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L106"
+      "source_location": "L115"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_transactionmodel_fromsnapshot",
@@ -6060,7 +6160,7 @@
       "file_type": "code",
       "norm_label": ".fromsnapshot()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L33"
+      "source_location": "L39"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_transactionmodel_tomap",
@@ -6072,7 +6172,7 @@
       "file_type": "code",
       "norm_label": ".tomap()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L20"
+      "source_location": "L23"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_model_usermodel_usermodel_fromsnapshot",
@@ -6097,6 +6197,30 @@
       "norm_label": ".tomap()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/UserModel.kt",
       "source_location": "L28"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_repository_firestorerepository_firestorerepository_createuserprofile",
+      "label": ".createUserProfile()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "OnboardingViewModel",
+      "file_type": "code",
+      "norm_label": ".createuserprofile()",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt",
+      "source_location": "L163"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_data_repository_firestorerepository_firestorerepository_streamuserprofile",
+      "label": ".streamUserProfile()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "OnboardingViewModel",
+      "file_type": "code",
+      "norm_label": ".streamuserprofile()",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt",
+      "source_location": "L154"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_onboardingviewmodel_onboardingviewmodel_clearerror",
@@ -6951,114 +7075,6 @@
       "source_location": "L28"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_callvastavikaichat",
-      "label": "callVastavikAiChat()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "callvastavikaichat()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L90"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatbubblerow",
-      "label": "ChatBubbleRow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "chatbubblerow()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1070"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_highlightcode",
-      "label": "highlightCode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "highlightcode()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1576"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsebasicmarkdown",
-      "label": "parseBasicMarkdown()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "parsebasicmarkdown()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1507"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsedmarkdowntext",
-      "label": "ParsedMarkdownText()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "parsedmarkdowntext()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1391"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parseinlinemarkdown",
-      "label": "parseInlineMarkdown()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "parseinlinemarkdown()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1537"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsemarkdownsegments",
-      "label": "parseMarkdownSegments()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "parsemarkdownsegments()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1346"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_studentpeerchatbubble",
-      "label": "StudentPeerChatBubble()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "studentpeerchatbubble()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1844"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_studentpeerchatview",
-      "label": "StudentPeerChatView()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "studentpeerchatview()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1640"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_waveformvisualizer",
       "label": "WaveformVisualizer()",
       "_callable": true,
@@ -7623,42 +7639,6 @@
       "source_location": "L20"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_sectionheader",
-      "label": "SectionHeader()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "sectionheader()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
-      "source_location": "L159"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_settingsrow",
-      "label": "SettingsRow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "settingsrow()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
-      "source_location": "L170"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_settingsscreen",
-      "label": "SettingsScreen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "settingsscreen()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
-      "source_location": "L22"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsviewmodel_settingsviewmodel_setdarkmode",
       "label": ".setDarkMode()",
       "_callable": true,
@@ -7875,18 +7855,6 @@
       "source_location": "L22"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
-      "label": "PaymentHistoryScreen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 56,
-      "community_name": "neoShape",
-      "file_type": "code",
-      "norm_label": "paymenthistoryscreen()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L23"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_searchresultsscreen_searchresultsscreen",
       "label": "SearchResultsScreen()",
       "_callable": true,
@@ -8019,64 +7987,16 @@
       "source_location": "L11"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_localmeetingclient_localmeetingclient_sendchatmessage",
-      "label": ".sendChatMessage()",
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_setwhiteboardtool",
+      "label": ".setWhiteboardTool()",
       "_callable": true,
       "_origin": "ast",
       "community": 58,
-      "community_name": "LiveChatMessage",
+      "community_name": "WhiteboardTool",
       "file_type": "code",
-      "norm_label": ".sendchatmessage()",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt",
-      "source_location": "L62"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_meetingclient_sendchatmessage",
-      "label": ".sendChatMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "LiveChatMessage",
-      "file_type": "code",
-      "norm_label": ".sendchatmessage()",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L33"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_webrtcmeetingclient_webrtcmeetingclient_sendchatmessage",
-      "label": ".sendChatMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "LiveChatMessage",
-      "file_type": "code",
-      "norm_label": ".sendchatmessage()",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt",
-      "source_location": "L178"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_onmessagereplyclick",
-      "label": ".onMessageReplyClick()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "LiveChatMessage",
-      "file_type": "code",
-      "norm_label": ".onmessagereplyclick()",
+      "norm_label": ".setwhiteboardtool()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
-      "source_location": "L59"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel_meetingviewmodel_setreplyto",
-      "label": ".setReplyTo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 58,
-      "community_name": "LiveChatMessage",
-      "file_type": "code",
-      "norm_label": ".setreplyto()",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt",
-      "source_location": "L58"
+      "source_location": "L73"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_vastavikapiservice_vastavikapiservice_cleanocrcode",
@@ -8667,6 +8587,42 @@
       "source_location": "L36"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_sectionheader",
+      "label": "SectionHeader()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "sectionheader()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
+      "source_location": "L159"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_settingsrow",
+      "label": "SettingsRow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "settingsrow()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
+      "source_location": "L170"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_settingsscreen",
+      "label": "SettingsScreen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "settingsscreen()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
+      "source_location": "L22"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_editor_codeeditorscreen_codeeditorscreen",
       "label": "CodeEditorScreen()",
       "_callable": true,
@@ -8737,30 +8693,6 @@
       "norm_label": "pyqscreen()",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PYQScreen.kt",
       "source_location": "L61"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service_languageidfor",
-      "label": ".languageIdFor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 69,
-      "community_name": "VastavikAi",
-      "file_type": "code",
-      "norm_label": ".languageidfor()",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
-      "source_location": "L18"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service_runcode",
-      "label": ".runCode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 69,
-      "community_name": "VastavikAi",
-      "file_type": "code",
-      "norm_label": ".runcode()",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
-      "source_location": "L34"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_utils_vastavikai_vastavikai_callgemini",
@@ -8989,6 +8921,30 @@
       "norm_label": ".executecode()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/repository/VastavikApiRepository.kt",
       "source_location": "L113"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service_languageidfor",
+      "label": ".languageIdFor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "Judge0Service",
+      "file_type": "code",
+      "norm_label": ".languageidfor()",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
+      "source_location": "L18"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service_judge0service_runcode",
+      "label": ".runCode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "Judge0Service",
+      "file_type": "code",
+      "norm_label": ".runcode()",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
+      "source_location": "L34"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_commoncomponents_appendformattedtext",
@@ -9260,7 +9216,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".connectwebsocket()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9272,7 +9228,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".onfailure()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9284,7 +9240,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".onmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9296,7 +9252,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".onopen()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9308,7 +9264,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".emitsocketmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9320,7 +9276,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".handlesocketiopacket()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9332,7 +9288,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".initialize()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9344,7 +9300,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".joinchannel()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9356,7 +9312,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".sendmessage()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -9368,11 +9324,143 @@
       "_callable": true,
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": ".settyping()",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
       "source_location": "L216"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_callvastavikaichat",
+      "label": "callVastavikAiChat()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "callvastavikaichat()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L90"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatbubblerow",
+      "label": "ChatBubbleRow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "chatbubblerow()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1070"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_chatscreen",
+      "label": "ChatScreen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "chatscreen()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L117"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_highlightcode",
+      "label": "highlightCode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "highlightcode()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1576"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsebasicmarkdown",
+      "label": "parseBasicMarkdown()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "parsebasicmarkdown()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1507"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsedmarkdowntext",
+      "label": "ParsedMarkdownText()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "parsedmarkdowntext()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1391"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parseinlinemarkdown",
+      "label": "parseInlineMarkdown()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "parseinlinemarkdown()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1537"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_parsemarkdownsegments",
+      "label": "parseMarkdownSegments()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "parsemarkdownsegments()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1346"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_studentpeerchatbubble",
+      "label": "StudentPeerChatBubble()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "studentpeerchatbubble()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1844"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_studentpeerchatview",
+      "label": "StudentPeerChatView()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "studentpeerchatview()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1640"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_voiceinputoverlay",
+      "label": "VoiceInputOverlay()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "voiceinputoverlay()",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1151"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_bannerspageroverlay",
@@ -9474,6 +9562,17 @@
       "source_location": ""
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay",
+      "label": "NinjaCelebrationOverlay.kt",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "ninjacelebrationoverlay.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt",
+      "source_location": "L1"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_promopopup",
       "label": "PromoPopup.kt",
       "_origin": "ast",
@@ -9559,6 +9658,17 @@
       "file_type": "code",
       "norm_label": "appnavhost.kt",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/navigation/AppNavHost.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_auth_forgotpasswordscreen",
+      "label": "ForgotPasswordScreen.kt",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "forgotpasswordscreen.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/auth/ForgotPasswordScreen.kt",
       "source_location": "L1"
     },
     {
@@ -9738,6 +9848,17 @@
       "source_location": "L1"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "label": "PaymentHistoryScreen.kt",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymenthistoryscreen.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L1"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
       "label": "PaymentScreen.kt",
       "_origin": "ast",
@@ -9870,6 +9991,28 @@
       "source_location": ""
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "label": "PaymentReceiptPdf.kt",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "paymentreceiptpdf.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_kt_context",
+      "label": "Context",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "context",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
       "id": "brush",
       "label": "Brush",
       "_origin": "ast",
@@ -9910,6 +10053,17 @@
       "community_name": "brutalBorderColor",
       "file_type": "code",
       "norm_label": "imageproxy",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "keyboardtype",
+      "label": "KeyboardType",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "brutalBorderColor",
+      "file_type": "code",
+      "norm_label": "keyboardtype",
       "source_file": "",
       "source_location": ""
     },
@@ -10486,103 +10640,59 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_arrow",
-      "label": "ARROW",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_connected",
+      "label": "CONNECTED",
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "arrow",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "connected",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_ellipse",
-      "label": "ELLIPSE",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_connecting",
+      "label": "CONNECTING",
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "ellipse",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "connecting",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_eraser",
-      "label": "ERASER",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_disconnected",
+      "label": "DISCONNECTED",
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "eraser",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "disconnected",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_hand",
-      "label": "HAND",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_failed",
+      "label": "FAILED",
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "hand",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "failed",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_line",
-      "label": "LINE",
+      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_reconnecting",
+      "label": "RECONNECTING",
       "_origin": "ast",
       "community": 18,
       "community_name": "MeetingViewModel",
       "file_type": "code",
-      "norm_label": "line",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_pen",
-      "label": "PEN",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "MeetingViewModel",
-      "file_type": "code",
-      "norm_label": "pen",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_rectangle",
-      "label": "RECTANGLE",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "MeetingViewModel",
-      "file_type": "code",
-      "norm_label": "rectangle",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_select",
-      "label": "SELECT",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "MeetingViewModel",
-      "file_type": "code",
-      "norm_label": "select",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_text",
-      "label": "TEXT",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "MeetingViewModel",
-      "file_type": "code",
-      "norm_label": "text",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
-      "source_location": "L35"
+      "norm_label": "reconnecting",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
+      "source_location": "L12"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_meeting_meetingviewmodel",
@@ -10805,6 +10915,17 @@
       "source_location": ""
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_utils_constants",
+      "label": "Constants.kt",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "FirestoreRepository",
+      "file_type": "code",
+      "norm_label": "constants.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Constants.kt",
+      "source_location": "L1"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_api_realtime_peerchatclient",
       "label": "PeerChatClient.kt",
       "_origin": "ast",
@@ -10856,6 +10977,17 @@
       "community_name": "PeerChatClient",
       "file_type": "code",
       "norm_label": "message",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "request",
+      "label": "Request",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "PeerChatClient",
+      "file_type": "code",
+      "norm_label": "request",
       "source_file": "",
       "source_location": ""
     },
@@ -12223,6 +12355,17 @@
       "source_location": "L6"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_data_api_apiconfig",
+      "label": "ApiConfig.kt",
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "WebRtcSignalingClient",
+      "file_type": "code",
+      "norm_label": "apiconfig.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt",
+      "source_location": "L1"
+    },
+    {
       "id": "app_src_main_java_com_vastavik_computer_data_api_realtime_webrtcsignalingclient",
       "label": "WebRtcSignalingClient.kt",
       "_origin": "ast",
@@ -12274,17 +12417,6 @@
       "community_name": "WebRtcSignalingClient",
       "file_type": "code",
       "norm_label": "payloadjson",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "request",
-      "label": "Request",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "WebRtcSignalingClient",
-      "file_type": "code",
-      "norm_label": "request",
       "source_file": "",
       "source_location": ""
     },
@@ -12364,94 +12496,6 @@
       "norm_label": "requestbody",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen",
-      "label": "ChatScreen.kt",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "chatscreen.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_androidx",
-      "label": "androidx",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "androidx",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_color",
-      "label": "Color",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "color",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_com",
-      "label": "com",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "com",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_modifier",
-      "label": "Modifier",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "modifier",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_code",
-      "label": "CODE",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "code",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1336"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_divider",
-      "label": "DIVIDER",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "divider",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1337"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_text",
-      "label": "TEXT",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "PracticeScreen.kt",
-      "file_type": "code",
-      "norm_label": "text",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
-      "source_location": "L1335"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_practice_practicescreen",
@@ -12542,39 +12586,6 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen",
-      "label": "SettingsScreen.kt",
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "settingsscreen.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_kt_androidx",
-      "label": "androidx",
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "androidx",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_kt_imagevector",
-      "label": "ImageVector",
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "SettingsViewModel",
-      "file_type": "code",
-      "norm_label": "imagevector",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsviewmodel",
       "label": "SettingsViewModel.kt",
       "_origin": "ast",
@@ -12606,17 +12617,6 @@
       "norm_label": "viewmodel",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_data_api_apiconfig",
-      "label": "ApiConfig.kt",
-      "_origin": "ast",
-      "community": 54,
-      "community_name": "VastavikAiStreamer.kt",
-      "file_type": "code",
-      "norm_label": "apiconfig.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt",
-      "source_location": "L1"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_data_api_circuitbreaker",
@@ -12762,17 +12762,6 @@
       "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_auth_forgotpasswordscreen",
-      "label": "ForgotPasswordScreen.kt",
-      "_origin": "ast",
-      "community": 56,
-      "community_name": "neoShape",
-      "file_type": "code",
-      "norm_label": "forgotpasswordscreen.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/auth/ForgotPasswordScreen.kt",
-      "source_location": "L1"
-    },
-    {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_accountdeletedscreen",
       "label": "AccountDeletedScreen.kt",
       "_origin": "ast",
@@ -12803,17 +12792,6 @@
       "file_type": "code",
       "norm_label": "mynotesscreen.kt",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/MyNotesScreen.kt",
-      "source_location": "L1"
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
-      "label": "PaymentHistoryScreen.kt",
-      "_origin": "ast",
-      "community": 56,
-      "community_name": "neoShape",
-      "file_type": "code",
-      "norm_label": "paymenthistoryscreen.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
       "source_location": "L1"
     },
     {
@@ -13047,6 +13025,105 @@
       "source_location": "L60"
     },
     {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_arrow",
+      "label": "ARROW",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "arrow",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_ellipse",
+      "label": "ELLIPSE",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "ellipse",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_eraser",
+      "label": "ERASER",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "eraser",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_hand",
+      "label": "HAND",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "hand",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_line",
+      "label": "LINE",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "line",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_pen",
+      "label": "PEN",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "pen",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_rectangle",
+      "label": "RECTANGLE",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "rectangle",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_select",
+      "label": "SELECT",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "select",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_components_whiteboard_whiteboardtool_text",
+      "label": "TEXT",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "WhiteboardTool",
+      "file_type": "code",
+      "norm_label": "text",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt",
+      "source_location": "L35"
+    },
+    {
       "id": "android",
       "label": "android",
       "_origin": "ast",
@@ -13199,17 +13276,6 @@
       "norm_label": "stateflow",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_constants",
-      "label": "Constants.kt",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "AppUpdater",
-      "file_type": "code",
-      "norm_label": "constants.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Constants.kt",
-      "source_location": "L1"
     },
     {
       "id": "job",
@@ -13397,59 +13463,100 @@
       "source_location": ""
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_connected",
-      "label": "CONNECTED",
+      "id": "app_src_main_assets_release_notes_v1_0_30",
+      "label": "RELEASE_NOTES_v1.0.30.md",
       "_origin": "ast",
       "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "connected",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "release_notes_v1.0.30.md",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L1"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_connecting",
-      "label": "CONNECTING",
+      "id": "app_src_main_assets_release_notes_v1_0_30_1_razorpay_integration_complete_phonepe_direct_removal",
+      "label": "1. Razorpay Integration & Complete PhonePe Direct Removal",
       "_origin": "ast",
       "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "connecting",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. razorpay integration & complete phonepe direct removal",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L11"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_disconnected",
-      "label": "DISCONNECTED",
+      "id": "app_src_main_assets_release_notes_v1_0_30_2_official_tax_invoice_payment_receipt_pdf_generator",
+      "label": "2. Official Tax Invoice & Payment Receipt PDF Generator",
       "_origin": "ast",
       "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "disconnected",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. official tax invoice & payment receipt pdf generator",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L21"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_failed",
-      "label": "FAILED",
+      "id": "app_src_main_assets_release_notes_v1_0_30_3_ninja_samurai_celebration_mode",
+      "label": "3. Ninja Samurai Celebration Mode",
       "_origin": "ast",
       "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "failed",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "3. ninja samurai celebration mode",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L29"
     },
     {
-      "id": "app_src_main_java_com_vastavik_computer_data_realtime_meetingclient_connectionstate_reconnecting",
-      "label": "RECONNECTING",
+      "id": "app_src_main_assets_release_notes_v1_0_30_4_unrestricted_administrator_access",
+      "label": "4. Unrestricted Administrator Access",
       "_origin": "ast",
       "community": 64,
-      "community_name": "ConnectionState",
-      "file_type": "code",
-      "norm_label": "reconnecting",
-      "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt",
-      "source_location": "L12"
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "4. unrestricted administrator access",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L38"
+    },
+    {
+      "id": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "label": "\ud83d\ude80 Key Highlights in this Release",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83d\ude80 key highlights in this release",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L9"
+    },
+    {
+      "id": "app_src_main_assets_release_notes_v1_0_30_release_notes_vastavik_computers_v1_0_30",
+      "label": "Release Notes \u2014 Vastavik Computers v1.0.30",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "release notes \u2014 vastavik computers v1.0.30",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_assets_release_notes_v1_0_30_technical_details_artifacts",
+      "label": "\ud83d\udee0 Technical Details & Artifacts",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "\ud83d\ude80 Key Highlights in this Release",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "\ud83d\udee0 technical details & artifacts",
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L44"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_video_videolessonviewmodel",
@@ -13472,6 +13579,83 @@
       "norm_label": "viewmodel",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen",
+      "label": "SettingsScreen.kt",
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "settingsscreen.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_kt_androidx",
+      "label": "androidx",
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "androidx",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_settingsscreen_kt_imagevector",
+      "label": "ImageVector",
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "SettingsScreen",
+      "file_type": "code",
+      "norm_label": "imagevector",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_card",
+      "label": "CARD",
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "RazorpayPaymentMethod",
+      "file_type": "code",
+      "norm_label": "card",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L52"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_netbanking",
+      "label": "NETBANKING",
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "RazorpayPaymentMethod",
+      "file_type": "code",
+      "norm_label": "netbanking",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L53"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_upi_autopay",
+      "label": "UPI_AUTOPAY",
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "RazorpayPaymentMethod",
+      "file_type": "code",
+      "norm_label": "upi_autopay",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L50"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_upi_standard",
+      "label": "UPI_STANDARD",
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "RazorpayPaymentMethod",
+      "file_type": "code",
+      "norm_label": "upi_standard",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L51"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_screens_editor_codeeditorscreen",
@@ -13505,17 +13689,6 @@
       "norm_label": "color",
       "source_file": "",
       "source_location": ""
-    },
-    {
-      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service",
-      "label": "Judge0Service.kt",
-      "_origin": "ast",
-      "community": 69,
-      "community_name": "VastavikAi",
-      "file_type": "code",
-      "norm_label": "judge0service.kt",
-      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
-      "source_location": "L1"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_utils_vastavikai",
@@ -13604,6 +13777,17 @@
       "norm_label": "runtimeexception",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_utils_judge0service",
+      "label": "Judge0Service.kt",
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "Judge0Service",
+      "file_type": "code",
+      "norm_label": "judge0service.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt",
+      "source_location": "L1"
     },
     {
       "id": "app_src_main_java_com_vastavik_computer_ui_components_commoncomponents",
@@ -13738,17 +13922,6 @@
       "source_location": ""
     },
     {
-      "id": "keyboardtype",
-      "label": "KeyboardType",
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "CommonComponents.kt",
-      "file_type": "code",
-      "norm_label": "keyboardtype",
-      "source_file": "",
-      "source_location": ""
-    },
-    {
       "id": "visualtransformation",
       "label": "VisualTransformation",
       "_origin": "ast",
@@ -13764,7 +13937,7 @@
       "label": "StudentConversationManager.kt",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "studentconversationmanager.kt",
       "source_file": "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt",
@@ -13775,7 +13948,7 @@
       "label": "Context",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "context",
       "source_file": "",
@@ -13786,7 +13959,7 @@
       "label": "ListenerRegistration",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "listenerregistration",
       "source_file": "",
@@ -13797,7 +13970,7 @@
       "label": "Response",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "response",
       "source_file": "",
@@ -13808,7 +13981,7 @@
       "label": "StateFlow",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "stateflow",
       "source_file": "",
@@ -13819,11 +13992,99 @@
       "label": "WebSocket",
       "_origin": "ast",
       "community": 9,
-      "community_name": "StudentConversationManager",
+      "community_name": "ChatScreen.kt",
       "file_type": "code",
       "norm_label": "websocket",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen",
+      "label": "ChatScreen.kt",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "chatscreen.kt",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_androidx",
+      "label": "androidx",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "androidx",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_color",
+      "label": "Color",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "color",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_com",
+      "label": "com",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "com",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_kt_modifier",
+      "label": "Modifier",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "modifier",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_code",
+      "label": "CODE",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "code",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1336"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_divider",
+      "label": "DIVIDER",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "divider",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1337"
+    },
+    {
+      "id": "app_src_main_java_com_vastavik_computer_ui_screens_chat_chatscreen_segmenttype_text",
+      "label": "TEXT",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "ChatScreen.kt",
+      "file_type": "code",
+      "norm_label": "text",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt",
+      "source_location": "L1335"
     },
     {
       "id": "AdminDiagnosticsEngine",
@@ -14292,7 +14553,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L78",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -14304,7 +14565,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L118",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -14316,7 +14577,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L34",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -15517,6 +15778,18 @@
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/components/MeetingComponents.kt",
       "source_location": "L200",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay_ninjacelebrationoverlay",
+      "target": "canvas",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt",
+      "source_location": "L235",
       "weight": 1.0
     },
     {
@@ -16764,7 +17037,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/doubts/DoubtSolvingScreen.kt",
-      "source_location": "L172",
+      "source_location": "L164",
       "weight": 1.0
     },
     {
@@ -16776,7 +17049,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/doubts/DoubtSolvingScreen.kt",
-      "source_location": "L409",
+      "source_location": "L401",
       "weight": 1.0
     },
     {
@@ -17657,14 +17930,50 @@
     },
     {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_neoshapes_neoshape",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalcard",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L78",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L187",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalbordercolor",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryitem",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L57",
       "weight": 1.0
     },
     {
@@ -17676,7 +17985,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L407",
+      "source_location": "L884",
       "weight": 1.0
     },
     {
@@ -17688,43 +17997,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L409",
+      "source_location": "L886",
       "weight": 1.0
     },
     {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_brutalplancard",
+      "target": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay_ninjacelebrationoverlay",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L159",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalboxcard",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L311",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalbordercolor",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L40",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -17736,7 +18021,43 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L96",
+      "source_location": "L191",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_brutalplancard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L292",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalbordercolor",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalboxcard",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L732",
       "weight": 1.0
     },
     {
@@ -19840,6 +20161,18 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_generatereceipt",
+      "target": "paint",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_utils_resource_resource_fromresult",
       "target": "app_src_main_java_com_vastavik_computer_utils_resource_success",
       "relation": "calls",
@@ -21905,6 +22238,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_kt_context",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "android.content.Context"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_utils_telegramnotificationmanager",
       "target": "app_src_main_java_com_vastavik_computer_utils_telegramnotificationmanager_kt_context",
       "relation": "imports",
@@ -22115,6 +22463,36 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "canvas",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "android.graphics.Canvas"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_color",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "android.graphics.Color"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_quiz_quiztakingscreen",
       "target": "paint",
       "relation": "imports",
@@ -22126,6 +22504,21 @@
         "target_fqn": "android.graphics.Paint"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizTakingScreen.kt",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "paint",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "android.graphics.Paint"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
       "source_location": "L7",
       "weight": 1.0
     },
@@ -22232,6 +22625,21 @@
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/editor/OcrExerciseScreen.kt",
       "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay",
+      "target": "canvas",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "androidx.compose.foundation.Canvas"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -22606,7 +23014,7 @@
         "target_fqn": "androidx.compose.ui.graphics.Brush"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L20",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -23131,7 +23539,7 @@
         "target_fqn": "androidx.compose.ui.graphics.Color"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L15",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -23146,7 +23554,7 @@
         "target_fqn": "androidx.compose.ui.graphics.Color"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L21",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -23507,6 +23915,21 @@
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/auth/SignupScreen.kt",
       "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "keyboardtype",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "androidx.compose.ui.text.input.KeyboardType"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -25550,6 +25973,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay_ninjacelebrationoverlay",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.ui.components.NinjaCelebrationOverlay"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_home_homescreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_components_vastaviktopbar_vastaviktopbar",
       "relation": "imports",
@@ -26195,6 +26633,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalboxcard",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.ui.theme.BrutalBoxCard"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalboxcard",
       "relation": "imports",
@@ -26206,7 +26659,7 @@
         "target_fqn": "com.vastavik.computer.ui.theme.BrutalBoxCard"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L27",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -26255,6 +26708,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalcard",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.ui.theme.BrutalCard"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalcard",
       "relation": "imports",
@@ -26266,7 +26734,7 @@
         "target_fqn": "com.vastavik.computer.ui.theme.BrutalCard"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L28",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -26360,6 +26828,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutaldefaults",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.ui.theme.BrutalDefaults"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutaldefaults",
       "relation": "imports",
@@ -26371,7 +26854,7 @@
         "target_fqn": "com.vastavik.computer.ui.theme.BrutalDefaults"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L29",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
@@ -26431,7 +26914,7 @@
         "target_fqn": "com.vastavik.computer.ui.theme.NeoBrutalistColors"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L30",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -26552,21 +27035,6 @@
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/MyNotesScreen.kt",
       "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_color_vastavikcolors",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "com.vastavik.computer.ui.theme.VastavikColors"
-      },
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -27005,6 +27473,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalbordercolor",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.ui.theme.brutalBorderColor"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_brutalism_brutalbordercolor",
       "relation": "imports",
@@ -27016,7 +27499,7 @@
         "target_fqn": "com.vastavik.computer.ui.theme.brutalBorderColor"
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L31",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -27560,21 +28043,6 @@
       "weight": 1.0
     },
     {
-      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_neoshapes_neocircleshape",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "com.vastavik.computer.ui.theme.neoCircleShape"
-      },
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L21",
-      "weight": 1.0
-    },
-    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_searchresultsscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_neoshapes_neocircleshape",
       "relation": "imports",
@@ -27710,21 +28178,6 @@
       "weight": 1.0
     },
     {
-      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
-      "target": "app_src_main_java_com_vastavik_computer_ui_theme_neoshapes_neoshape",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "metadata": {
-        "target_fqn": "com.vastavik.computer.ui.theme.neoShape"
-      },
-      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_searchresultsscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_theme_neoshapes_neoshape",
       "relation": "imports",
@@ -27845,6 +28298,21 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_adminsession_adminsession",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.utils.AdminSession"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_notifications_appupdatescreen",
       "target": "app_src_main_java_com_vastavik_computer_utils_appupdater_appupdater",
       "relation": "imports",
@@ -27962,6 +28430,66 @@
       },
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/editor/CodeEditorScreen.kt",
       "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.utils.PaymentReceiptData"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.utils.PaymentReceiptData"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.utils.PaymentReceiptPdf"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "metadata": {
+        "target_fqn": "com.vastavik.computer.utils.PaymentReceiptPdf"
+      },
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -29530,7 +30058,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L77",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -29542,7 +30070,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L117",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -29554,7 +30082,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L33",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -32150,6 +32678,42 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_generatereceipt",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_kt_context",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_generatereceipt",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_openpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_kt_context",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L446",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_utils_resource_resource_fromresult",
       "target": "app_src_main_java_com_vastavik_computer_utils_resource_kt_result",
       "relation": "references",
@@ -34019,6 +34583,50 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_upi_autopay",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_upi_standard",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_card",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod_netbanking",
+      "relation": "case_of",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_practice_practicescreen_questionsource",
       "target": "app_src_main_java_com_vastavik_computer_ui_screens_practice_practicescreen_questionsource_ai",
       "relation": "case_of",
@@ -34411,6 +35019,83 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.29.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30",
+      "target": "app_src_main_assets_release_notes_v1_0_30_release_notes_vastavik_computers_v1_0_30",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "target": "app_src_main_assets_release_notes_v1_0_30_1_razorpay_integration_complete_phonepe_direct_removal",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "target": "app_src_main_assets_release_notes_v1_0_30_2_official_tax_invoice_payment_receipt_pdf_generator",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "target": "app_src_main_assets_release_notes_v1_0_30_3_ninja_samurai_celebration_mode",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "target": "app_src_main_assets_release_notes_v1_0_30_4_unrestricted_administrator_access",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_release_notes_vastavik_computers_v1_0_30",
+      "target": "app_src_main_assets_release_notes_v1_0_30_technical_details_artifacts",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_assets_release_notes_v1_0_30_release_notes_vastavik_computers_v1_0_30",
+      "target": "app_src_main_assets_release_notes_v1_0_30_key_highlights_in_this_release",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/assets/RELEASE_NOTES_v1.0.30.md",
       "source_location": "L9",
       "weight": 1.0
     },
@@ -35329,13 +36014,24 @@
     },
     {
       "source": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel",
+      "target": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionplan",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel",
       "target": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionmodel",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L51",
+      "source_location": "L60",
       "weight": 1.0
     },
     {
@@ -35347,17 +36043,6 @@
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
       "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel",
-      "target": "app_src_main_java_com_vastavik_computer_data_model_subscriptionmodel_subscriptionplan",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -35974,6 +36659,17 @@
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/ui/components/MeetingComponents.kt",
       "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay",
+      "target": "app_src_main_java_com_vastavik_computer_ui_components_ninjacelebrationoverlay_ninjacelebrationoverlay",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -36924,13 +37620,35 @@
     },
     {
       "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryitem",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen",
       "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymenthistoryscreen_paymenthistoryscreen",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt",
-      "source_location": "L23",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen",
+      "target": "app_src_main_java_com_vastavik_computer_ui_screens_onboarding_paymentscreen_razorpaypaymentmethod",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -36941,7 +37659,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L37",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -36952,7 +37670,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt",
-      "source_location": "L397",
+      "source_location": "L874",
       "weight": 1.0
     },
     {
@@ -38031,6 +38749,28 @@
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/utils/NotificationDismissReceiver.kt",
       "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptdata",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -39757,7 +40497,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L64",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -39768,7 +40508,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L106",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -39779,7 +40519,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt",
-      "source_location": "L20",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -42786,6 +43526,28 @@
       "weight": 1.0
     },
     {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_generatereceipt",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf",
+      "target": "app_src_main_java_com_vastavik_computer_utils_paymentreceiptpdf_paymentreceiptpdf_openpdf",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt",
+      "source_location": "L446",
+      "weight": 1.0
+    },
+    {
       "source": "app_src_main_java_com_vastavik_computer_utils_resource_resource",
       "target": "app_src_main_java_com_vastavik_computer_utils_resource_resource_getornull",
       "relation": "method",
@@ -43989,5 +44751,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "021caf26ce2e2e951e48a5efd7121a6f7309633d"
+  "built_at_commit": "6bc6e6e0f8761818484d658b256b355009cb6678"
 }
