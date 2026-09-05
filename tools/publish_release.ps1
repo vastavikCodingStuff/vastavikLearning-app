@@ -74,16 +74,30 @@ if (Test-Path $ApkPath) {
     }
 
     $uploadUrl = "https://uploads.github.com/repos/$repo/releases/$($release.id)/assets?name=$fileName"
-    $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $ApkPath).Path)
+    $resolvedPath = (Resolve-Path $ApkPath).Path
 
-    $uploadHeaders = @{
-        "Authorization" = "Bearer $Token"
-        "Accept"        = "application/vnd.github.v3+json"
-        "Content-Type"  = "application/vnd.android.package-archive"
-        "User-Agent"    = "PowerShell"
+    $curlAvailable = (Get-Command "curl.exe" -ErrorAction SilentlyContinue) -ne $null
+    if ($curlAvailable) {
+        Write-Host "Uploading asset via curl.exe..."
+        $curlOutput = & curl.exe --progress-bar -X POST `
+            -H "Authorization: Bearer $Token" `
+            -H "Accept: application/vnd.github.v3+json" `
+            -H "Content-Type: application/vnd.android.package-archive" `
+            --data-binary "@$resolvedPath" `
+            "$uploadUrl"
+        $asset = $curlOutput | ConvertFrom-Json
+    } else {
+        Write-Host "curl.exe not found, uploading via Invoke-RestMethod..."
+        $bytes = [System.IO.File]::ReadAllBytes($resolvedPath)
+        $uploadHeaders = @{
+            "Authorization" = "Bearer $Token"
+            "Accept"        = "application/vnd.github.v3+json"
+            "Content-Type"  = "application/vnd.android.package-archive"
+            "User-Agent"    = "PowerShell"
+        }
+        $asset = Invoke-RestMethod -Uri $uploadUrl -Headers $uploadHeaders -Method Post -Body $bytes -TimeoutSec 600
     }
 
-    $asset = Invoke-RestMethod -Uri $uploadUrl -Headers $uploadHeaders -Method Post -Body $bytes
     Write-Host "Asset uploaded successfully!"
     Write-Host "Asset Download URL: $($asset.browser_download_url)"
 } else {
