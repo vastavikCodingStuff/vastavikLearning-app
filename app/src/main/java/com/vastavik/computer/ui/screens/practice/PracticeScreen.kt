@@ -63,17 +63,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.vastavik.computer.utils.VastavikAi
 import com.vastavik.computer.utils.VastavikAiDiskCache
+import com.vastavik.computer.utils.OutputCheckResult
 
 private enum class QuestionSource(val label: String, val tagBg: Color, val tagText: Color) {
     AI("AI-Generated", Color(0xFF2563EB), Color.White),
     SIR("Sir-Generated", Color(0xFFF59E0B), Color(0xFF0F172A))
 }
-
-private data class OutputCheckResult(
-    val isCorrect: Boolean,
-    val actualOutput: String,
-    val explanation: String
-)
 
 private data class MCQItem(val title: String, val sub: String, val source: QuestionSource)
 private data class PredictOutputItem(val setNumber: Int, val title: String, val topic: String, val questionCount: String, val difficulty: String, val codeSnippet: String, val source: QuestionSource)
@@ -125,6 +120,36 @@ private fun highlightPracticeCode(code: String): AnnotatedString = buildAnnotate
             }
         }
         if (lineIdx < lines.lastIndex) append("\n")
+    }
+}
+
+private fun convertSnippetToLanguage(code: String, lang: String): String {
+    return when (lang) {
+        "Python" -> {
+            var py = code
+            py = py.replace(Regex("System\\.out\\.println\\((.*?)\\);"), "print($1)")
+            py = py.replace(Regex("System\\.out\\.print\\((.*?)\\);"), "print($1, end=\"\")")
+            py = py.replace("int ", "").replace("char ", "").replace("String ", "").replace("boolean ", "").replace("double ", "").replace("float ", "")
+            py = py.replace(";", "")
+            py = py.replace("{", "").replace("}", "")
+            py.trimIndent()
+        }
+        "C++" -> {
+            var cpp = code
+            cpp = cpp.replace(Regex("System\\.out\\.println\\((.*?)\\);"), "cout << $1 << endl;")
+            cpp = cpp.replace(Regex("System\\.out\\.print\\((.*?)\\);"), "cout << $1;")
+            cpp = cpp.replace("String", "string")
+            cpp = cpp.replace("boolean", "bool")
+            "#include <iostream>\nusing namespace std;\n\n$cpp"
+        }
+        "JavaScript" -> {
+            var js = code
+            js = js.replace(Regex("System\\.out\\.println\\((.*?)\\);"), "console.log($1);")
+            js = js.replace(Regex("System\\.out\\.print\\((.*?)\\);"), "process.stdout.write(String($1));")
+            js = js.replace(Regex("\\b(int|String|char|boolean|double|float)\\b"), "let")
+            js
+        }
+        else -> code
     }
 }
 
@@ -451,11 +476,15 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                     1 -> PredictOutputContent(
                         selectedSource = selectedSource,
                         onNavigate = onNavigate,
-                        onSolveSet = { item ->
+                        onOpenSingleItem = { item ->
                             activePredictOutputItem = item
                             studentPredictedOutput = ""
                             outputCheckResult = null
                             isCheckingOutput = false
+                        },
+                        onSolveSet = { item ->
+                            val encoded = Uri.encode(item.title, "UTF-8")
+                            onNavigate("predict_output_set/$encoded")
                         }
                     )
                     2 -> CodingContent(
@@ -719,7 +748,34 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         Button(
                             onClick = {
                                 val encoded = Uri.encode(rawCode, "UTF-8")
-                                val encodedQ = Uri.encode(item.title, "UTF-8")
+                                
+                                val explRegex = Regex("(?i)##\\s*Explanation\\s*\\n([\\s\\S]*?)(?=##|$)")
+                                val explMatch = explRegex.find(aiSolutionMarkdown)?.groupValues?.get(1)?.trim()
+                                
+                                val algoRegex = Regex("(?i)##\\s*Algorithm\\s*\\n([\\s\\S]*?)(?=##|$)")
+                                val algoMatch = algoRegex.find(aiSolutionMarkdown)?.groupValues?.get(1)?.trim()
+                                
+                                val structuredQ = buildString {
+                                    append("1. Question\n")
+                                    append("${item.title}\nWrite a complete and optimized solution in $selectedLanguage to solve this challenge.\n\n")
+                                    append("2. Explanation\n")
+                                    if (!explMatch.isNullOrBlank()) {
+                                        append(explMatch)
+                                    } else {
+                                        append("Understand the problem statement, factors, constraints, and algorithmic approach in $selectedLanguage.")
+                                    }
+                                    append("\n\n")
+                                    append("3. Input / Output\n")
+                                    append("Verify your program logic with representative inputs and expected outputs according to problem constraints.")
+                                    append("\n\n")
+                                    append("4. Algorithm\n")
+                                    if (!algoMatch.isNullOrBlank()) {
+                                        append(algoMatch)
+                                    } else {
+                                        append("1. Read inputs.\n2. Apply algorithmic logic and checks.\n3. Compute required state.\n4. Output result.")
+                                    }
+                                }
+                                val encodedQ = Uri.encode(structuredQ, "UTF-8")
                                 activeCodingItem = null
                                 onNavigate("code_editor?initialCode=$encoded&language=$selectedLanguage&question=$encodedQ")
                             },
@@ -742,6 +798,11 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
 
         // Interactive NeoBrutalistic "Predict the Output" Dialog
         activePredictOutputItem?.let { item ->
+            var dialogLanguage by remember(item) { mutableStateOf("Java") }
+            val activeSnippet = remember(item, dialogLanguage) {
+                convertSnippetToLanguage(item.codeSnippet, dialogLanguage)
+            }
+
             Dialog(
                 onDismissRequest = { activePredictOutputItem = null },
                 properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -820,6 +881,40 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                             }
 
                             Spacer(Modifier.height(10.dp))
+
+                            // Language Switcher Selector (Java, Python, C++, JavaScript)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                listOf("Java", "Python", "C++", "JavaScript").forEach { lang ->
+                                    val isLangSelected = dialogLanguage == lang
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(if (isLangSelected) Color(0xFF2563EB) else MaterialTheme.colorScheme.surface)
+                                            .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(8.dp))
+                                            .clickable {
+                                                if (dialogLanguage != lang) {
+                                                    dialogLanguage = lang
+                                                    outputCheckResult = null
+                                                }
+                                            }
+                                            .padding(horizontal = 10.dp, vertical = 5.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = lang,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isLangSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(Modifier.height(10.dp))
                             HorizontalDivider(thickness = 1.5.dp, color = bb.copy(alpha = 0.25f))
                             Spacer(Modifier.height(10.dp))
 
@@ -837,7 +932,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                 )
                                 Spacer(Modifier.height(4.dp))
                                 Text(
-                                    text = "Read the code snippet carefully and predict what console output will be produced.",
+                                    text = "Read the code snippet carefully and predict what console output will be produced in $dialogLanguage.",
                                     fontSize = 12.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -863,7 +958,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                                 Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(Color(0xFF10B981)))
                                             }
                                             Text(
-                                                "Code Tracing Preview",
+                                                "$dialogLanguage Code Snippet",
                                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                                 fontSize = 10.sp,
                                                 color = Color(0xFF94A3B8)
@@ -871,7 +966,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                         }
                                         Spacer(Modifier.height(8.dp))
                                         Text(
-                                            text = highlightPracticeCode(item.codeSnippet),
+                                            text = highlightPracticeCode(activeSnippet),
                                             fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                             fontSize = 12.sp,
                                             lineHeight = 18.sp
@@ -881,7 +976,7 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
 
                                 Spacer(Modifier.height(16.dp))
 
-                                // Student Output Input Box
+                                // Student Output Input Box (3 lines max)
                                 Text(
                                     "Your Predicted Output:",
                                     fontSize = 13.sp,
@@ -907,8 +1002,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                                     ),
-                                    minLines = 2,
-                                    maxLines = 5
+                                    minLines = 1,
+                                    maxLines = 3
                                 )
 
                                 Spacer(Modifier.height(14.dp))
@@ -927,15 +1022,16 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                                 try {
                                                     val prompt = """
 You are evaluating a student's answer for a 'Predict the Output' computer science question.
+Language: $dialogLanguage
 Topic: ${item.topic}
 Code:
-${item.codeSnippet}
+$activeSnippet
 
 Student's Predicted Output:
 $studentPredictedOutput
 
 Task:
-1. Determine the EXACT console output of running this code.
+1. Determine the EXACT console output of running this code in $dialogLanguage.
 2. Determine if the student's prediction matches the exact output (be forgiving of small trailing space or case differences if semantic output matches).
 3. Provide a clear, concise step-by-step trace of how the code executes.
 
@@ -947,7 +1043,7 @@ EXPLANATION:
 <concise step-by-step trace here>
 """.trimIndent()
                                                     val response = VastavikAi.chat(
-                                                        systemPrompt = "You are an expert computer science teacher evaluating code outputs accurately.",
+                                                        systemPrompt = "You are an expert computer science teacher evaluating code outputs accurately using Mistral Small.",
                                                         userPrompt = prompt,
                                                         temperature = 0.1
                                                     )
@@ -984,7 +1080,7 @@ EXPLANATION:
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                                             Spacer(Modifier.width(8.dp))
-                                            Text("Evaluating with Mistral AI...", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                            Text("Evaluating with Mistral Small AI...", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                         }
                                     } else {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1005,21 +1101,36 @@ EXPLANATION:
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Column(modifier = Modifier.padding(14.dp)) {
-                                            // Verdict Badge
+                                            // Verdict Badge with Big Bold Checkmark
                                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    if (res.isCorrect) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
-                                                    contentDescription = null,
-                                                    tint = if (res.isCorrect) Color(0xFF059669) else Color(0xFFDC2626),
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(Modifier.width(8.dp))
-                                                Text(
-                                                    text = if (res.isCorrect) "PERFECT MATCH! (CORRECT)" else "OUTPUT MISMATCH (INCORRECT)",
-                                                    fontWeight = FontWeight.Black,
-                                                    fontSize = 14.sp,
-                                                    color = if (res.isCorrect) Color(0xFF065F46) else Color(0xFF991B1B)
-                                                )
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(32.dp)
+                                                        .clip(CircleShape)
+                                                        .background(if (res.isCorrect) Color(0xFF059669) else Color(0xFFDC2626)),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        if (res.isCorrect) Icons.Filled.CheckCircle else Icons.Filled.Cancel,
+                                                        contentDescription = null,
+                                                        tint = Color.White,
+                                                        modifier = Modifier.size(22.dp)
+                                                    )
+                                                }
+                                                Spacer(Modifier.width(10.dp))
+                                                Column {
+                                                    Text(
+                                                        text = if (res.isCorrect) "✔ PERFECT MATCH! (CORRECT)" else "✖ OUTPUT MISMATCH (INCORRECT)",
+                                                        fontWeight = FontWeight.Black,
+                                                        fontSize = 14.sp,
+                                                        color = if (res.isCorrect) Color(0xFF065F46) else Color(0xFF991B1B)
+                                                    )
+                                                    Text(
+                                                        text = if (res.isCorrect) "Verified accurately by Mistral Small" else "Check the logic trace below",
+                                                        fontSize = 11.sp,
+                                                        color = Color(0xFF64748B)
+                                                    )
+                                                }
                                             }
 
                                             Spacer(Modifier.height(10.dp))
@@ -1051,6 +1162,44 @@ EXPLANATION:
                                         }
                                     }
                                 }
+
+                                Spacer(Modifier.height(16.dp))
+
+                                // NeoBrutalistic "Solve Full Multi-Question Set" Button
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp))
+                                        .clickable {
+                                            val encoded = Uri.encode(item.title, "UTF-8")
+                                            activePredictOutputItem = null
+                                            onNavigate("predict_output_set/$encoded")
+                                        },
+                                    color = Color(0xFFF59E0B),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color(0xFF0F172A), modifier = Modifier.size(18.dp))
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                "Solve Full Multi-Question Set",
+                                                fontWeight = FontWeight.Black,
+                                                fontSize = 13.sp,
+                                                color = Color(0xFF0F172A)
+                                            )
+                                        }
+                                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color(0xFF0F172A), modifier = Modifier.size(16.dp))
+                                    }
+                                }
+
                                 Spacer(Modifier.height(16.dp))
                             }
                         }
@@ -2415,6 +2564,7 @@ private fun MCQContent(
 private fun PredictOutputContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit,
+    onOpenSingleItem: ((PredictOutputItem) -> Unit)? = null,
     onSolveSet: (PredictOutputItem) -> Unit
 ) {
     val context = LocalContext.current
@@ -2540,6 +2690,7 @@ private fun PredictOutputContent(
             PredictOutputCard(
                 item = item,
                 onNavigate = onNavigate,
+                onOpenSingleItem = onOpenSingleItem,
                 onSolveSet = onSolveSet,
                 onDelete = if (item.source == QuestionSource.AI) {
                     { toDelete ->
@@ -2558,6 +2709,7 @@ private fun PredictOutputCard(
     item: PredictOutputItem,
     onNavigate: (String) -> Unit,
     onDelete: ((PredictOutputItem) -> Unit)? = null,
+    onOpenSingleItem: ((PredictOutputItem) -> Unit)? = null,
     onSolveSet: ((PredictOutputItem) -> Unit)? = null
 ) {
     val bb = brutalBorderColor()
@@ -2575,7 +2727,9 @@ private fun PredictOutputCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    if (onSolveSet != null) {
+                    if (onOpenSingleItem != null) {
+                        onOpenSingleItem(item)
+                    } else if (onSolveSet != null) {
                         onSolveSet(item)
                     } else {
                         val encoded = Uri.encode(item.title, "UTF-8")
@@ -2728,6 +2882,26 @@ private fun PredictOutputCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        if (onOpenSingleItem != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .defaultMinSize(minHeight = 28.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFFF59E0B).copy(alpha = 0.18f))
+                                    .border(BorderStroke(1.5.dp, Color(0xFFF59E0B)), RoundedCornerShape(8.dp))
+                                    .clickable { onOpenSingleItem(item) }
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color(0xFFB45309), modifier = Modifier.size(12.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Try Item", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB45309))
+                                }
+                            }
+                        }
+
                         Box(
                             modifier = Modifier
                                 .fillMaxHeight()
@@ -3012,7 +3186,19 @@ private fun CodingCard(
                     if (item.source == QuestionSource.AI) {
                         onOpenVastavikAi(item)
                     } else {
-                        val encodedQ = Uri.encode(item.title, "UTF-8")
+                        val structuredQ = buildString {
+                            append("1. Question\n")
+                            append("${item.title}\nTopic: ${item.topic} | Difficulty: ${item.difficulty}\nWrite a complete program in Java to solve this problem.\n\n")
+                            append("2. Explanation\n")
+                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs.")
+                            append("\n\n")
+                            append("3. Input / Output\n")
+                            append("Sample Input:\nRepresentative test case inputs.\n\nSample Output:\nExpected output according to problem specifications.")
+                            append("\n\n")
+                            append("4. Algorithm\n")
+                            append("1. Declare and initialize necessary variables.\n2. Read and parse inputs.\n3. Execute the algorithm logic step-by-step.\n4. Print the final computed output.")
+                        }
+                        val encodedQ = Uri.encode(structuredQ, "UTF-8")
                         onNavigate("code_editor?question=$encodedQ")
                     }
                 },
@@ -3139,7 +3325,19 @@ private fun CodingCard(
                                     },
                                     onClick = {
                                         menuOpen = false
-                                        val encodedQ = Uri.encode(item.title, "UTF-8")
+                                        val structuredQ = buildString {
+                                            append("1. Question\n")
+                                            append("${item.title}\nTopic: ${item.topic} | Difficulty: ${item.difficulty}\nWrite a complete program in Java to solve this problem.\n\n")
+                                            append("2. Explanation\n")
+                                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs.")
+                                            append("\n\n")
+                                            append("3. Input / Output\n")
+                                            append("Sample Input:\nRepresentative test case inputs.\n\nSample Output:\nExpected output according to problem specifications.")
+                                            append("\n\n")
+                                            append("4. Algorithm\n")
+                                            append("1. Declare and initialize necessary variables.\n2. Read and parse inputs.\n3. Execute the algorithm logic step-by-step.\n4. Print the final computed output.")
+                                        }
+                                        val encodedQ = Uri.encode(structuredQ, "UTF-8")
                                         onNavigate("code_editor?question=$encodedQ")
                                     }
                                 )
