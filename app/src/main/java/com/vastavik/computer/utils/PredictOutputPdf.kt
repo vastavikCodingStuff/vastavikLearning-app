@@ -170,17 +170,17 @@ object PredictOutputPdf {
             val codeBoxHeight = (codeLines.size * 13f) + 16f
 
             // Output comparison lines
-            val studentAnsLines = wrapPdfText("Student Answer: ${q.studentAnswer.ifBlank { "(no answer)" }}", if (q.isCorrect) correctPaint else wrongPaint, contentWidth)
-            val actualAnsLines = wrapPdfText("Actual Output: ${q.actualOutput}", bodyPaint, contentWidth)
+            val studentAnsLines = wrapPdfText("Your Answer: ${q.studentAnswer.ifBlank { "(no answer)" }}", if (q.isCorrect) correctPaint else wrongPaint, contentWidth)
+            val actualAnsLines = wrapPdfText("Correct Expected Output: ${q.actualOutput}", correctPaint, contentWidth)
 
-            // AI Explanation
+            // Step-by-step trace
             val cleanExp = q.explanation.replace("**", "").replace("*", "").replace("`", "").trim()
             val aiLines = if (cleanExp.isNotBlank()) wrapPdfText(cleanExp, aiTextPaint, contentWidth - 16f) else emptyList()
-            val aiBoxHeight = if (aiLines.isNotEmpty()) (aiLines.size * 13f) + 24f else 0f
+            val aiBoxHeight = if (aiLines.isNotEmpty()) (aiLines.size * 12.5f) + 24f else 0f
 
             val neededHeight = (qLines.size * 15f) + codeBoxHeight + (studentAnsLines.size * 14f) + (actualAnsLines.size * 14f) + aiBoxHeight + 24f
 
-            if (y + neededHeight > bottomMargin) {
+            if (y > 84f && y + neededHeight > bottomMargin) {
                 document.finishPage(page)
                 pageNumber++
                 val newPageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNumber).create()
@@ -214,22 +214,24 @@ object PredictOutputPdf {
                 y += 14f
             }
             for (aa in actualAnsLines) {
-                canvas.drawText(aa, leftMargin, y, bodyPaint)
+                canvas.drawText(aa, leftMargin, y, correctPaint)
                 y += 14f
             }
             y += 4f
 
-            // Draw AI Trace Box
+            // Draw Step-by-Step Trace Box
             if (aiLines.isNotEmpty()) {
                 val aiBoxTop = y
                 canvas.drawRect(leftMargin, aiBoxTop, rightMargin, aiBoxTop + aiBoxHeight, aiBoxBgPaint)
                 canvas.drawRect(leftMargin, aiBoxTop, rightMargin, aiBoxTop + aiBoxHeight, aiBoxBorderPaint)
                 var aiY = aiBoxTop + 13f
-                canvas.drawText("Mistral AI Step-by-Step Code Trace:", leftMargin + 8f, aiY, aiHeaderPaint)
+                canvas.drawText("Step-by-Step Line, Function & Types Trace:", leftMargin + 8f, aiY, aiHeaderPaint)
                 aiY += 14f
                 for (line in aiLines) {
-                    canvas.drawText(line, leftMargin + 8f, aiY, aiTextPaint)
-                    aiY += 13f
+                    if (line.isNotEmpty()) {
+                        canvas.drawText(line, leftMargin + 8f, aiY, aiTextPaint)
+                    }
+                    aiY += 12.5f
                 }
                 y += aiBoxHeight + 8f
             }
@@ -269,6 +271,10 @@ object PredictOutputPdf {
         val result = mutableListOf<String>()
         val lines = text.split("\n")
         for (line in lines) {
+            if (line.trim().isEmpty()) {
+                result.add("")
+                continue
+            }
             val words = line.split(" ")
             var current = ""
             for (w in words) {

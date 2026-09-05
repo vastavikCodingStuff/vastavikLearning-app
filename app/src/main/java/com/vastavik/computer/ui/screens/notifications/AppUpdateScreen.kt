@@ -241,7 +241,12 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                 downloading = false
                 if (file != null && AppUpdater.hasUsableApk(context, version)) {
                     downloadCompleted = true
-                    AppUpdater.cancelDownloadNotification(context)
+                    AppUpdater.postDownloadCompletedNotification(
+                        context,
+                        version,
+                        updateInfo.releaseTitle.ifBlank { "Vastavik Computers" },
+                        file.length()
+                    )
                     if (!AppUpdater.canRequestPackageInstalls(context)) {
                         showPermissionDialog = true
                     } else {
@@ -565,38 +570,43 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                         )
 
                                         if (downloading) {
+                                            val isDone = downloadProgress >= 1f || downloadCompleted
+                                            val cleanVersion = updateInfo.latestVersion.trim().removePrefix("v").removePrefix("V")
                                             Spacer(Modifier.height(16.dp))
                                             Column(modifier = Modifier.fillMaxWidth()) {
                                                 Row(
                                                     modifier = Modifier.fillMaxWidth(),
-                                                    horizontalArrangement = Arrangement.SpaceBetween
-                                                ) {
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                 ) {
                                                     Text(
-                                                        "Downloading APK… ${(downloadProgress * 100).toInt()}%",
+                                                        if (isDone) "Done downloading Vastavik v$cleanVersion Update" else "Downloading APK… ${(downloadProgress * 100).toInt()}%",
                                                         fontSize = 12.sp,
                                                         fontWeight = FontWeight.Bold,
-                                                        color = Color(0xFF2563EB)
+                                                        color = if (isDone) Color(0xFF10B981) else Color(0xFF2563EB)
                                                     )
                                                     if (totalBytes > 0) {
                                                         val currentMb = downloadedBytes.toDouble() / (1024 * 1024)
                                                         val totalMb = totalBytes.toDouble() / (1024 * 1024)
                                                         Text(
-                                                            "%.1f / %.1f MB".format(currentMb, totalMb),
-                                                            fontSize = 11.sp,
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                        )
+                                                             "%.1f / %.1f MB".format(currentMb, totalMb),
+                                                             fontSize = 11.sp,
+                                                             color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                         )
                                                     }
                                                 }
-                                                Spacer(Modifier.height(6.dp))
-                                                LinearProgressIndicator(
-                                                    progress = { downloadProgress },
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .height(8.dp)
-                                                        .clip(RoundedCornerShape(4.dp)),
-                                                    color = Color(0xFF2563EB),
-                                                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                                                )
+                                                if (!isDone) {
+                                                    Spacer(Modifier.height(6.dp))
+                                                    LinearProgressIndicator(
+                                                         progress = { downloadProgress },
+                                                         modifier = Modifier
+                                                             .fillMaxWidth()
+                                                             .height(8.dp)
+                                                             .clip(RoundedCornerShape(4.dp)),
+                                                         color = Color(0xFF2563EB),
+                                                         trackColor = MaterialTheme.colorScheme.surfaceVariant
+                                                     )
+                                                }
                                             }
                                         }
                                     }
@@ -664,33 +674,68 @@ fun AppUpdateScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = { onNavig
                                     Text("Later", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                 }
                             } else {
-                                // Cancel Button while downloading
+                                val isDone = downloadProgress >= 1f || downloadCompleted
                                 Spacer(Modifier.height(20.dp))
-                                OutlinedButton(
-                                    onClick = onCancelDownload,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(50.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.5.dp, bb),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        contentColor = Color(0xFFEF4444)
-                                    )
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Close,
-                                        contentDescription = null,
-                                        tint = Color(0xFFEF4444),
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        "Cancel Download",
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 15.sp,
-                                        color = Color(0xFFEF4444)
-                                    )
+                                if (isDone) {
+                                    Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .offset(x = 3.dp, y = 3.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(bs)
+                                        )
+                                        Button(
+                                            onClick = onUpdateClick,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(50.dp),
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
+                                            border = BorderStroke(1.5.dp, bb)
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.InstallMobile,
+                                                contentDescription = null,
+                                                tint = Color.White,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                "Install Now",
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 15.sp,
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    OutlinedButton(
+                                        onClick = onCancelDownload,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(50.dp),
+                                        shape = RoundedCornerShape(12.dp),
+                                        border = BorderStroke(1.5.dp, bb),
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                            contentColor = Color(0xFFEF4444)
+                                        )
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Close,
+                                            contentDescription = null,
+                                            tint = Color(0xFFEF4444),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(
+                                            "Cancel Download",
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 15.sp,
+                                            color = Color(0xFFEF4444)
+                                        )
+                                    }
                                 }
                             }
                         } else {

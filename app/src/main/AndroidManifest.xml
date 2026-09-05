@@ -102,6 +102,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.vastavik.computer.action.CANCEL_DOWNLOAD" />
+                <action android:name="com.vastavik.computer.action.INSTALL_DOWNLOAD" />
             </intent-filter>
         </receiver>
 

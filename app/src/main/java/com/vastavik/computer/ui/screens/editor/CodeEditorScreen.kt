@@ -49,6 +49,69 @@ import kotlinx.coroutines.launch
 
 private val mono = FontFamily.Monospace
 
+/**
+ * In-memory shared state holder to reliably transfer code, language, and structured questions
+ * between screens (Practice, PYQ, Chat, etc.) without hitting URL route limits or escaping issues.
+ */
+object CodeEditorSharedState {
+    var activeCode: String = ""
+    var activeLanguage: String = ""
+    var activeQuestion: String = ""
+
+    fun set(code: String = "", language: String = "", question: String = "") {
+        activeCode = code
+        activeLanguage = language
+        activeQuestion = question
+    }
+
+    fun clear() {
+        activeCode = ""
+        activeLanguage = ""
+        activeQuestion = ""
+    }
+}
+
+/**
+ * Intelligently derives a problem title and 4-part structured question from source code
+ * comments, class names, or function names if question was not explicitly provided.
+ */
+fun deriveQuestionFromCode(code: String, lang: String): String {
+    if (code.isBlank()) return ""
+    val commentRegex = Regex("(?m)^\\s*//\\s*(?:Declare the main public class for\\s+)?([A-Za-z0-9 ]+)")
+    val commentTitle = commentRegex.find(code)?.groupValues?.get(1)?.trim()
+
+    val classRegex = Regex("(?:public\\s+)?class\\s+([A-Za-z0-9_]+)")
+    val classMatch = classRegex.find(code)?.groupValues?.get(1)?.trim()
+
+    val funcRegex = Regex("(?:def|function)\\s+([A-Za-z0-9_]+)")
+    val funcMatch = funcRegex.find(code)?.groupValues?.get(1)?.trim()
+
+    val rawTitle = when {
+        !commentTitle.isNullOrBlank() && commentTitle.length < 50 && !commentTitle.equals("Main", true) -> commentTitle
+        !classMatch.isNullOrBlank() && !classMatch.equals("Main", true) && !classMatch.equals("Solution", true) -> {
+            classMatch.replace(Regex("([a-z])([A-Z])"), "$1 $2").replace('_', ' ').trim()
+        }
+        !funcMatch.isNullOrBlank() && !funcMatch.equals("solve", true) && !funcMatch.equals("main", true) -> {
+            funcMatch.replace(Regex("([a-z])([A-Z])"), "$1 $2").replace('_', ' ').trim()
+        }
+        else -> ""
+    }
+
+    if (rawTitle.isNotBlank()) {
+        return buildString {
+            append("1. Question\n")
+            append("$rawTitle\nWrite a complete and optimized solution in $lang to solve this challenge.\n\n")
+            append("2. Explanation\n")
+            append("Analyze the problem requirements carefully. Identify core logic, algorithmic approach, and constraints for $rawTitle in $lang.\n\n")
+            append("3. Input / Output\n")
+            append("Sample Input:\nRepresentative test case inputs for $rawTitle.\n\nSample Output:\nExpected console output according to problem constraints.\n\n")
+            append("4. Algorithm\n")
+            append("1. Initialize required variables.\n2. Read and parse inputs from standard input.\n3. Execute core logic and checks.\n4. Output the final computed result.")
+        }
+    }
+    return ""
+}
+
 private object SyntaxColors {
     val keyword = Color(0xFFC586C0)   // purple
     val string = Color(0xFFCE9178)    // orange
@@ -150,16 +213,26 @@ private fun highlightCode(code: String, language: String) = buildAnnotatedString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, onBack: () -> Unit = {}, initialCode: String = "", initialLanguage: String = "Python", @Suppress("UNUSED_PARAMETER") initialQuestion: String = "") {
-    var language by remember { mutableStateOf(initialLanguage.ifBlank { "Python" }) }
-    var code by remember { mutableStateOf(initialCode.ifBlank { defaultCode(language) }) }
+fun CodeEditorScreen(
+    @Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit,
+    onBack: () -> Unit = {},
+    initialCode: String = "",
+    initialLanguage: String = "Python",
+    initialQuestion: String = ""
+) {
+    val effectiveInitLang = CodeEditorSharedState.activeLanguage.ifBlank { initialLanguage }.ifBlank { "Python" }
+    val effectiveInitCode = CodeEditorSharedState.activeCode.ifBlank { initialCode }.ifBlank { defaultCode(effectiveInitLang) }
+    val effectiveInitQuestion = CodeEditorSharedState.activeQuestion.ifBlank { initialQuestion }
+
+    var language by remember(effectiveInitLang) { mutableStateOf(effectiveInitLang) }
+    var code by remember(effectiveInitCode) { mutableStateOf(effectiveInitCode) }
     var output by remember { mutableStateOf("") }
     var stdin by remember { mutableStateOf("") }
     var isRunning by remember { mutableStateOf(false) }
     var isSuccess by remember { mutableStateOf(true) }
     var executionMeta by remember { mutableStateOf("") }
-    var question by remember { mutableStateOf(initialQuestion) }
-    var showQuestion by remember { mutableStateOf(initialQuestion.isNotBlank()) }
+    var question by remember(effectiveInitQuestion) { mutableStateOf(effectiveInitQuestion) }
+    var showQuestion by remember { mutableStateOf(false) }
     var isWordWrap by remember { mutableStateOf(false) }
     var aiPromptText by remember { mutableStateOf("") }
     var isGeneratingAiQuestion by remember { mutableStateOf(false) }
@@ -240,7 +313,30 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
         }
     }
 
-    LaunchedEffect(initialQuestion) {
+    LaunchedEffect(initialCode, initialQuestion, initialLanguage) {
+        if (CodeEditorSharedState.activeCode.isNotBlank()) {
+            code = CodeEditorSharedState.activeCode
+        } else if (initialCode.isNotBlank()) {
+            code = initialCode
+        }
+
+        if (CodeEditorSharedState.activeLanguage.isNotBlank()) {
+            language = CodeEditorSharedState.activeLanguage
+        } else if (initialLanguage.isNotBlank()) {
+            language = initialLanguage
+        }
+
+        if (CodeEditorSharedState.activeQuestion.isNotBlank()) {
+            question = CodeEditorSharedState.activeQuestion
+        } else if (initialQuestion.isNotBlank()) {
+            question = initialQuestion
+        } else if (question.isBlank()) {
+            val derived = deriveQuestionFromCode(code, language)
+            if (derived.isNotBlank()) {
+                question = derived
+            }
+        }
+
         if (question.isNotBlank()) {
             val sections = parseProblemSections(question)
             if (sections.size < 2) {
@@ -271,19 +367,20 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                 title = { Text("Code Editor", fontWeight = FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = { onBack() }) { Icon(Icons.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
-                    // Question Icon - Gray when empty with Toast feedback, active when question present
-                    val hasQuestion = question.isNotBlank()
+                    // Question Icon - Always active and toggles dialog, auto-derives from code if blank
                     IconButton(onClick = {
-                        if (!hasQuestion) {
-                            Toast.makeText(context, "Question isn't available over here!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            showQuestion = !showQuestion
+                        if (question.isBlank()) {
+                            val derived = deriveQuestionFromCode(code, language)
+                            if (derived.isNotBlank()) {
+                                question = derived
+                            }
                         }
+                        showQuestion = !showQuestion
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.Help,
                             contentDescription = "View question",
-                            tint = if (!hasQuestion) Color.Gray else if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            tint = if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     var expanded by remember { mutableStateOf(false) }
@@ -542,7 +639,7 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                 ) {
                                     if (parsedSections.isEmpty()) {
                                         Text(
-                                            text = "No question specified yet. Type a topic below to generate a complete challenge with Mistral AI!",
+                                            text = "No question specified yet. Type a topic below to generate a complete challenge with Vastavik AI!",
                                             fontSize = 14.sp,
                                             lineHeight = 21.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -604,7 +701,7 @@ fun CodeEditorScreen(@Suppress("UNUSED_PARAMETER") onNavigate: (String)->Unit, o
                                                 )
                                                 Spacer(Modifier.width(10.dp))
                                                 Text(
-                                                    "Enriching 4-part breakdown (Explanation, I/O, Algorithm) with Mistral AI...",
+                                                    "Enriching 4-part breakdown (Explanation, I/O, Algorithm) with Vastavik AI...",
                                                     fontSize = 11.5.sp,
                                                     fontWeight = FontWeight.SemiBold,
                                                     color = Color(0xFF1D4ED8)

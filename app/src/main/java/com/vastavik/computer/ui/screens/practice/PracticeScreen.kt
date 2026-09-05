@@ -476,12 +476,6 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                     1 -> PredictOutputContent(
                         selectedSource = selectedSource,
                         onNavigate = onNavigate,
-                        onOpenSingleItem = { item ->
-                            activePredictOutputItem = item
-                            studentPredictedOutput = ""
-                            outputCheckResult = null
-                            isCheckingOutput = false
-                        },
                         onSolveSet = { item ->
                             val encoded = Uri.encode(item.title, "UTF-8")
                             onNavigate("predict_output_set/$encoded")
@@ -747,26 +741,28 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         // Open in Editor Button
                         Button(
                             onClick = {
-                                val encoded = Uri.encode(rawCode, "UTF-8")
-                                
-                                val explRegex = Regex("(?i)##\\s*Explanation\\s*\\n([\\s\\S]*?)(?=##|$)")
-                                val explMatch = explRegex.find(aiSolutionMarkdown)?.groupValues?.get(1)?.trim()
-                                
-                                val algoRegex = Regex("(?i)##\\s*Algorithm\\s*\\n([\\s\\S]*?)(?=##|$)")
-                                val algoMatch = algoRegex.find(aiSolutionMarkdown)?.groupValues?.get(1)?.trim()
-                                
+                                val explMatch = extractSectionFromMarkdown(aiSolutionMarkdown, "Explanation")
+                                val algoMatch = extractSectionFromMarkdown(aiSolutionMarkdown, "Algorithm")
+                                val ioMatch = extractSectionFromMarkdown(aiSolutionMarkdown, "Input")
+                                    ?: extractSectionFromMarkdown(aiSolutionMarkdown, "Sample")
+                                    ?: extractSectionFromMarkdown(aiSolutionMarkdown, "Test")
+
                                 val structuredQ = buildString {
                                     append("1. Question\n")
-                                    append("${item.title}\nWrite a complete and optimized solution in $selectedLanguage to solve this challenge.\n\n")
+                                    append("${item.title}\nTopic: ${item.topic} | Difficulty: ${item.difficulty}\nWrite a complete and optimized solution in $selectedLanguage to solve this challenge.\n\n")
                                     append("2. Explanation\n")
                                     if (!explMatch.isNullOrBlank()) {
                                         append(explMatch)
                                     } else {
-                                        append("Understand the problem statement, factors, constraints, and algorithmic approach in $selectedLanguage.")
+                                        append("Understand the problem statement, factors, constraints, and algorithmic approach for ${item.title} in $selectedLanguage.")
                                     }
                                     append("\n\n")
                                     append("3. Input / Output\n")
-                                    append("Verify your program logic with representative inputs and expected outputs according to problem constraints.")
+                                    if (!ioMatch.isNullOrBlank()) {
+                                        append(ioMatch)
+                                    } else {
+                                        append("Sample Input:\nRepresentative test case inputs for ${item.title}.\n\nSample Output:\nExpected output according to problem constraints.")
+                                    }
                                     append("\n\n")
                                     append("4. Algorithm\n")
                                     if (!algoMatch.isNullOrBlank()) {
@@ -775,7 +771,15 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                                         append("1. Read inputs.\n2. Apply algorithmic logic and checks.\n3. Compute required state.\n4. Output result.")
                                     }
                                 }
-                                val encodedQ = Uri.encode(structuredQ, "UTF-8")
+
+                                com.vastavik.computer.ui.screens.editor.CodeEditorSharedState.set(
+                                    code = rawCode,
+                                    language = selectedLanguage,
+                                    question = structuredQ
+                                )
+
+                                val encoded = try { Uri.encode(rawCode) } catch (_: Exception) { "" }
+                                val encodedQ = try { Uri.encode(structuredQ) } catch (_: Exception) { "" }
                                 activeCodingItem = null
                                 onNavigate("code_editor?initialCode=$encoded&language=$selectedLanguage&question=$encodedQ")
                             },
@@ -2564,7 +2568,6 @@ private fun MCQContent(
 private fun PredictOutputContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit,
-    onOpenSingleItem: ((PredictOutputItem) -> Unit)? = null,
     onSolveSet: (PredictOutputItem) -> Unit
 ) {
     val context = LocalContext.current
@@ -2690,7 +2693,6 @@ private fun PredictOutputContent(
             PredictOutputCard(
                 item = item,
                 onNavigate = onNavigate,
-                onOpenSingleItem = onOpenSingleItem,
                 onSolveSet = onSolveSet,
                 onDelete = if (item.source == QuestionSource.AI) {
                     { toDelete ->
@@ -2709,7 +2711,6 @@ private fun PredictOutputCard(
     item: PredictOutputItem,
     onNavigate: (String) -> Unit,
     onDelete: ((PredictOutputItem) -> Unit)? = null,
-    onOpenSingleItem: ((PredictOutputItem) -> Unit)? = null,
     onSolveSet: ((PredictOutputItem) -> Unit)? = null
 ) {
     val bb = brutalBorderColor()
@@ -2727,13 +2728,11 @@ private fun PredictOutputCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    if (onOpenSingleItem != null) {
-                        onOpenSingleItem(item)
-                    } else if (onSolveSet != null) {
+                    if (onSolveSet != null) {
                         onSolveSet(item)
                     } else {
                         val encoded = Uri.encode(item.title, "UTF-8")
-                        onNavigate("quiz_setup/$encoded")
+                        onNavigate("predict_output_set/$encoded")
                     }
                 },
             shape = RoundedCornerShape(16.dp),
@@ -2882,26 +2881,6 @@ private fun PredictOutputCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (onOpenSingleItem != null) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .defaultMinSize(minHeight = 28.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFFF59E0B).copy(alpha = 0.18f))
-                                    .border(BorderStroke(1.5.dp, Color(0xFFF59E0B)), RoundedCornerShape(8.dp))
-                                    .clickable { onOpenSingleItem(item) }
-                                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Color(0xFFB45309), modifier = Modifier.size(12.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Try Item", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFB45309))
-                                }
-                            }
-                        }
-
                         Box(
                             modifier = Modifier
                                 .fillMaxHeight()
@@ -2914,7 +2893,7 @@ private fun PredictOutputCard(
                                         onSolveSet(item)
                                     } else {
                                         val encoded = Uri.encode(item.title, "UTF-8")
-                                        onNavigate("quiz_setup/$encoded")
+                                        onNavigate("predict_output_set/$encoded")
                                     }
                                 }
                                 .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -3190,15 +3169,20 @@ private fun CodingCard(
                             append("1. Question\n")
                             append("${item.title}\nTopic: ${item.topic} | Difficulty: ${item.difficulty}\nWrite a complete program in Java to solve this problem.\n\n")
                             append("2. Explanation\n")
-                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs.")
+                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs for ${item.title}.")
                             append("\n\n")
                             append("3. Input / Output\n")
-                            append("Sample Input:\nRepresentative test case inputs.\n\nSample Output:\nExpected output according to problem specifications.")
+                            append("Sample Input:\nRepresentative test case inputs for ${item.title}.\n\nSample Output:\nExpected output according to problem specifications.")
                             append("\n\n")
                             append("4. Algorithm\n")
                             append("1. Declare and initialize necessary variables.\n2. Read and parse inputs.\n3. Execute the algorithm logic step-by-step.\n4. Print the final computed output.")
                         }
-                        val encodedQ = Uri.encode(structuredQ, "UTF-8")
+                        com.vastavik.computer.ui.screens.editor.CodeEditorSharedState.set(
+                            code = "",
+                            language = "Java",
+                            question = structuredQ
+                        )
+                        val encodedQ = try { Uri.encode(structuredQ) } catch (_: Exception) { "" }
                         onNavigate("code_editor?question=$encodedQ")
                     }
                 },
@@ -3329,15 +3313,20 @@ private fun CodingCard(
                                             append("1. Question\n")
                                             append("${item.title}\nTopic: ${item.topic} | Difficulty: ${item.difficulty}\nWrite a complete program in Java to solve this problem.\n\n")
                                             append("2. Explanation\n")
-                                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs.")
+                                            append("Analyze the problem requirements carefully. Identify input formats, constraints, edge cases, and time/space complexity trade-offs for ${item.title}.")
                                             append("\n\n")
                                             append("3. Input / Output\n")
-                                            append("Sample Input:\nRepresentative test case inputs.\n\nSample Output:\nExpected output according to problem specifications.")
+                                            append("Sample Input:\nRepresentative test case inputs for ${item.title}.\n\nSample Output:\nExpected output according to problem specifications.")
                                             append("\n\n")
                                             append("4. Algorithm\n")
                                             append("1. Declare and initialize necessary variables.\n2. Read and parse inputs.\n3. Execute the algorithm logic step-by-step.\n4. Print the final computed output.")
                                         }
-                                        val encodedQ = Uri.encode(structuredQ, "UTF-8")
+                                        com.vastavik.computer.ui.screens.editor.CodeEditorSharedState.set(
+                                            code = "",
+                                            language = "Java",
+                                            question = structuredQ
+                                        )
+                                        val encodedQ = try { Uri.encode(structuredQ) } catch (_: Exception) { "" }
                                         onNavigate("code_editor?question=$encodedQ")
                                     }
                                 )
@@ -3698,8 +3687,15 @@ private suspend fun callVastavikAiGenerateCode(
     }
 }
 
+private fun extractSectionFromMarkdown(markdown: String, sectionName: String): String? {
+    if (markdown.isBlank()) return null
+    val regex = Regex("(?im)^[#*\\s]*(?:\\d+\\.\\s*)?$sectionName[:*\\s]*\\r?\\n([\\s\\S]*?)(?=(?:^[#*\\s]*(?:\\d+\\.\\s*)?(?:Explanation|Algorithm|Code|Complexity|Input|Output|Sample|Test)[:*\\s]*\\r?\\n)|\\z)")
+    val match = regex.find(markdown)?.groupValues?.get(1)?.trim()
+    return if (!match.isNullOrBlank()) match else null
+}
+
 private fun extractCodeFromMarkdown(markdown: String): String {
-    val regex = Regex("```(?:[a-zA-Z0-9+#]+)?\\n([\\s\\S]*?)```")
+    val regex = Regex("```(?:[a-zA-Z0-9+#]+)?\\r?\\n([\\s\\S]*?)```")
     val match = regex.find(markdown)
     return match?.groupValues?.get(1)?.trim() ?: markdown
 }

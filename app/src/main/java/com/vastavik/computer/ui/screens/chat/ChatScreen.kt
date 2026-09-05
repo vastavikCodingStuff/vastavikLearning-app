@@ -16,6 +16,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import com.vastavik.computer.ui.theme.RobotoSlabFontFamily
 import java.util.UUID
+import com.vastavik.computer.ui.screens.editor.CodeEditorSharedState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -1426,7 +1427,12 @@ fun ParsedMarkdownText(text: String, modifier: Modifier = Modifier, onNavigate: 
                         val filename = "code.$ext"
                         Surface(
                             onClick = {
-                                val encoded = Uri.encode(seg.content, "UTF-8")
+                                CodeEditorSharedState.set(
+                                    code = seg.content,
+                                    language = seg.language,
+                                    question = ""
+                                )
+                                val encoded = try { Uri.encode(seg.content) } catch (_: Exception) { "" }
                                 onNavigate("code_editor?initialCode=$encoded&language=${seg.language}")
                             },
                             shape = RoundedCornerShape(10.dp),

@@ -33,6 +33,7 @@ import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.utils.VastavikAi
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
+import com.vastavik.computer.ui.screens.editor.CodeEditorSharedState
 
 data class PyqItem(
     val id: String,
@@ -695,6 +696,11 @@ fun PYQScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                 }
                                 Button(
                                     onClick = {
+                                        CodeEditorSharedState.set(
+                                            code = pyq.solution,
+                                            language = pyq.language,
+                                            question = pyq.questionText
+                                        )
                                         val encodedQ = try { URLEncoder.encode(pyq.questionText, "UTF-8") } catch (_: Exception) { "" }
                                         val encodedCode = try { URLEncoder.encode(pyq.solution, "UTF-8") } catch (_: Exception) { "" }
                                         selectedPyqForDialog = null

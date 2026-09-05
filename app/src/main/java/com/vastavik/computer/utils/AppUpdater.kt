@@ -737,7 +737,10 @@ object AppUpdater {
         ensureDownloadChannel(context)
         val channelId = "vastavik_app_downloads"
         val percent = (progressFloat * 100).toInt().coerceIn(0, 100)
-        val indeterminate = totalBytes <= 0
+        val isCompleted = percent >= 100 || (totalBytes > 0 && bytesRead >= totalBytes)
+        val indeterminate = totalBytes <= 0 && !isCompleted
+        val cleanVersion = version.trim().removePrefix("v").removePrefix("V")
+
         val sizeStr = if (totalBytes > 0) {
             val cur = bytesRead.toDouble() / (1024.0 * 1024.0)
             val tot = totalBytes.toDouble() / (1024.0 * 1024.0)
@@ -746,48 +749,81 @@ object AppUpdater {
             String.format(java.util.Locale.US, "%.1f MB downloaded", bytesRead.toDouble() / (1024.0 * 1024.0))
         }
 
-        val openIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("navigate_to", "app_update")
-        }
         val openPiFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         } else {
             PendingIntent.FLAG_UPDATE_CURRENT
         }
+
+        val openIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("navigate_to", "app_update")
+        }
         val openPi = PendingIntent.getActivity(context, 2003, openIntent, openPiFlags)
 
-        val cancelIntent = Intent(context, DownloadProgressReceiver::class.java).apply {
-            action = DownloadProgressReceiver.ACTION_CANCEL
-            putExtra(EXTRA_DOWNLOAD_VERSION, version)
-        }
-        val cancelPi = PendingIntent.getBroadcast(
-            context,
-            2004,
-            cancelIntent,
-            openPiFlags
-        )
-
-        val cleanVersion = version.trim().removePrefix("v").removePrefix("V")
         val appIconBitmap = getAppIconBitmap(context)
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Downloading Vastavik v$cleanVersion Update")
-            .setContentText("$percent% • $sizeStr")
             .setSubText(title)
-            .setProgress(100, percent, indeterminate)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setContentIntent(openPi)
-            .addAction(
+
+        if (isCompleted) {
+            // Once 100% is reached:
+            // "once you have reached 100 download the Text should Done downloading Vastavikv1.0.31 Update and after it there should be no progresss bar please remove it just add the Install Now button over there in place of cancel over here right now!!"
+            builder.setContentTitle("Done downloading Vastavik v$cleanVersion Update")
+            builder.setContentText(if (totalBytes > 0) "$sizeStr • Ready to install" else "Update downloaded • Ready to install")
+            // No progress bar
+            builder.setProgress(0, 0, false)
+            builder.setOngoing(false)
+            builder.setAutoCancel(true)
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+
+            val installIntent = buildInstallIntent(context, version)
+            val installPi = if (installIntent != null) {
+                PendingIntent.getActivity(context, 2005, installIntent, openPiFlags)
+            } else {
+                val broadcastIntent = Intent(context, DownloadProgressReceiver::class.java).apply {
+                    action = DownloadProgressReceiver.ACTION_INSTALL
+                    putExtra(EXTRA_DOWNLOAD_VERSION, version)
+                }
+                PendingIntent.getBroadcast(context, 2005, broadcastIntent, openPiFlags)
+            }
+
+            builder.setContentIntent(installPi)
+            builder.addAction(
+                NotificationCompat.Action.Builder(
+                    R.drawable.ic_notification,
+                    "Install Now",
+                    installPi
+                ).build()
+            )
+        } else {
+            val cancelIntent = Intent(context, DownloadProgressReceiver::class.java).apply {
+                action = DownloadProgressReceiver.ACTION_CANCEL
+                putExtra(EXTRA_DOWNLOAD_VERSION, version)
+            }
+            val cancelPi = PendingIntent.getBroadcast(
+                context,
+                2004,
+                cancelIntent,
+                openPiFlags
+            )
+
+            builder.setContentTitle("Downloading Vastavik v$cleanVersion Update")
+            builder.setContentText("$percent% • $sizeStr")
+            builder.setProgress(100, percent, indeterminate)
+            builder.setOngoing(true)
+            builder.setOnlyAlertOnce(true)
+            builder.setPriority(NotificationCompat.PRIORITY_LOW)
+            builder.setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            builder.setContentIntent(openPi)
+            builder.addAction(
                 NotificationCompat.Action.Builder(
                     R.drawable.ic_notification,
                     "Cancel",
                     cancelPi
                 ).build()
             )
+        }
 
         if (appIconBitmap != null) builder.setLargeIcon(appIconBitmap)
         return builder.build()
@@ -809,6 +845,23 @@ object AppUpdater {
             nm.notify(DownloadProgressReceiver.NOTIFICATION_ID_DOWNLOAD, n)
         } catch (e: Exception) {
             android.util.Log.e("AppUpdater", "Failed to post download progress notification: ${e.message}")
+        }
+    }
+
+    fun postDownloadCompletedNotification(
+        context: Context,
+        version: String,
+        title: String,
+        totalBytes: Long
+    ) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager ?: return
+            val n = buildDownloadProgressNotification(
+                context, version, title, totalBytes, totalBytes, 1.0f
+            )
+            nm.notify(DownloadProgressReceiver.NOTIFICATION_ID_DOWNLOAD, n)
+        } catch (e: Exception) {
+            android.util.Log.e("AppUpdater", "Failed to post download completed notification: ${e.message}")
         }
     }
 

@@ -35,8 +35,7 @@
   - Professional typography: Times New Roman serif for questions and code blocks, Roboto Slab serif for Mistral AI evaluation notes.
   - Instant generation and sharing via Android's secure `FileProvider`.
 - **Integrated Practice Hub:**
-  - Added "Try Item" for quick single-question interactive practice modal.
-  - Added "Solve Set" for opening the complete multi-question exam set solver with score summary and PDF export.
+  - One-tap "Solve Set" for opening the complete multi-question exam set solver with score summary, guaranteed exact outputs, full step-by-step line & function execution traces, and 1-inch margin PDF export.
 
 ---
 
