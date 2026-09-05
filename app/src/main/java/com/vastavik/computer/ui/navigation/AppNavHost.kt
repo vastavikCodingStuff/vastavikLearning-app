@@ -208,14 +208,7 @@ fun AppNavHost(
             SettingsScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("admin") {
-            if (com.vastavik.computer.utils.AdminSession.isAdmin.value) {
-                AdminDashboardScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
-            } else {
-                // Students can never see the admin dashboard — bounce to home
-                LaunchedEffect(Unit) {
-                    navController.navigate("home") { popUpTo("home") { inclusive = true } }
-                }
-            }
+            AdminDashboardScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
         }
         composable("account_deleted") {
             AccountDeletedScreen(onNavigate = { route ->

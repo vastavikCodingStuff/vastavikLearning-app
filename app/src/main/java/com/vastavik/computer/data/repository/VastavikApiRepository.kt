@@ -1,15 +1,231 @@
 package com.vastavik.computer.data.repository
 
+import com.vastavik.computer.data.api.CircuitBreaker.safeApiCall
+import com.vastavik.computer.data.api.TokenManager
 import com.vastavik.computer.data.api.VastavikApiService
+import com.vastavik.computer.data.api.model.*
 import com.vastavik.computer.data.model.LessonModel
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class VastavikApiRepository @Inject constructor(
-    private val api: VastavikApiService
+    private val api: VastavikApiService,
+    private val tokenManager: TokenManager
 ) {
+
+    // ==========================================
+    // Lessons & Curriculum
+    // ==========================================
+
     suspend fun getLesson(lessonId: String): LessonModel = api.getLesson(lessonId)
+
     suspend fun getLessons(courseId: String, partId: String, subpartId: String): List<LessonModel> =
         api.getLessons(courseId, partId, subpartId)
+
+    suspend fun getLessonV1(lessonId: String): Result<LessonResponse> = safeApiCall {
+        api.getLessonV1(lessonId)
+    }
+
+    suspend fun getHomeCatalog(): Result<HomeCatalogResponse> = safeApiCall {
+        api.getHomeCatalog()
+    }
+
+    suspend fun getCurriculum(courseId: String): Result<CurriculumResponse> = safeApiCall {
+        api.getCurriculum(courseId)
+    }
+
+    suspend fun markPartVisited(courseId: String, partId: String): Result<CommonResponse> = safeApiCall {
+        api.markPartVisited(VisitedRequest(courseId, partId))
+    }
+
+    // ==========================================
+    // Authentication
+    // ==========================================
+
+    suspend fun signup(
+        email: String,
+        password: String,
+        name: String,
+        board: String = "ICSE",
+        language: String = "Java"
+    ): Result<AuthResponse> = safeApiCall {
+        val res = api.signup(SignupRequest(email, password, name, board, language))
+        if (res.success && res.accessToken != null && res.refreshToken != null) {
+            tokenManager.saveTokens(res.accessToken, res.refreshToken)
+        }
+        res
+    }
+
+    suspend fun login(
+        email: String,
+        password: String,
+        deviceFingerprint: String? = null
+    ): Result<AuthResponse> = safeApiCall {
+        val res = api.login(LoginRequest(email, password, deviceFingerprint))
+        if (res.success && res.accessToken != null && res.refreshToken != null) {
+            tokenManager.saveTokens(res.accessToken, res.refreshToken)
+        }
+        res
+    }
+
+    suspend fun loginWithGoogle(idToken: String): Result<AuthResponse> = safeApiCall {
+        val res = api.loginWithGoogle(OAuthGoogleRequest(idToken))
+        if (res.success && res.accessToken != null && res.refreshToken != null) {
+            tokenManager.saveTokens(res.accessToken, res.refreshToken)
+        }
+        res
+    }
+
+    suspend fun loginWithGitHub(code: String): Result<AuthResponse> = safeApiCall {
+        val res = api.loginWithGitHub(OAuthGitHubRequest(code))
+        if (res.success && res.accessToken != null && res.refreshToken != null) {
+            tokenManager.saveTokens(res.accessToken, res.refreshToken)
+        }
+        res
+    }
+
+    suspend fun getUserProfile(): Result<UserProfileResponse> = safeApiCall {
+        api.getUserProfile()
+    }
+
+    fun logout() {
+        tokenManager.clearTokens()
+    }
+
+    // ==========================================
+    // AI Chat & Code Runner
+    // ==========================================
+
+    suspend fun sendAiChat(
+        prompt: String,
+        model: String = "mistral-god",
+        history: List<ChatHistoryItem> = emptyList()
+    ): Result<ChatResponse> = safeApiCall {
+        api.sendAiChat(ChatRequest(prompt = prompt, model = model, history = history))
+    }
+
+    suspend fun executeCode(
+        language: String,
+        sourceCode: String,
+        stdin: String = ""
+    ): Result<CodeExecutionResponse> = safeApiCall {
+        api.executeCode(CodeExecutionRequest(language = language, sourceCode = sourceCode, stdin = stdin))
+    }
+
+    suspend fun cleanOcrCode(rawOcrText: String, language: String = "java"): Result<OcrCleanResponse> = safeApiCall {
+        api.cleanOcrCode(OcrCleanRequest(rawOcrText = rawOcrText, language = language))
+    }
+
+    // ==========================================
+    // Notes & PYQ & Search
+    // ==========================================
+
+    suspend fun listNotes(): Result<List<NoteResponse>> = safeApiCall {
+        api.listNotes()
+    }
+
+    suspend fun createNote(title: String, content: String, tag: String = "General"): Result<NoteResponse> = safeApiCall {
+        api.createNote(NoteCreateRequest(title = title, content = content, tag = tag))
+    }
+
+    suspend fun deleteNote(noteId: String): Result<CommonResponse> = safeApiCall {
+        api.deleteNote(noteId)
+    }
+
+    suspend fun getPyqs(
+        board: String? = null,
+        year: String? = null,
+        subject: String? = null
+    ): Result<List<PYQResponse>> = safeApiCall {
+        api.getPyqs(board, year, subject)
+    }
+
+    suspend fun searchCatalog(query: String): Result<SearchResponse> = safeApiCall {
+        api.searchCatalog(query)
+    }
+
+    // ==========================================
+    // Payments
+    // ==========================================
+
+    suspend fun createPaymentOrder(planId: String, amount: Double): Result<CreateOrderResponse> = safeApiCall {
+        api.createPaymentOrder(CreateOrderRequest(planId = planId, amount = amount))
+    }
+
+    suspend fun getPaymentHistory(): Result<List<Map<String, Any>>> = safeApiCall {
+        api.getPaymentHistory()
+    }
+
+    // ==========================================
+    // System & Updates
+    // ==========================================
+
+    suspend fun checkAppUpdate(): Result<AppUpdateResponse> = safeApiCall {
+        api.checkAppUpdate()
+    }
+
+    suspend fun registerFcmToken(token: String): Result<CommonResponse> = safeApiCall {
+        api.registerFcmToken(FcmTokenRequest(token))
+    }
+
+    // ==========================================
+    // Multipart Uploads
+    // ==========================================
+
+    suspend fun submitDoubt(
+        title: String,
+        question: String,
+        subject: String,
+        file: File?
+    ): Result<Map<String, Any>> = safeApiCall {
+        val titlePart = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val questionPart = question.toRequestBody("text/plain".toMediaTypeOrNull())
+        val subjectPart = subject.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val filePart = file?.let {
+            val mediaType = when (it.extension.lowercase()) {
+                "png" -> "image/png"
+                "mp4" -> "video/mp4"
+                else -> "image/jpeg"
+            }.toMediaTypeOrNull()
+            val reqFile = it.asRequestBody(mediaType)
+            MultipartBody.Part.createFormData("file", it.name, reqFile)
+        }
+
+        api.submitDoubt(titlePart, questionPart, subjectPart, filePart)
+    }
+
+    suspend fun submitBugReport(
+        title: String,
+        description: String,
+        category: String,
+        deviceDiagnostics: String,
+        mediaFiles: List<File>?
+    ): Result<Map<String, Any>> = safeApiCall {
+        val titlePart = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val descPart = description.toRequestBody("text/plain".toMediaTypeOrNull())
+        val catPart = category.toRequestBody("text/plain".toMediaTypeOrNull())
+        val diagPart = deviceDiagnostics.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val mediaParts = mediaFiles?.mapNotNull { f ->
+            if (!f.exists()) null
+            else {
+                val mediaType = when (f.extension.lowercase()) {
+                    "png" -> "image/png"
+                    "mp4" -> "video/mp4"
+                    else -> "image/jpeg"
+                }.toMediaTypeOrNull()
+                val reqFile = f.asRequestBody(mediaType)
+                MultipartBody.Part.createFormData("media", f.name, reqFile)
+            }
+        }
+
+        api.submitBugReport(titlePart, descPart, catPart, diagPart, mediaParts)
+    }
 }
