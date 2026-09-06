@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788697532.9051716,
-    "seen": 1788697887.1908422,
-    "ast_hash": "78eed5a58b5de3119341ce0593b3f119",
+    "mtime": 1788699875.7828705,
+    "seen": 1788700198.7871327,
+    "ast_hash": "594409545f14f68038e117927af0dfe1",
     "semantic_hash": ""
   },
   "app/google-services.json": {
@@ -798,15 +798,15 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
-    "mtime": 1788697533.4948678,
-    "seen": 1788697887.190962,
-    "ast_hash": "9967e057d72c99d59d5caa95826870fa",
+    "mtime": 1788699875.8912811,
+    "seen": 1788700198.7872713,
+    "ast_hash": "a614f508de437fa09936976439a9b995",
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
-    "mtime": 1788697533.4959867,
-    "seen": 1788697887.1909811,
-    "ast_hash": "adccb651a98245a029a2820e13968b5f",
+    "mtime": 1788699875.8922813,
+    "seen": 1788700198.7872927,
+    "ast_hash": "3d9ca7ccbae68a7292f63bd6e41afd0c",
     "semantic_hash": ""
   },
   "companion-codeoss/scripts/start-ubuntu.sh": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
-    "mtime": 1788697533.4982765,
-    "seen": 1788697887.1909828,
-    "ast_hash": "68d81a5a17ee26665d88f3e063ea3258",
+    "mtime": 1788699876.026348,
+    "seen": 1788700198.78739,
+    "ast_hash": "eee8f5dc96cd5f6b95c94aecddc76c91",
     "semantic_hash": ""
   },
   "companion-codeoss/README.md": {
@@ -840,9 +840,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/UbuntuTerminalEngine.kt": {
-    "mtime": 1788697533.4982765,
-    "seen": 1788697887.1909854,
-    "ast_hash": "4723ae1fdb207af838fa0888ccac6ccf",
+    "mtime": 1788699876.0274234,
+    "seen": 1788700198.787393,
+    "ast_hash": "9c3fd011c686b0625e32aac37a4d2df9",
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MistralAiClient.kt": {
@@ -852,9 +852,615 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/index.html": {
-    "mtime": 1788697533.4969327,
-    "seen": 1788697887.1910028,
-    "ast_hash": "163ad157cf083cd19b38d09cd766de11",
+    "mtime": 1788699875.8922813,
+    "seen": 1788700198.7874136,
+    "ast_hash": "117e5fce4feee35e828c690238c6762d",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/base/worker/workerMain.js": {
+    "mtime": 1788699875.8972995,
+    "seen": 1788700198.787296,
+    "ast_hash": "e56441dea3727f40df97586141d1eede",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/abap/abap.js": {
+    "mtime": 1788699875.8972995,
+    "seen": 1788700198.787297,
+    "ast_hash": "f2923a7502971611f3c02dcbc29ba98b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/apex/apex.js": {
+    "mtime": 1788699875.8982751,
+    "seen": 1788700198.7872982,
+    "ast_hash": "884e6422bc249e925a666d35f42433f7",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/azcli/azcli.js": {
+    "mtime": 1788699875.8982751,
+    "seen": 1788700198.7872994,
+    "ast_hash": "293a6224ef33293fe0e4d0020d122321",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/bat/bat.js": {
+    "mtime": 1788699875.8982751,
+    "seen": 1788700198.7873,
+    "ast_hash": "e91ebc378373b6242cc136340bc4c36c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/bicep/bicep.js": {
+    "mtime": 1788699875.8992844,
+    "seen": 1788700198.7873008,
+    "ast_hash": "69debb303cd2adb46ef78ca0528c6bbc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cameligo/cameligo.js": {
+    "mtime": 1788699875.9002812,
+    "seen": 1788700198.7873018,
+    "ast_hash": "91963f145ab3bb05868f53e6880b9655",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/clojure/clojure.js": {
+    "mtime": 1788699875.9002812,
+    "seen": 1788700198.7873027,
+    "ast_hash": "d30372d288d0db9579390174fac97a55",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/coffee/coffee.js": {
+    "mtime": 1788699875.9012823,
+    "seen": 1788700198.7873037,
+    "ast_hash": "eb1a67db0bb7eaab0521d0519aae8969",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cpp/cpp.js": {
+    "mtime": 1788699875.9012823,
+    "seen": 1788700198.7873046,
+    "ast_hash": "64551d72c8784e567bd5f52115321320",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/csharp/csharp.js": {
+    "mtime": 1788699875.9022827,
+    "seen": 1788700198.7873054,
+    "ast_hash": "489ac43c477464b5dbbd43a46f54745e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/csp/csp.js": {
+    "mtime": 1788699875.9022827,
+    "seen": 1788700198.7873065,
+    "ast_hash": "b25ba24579e708f3f7dec5cf00e6e184",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/css/css.js": {
+    "mtime": 1788699875.9022827,
+    "seen": 1788700198.7873075,
+    "ast_hash": "b58ed016fd8205102687d3986151b839",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cypher/cypher.js": {
+    "mtime": 1788699875.9032822,
+    "seen": 1788700198.7873082,
+    "ast_hash": "d3b60489aec38fdd49ee08c1021439c5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/dart/dart.js": {
+    "mtime": 1788699875.9032822,
+    "seen": 1788700198.7873094,
+    "ast_hash": "5f4b97baab82b4d496172095da409f61",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/dockerfile/dockerfile.js": {
+    "mtime": 1788699875.9042842,
+    "seen": 1788700198.7873101,
+    "ast_hash": "22590eeb5d1481281c504d699bc9922b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ecl/ecl.js": {
+    "mtime": 1788699875.9042842,
+    "seen": 1788700198.787311,
+    "ast_hash": "c4de5dc28d3ef6a456a739cfb9c4fbcc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/elixir/elixir.js": {
+    "mtime": 1788699875.9042842,
+    "seen": 1788700198.7873118,
+    "ast_hash": "3a5867d12f8d7affff09cfad363f829c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/flow9/flow9.js": {
+    "mtime": 1788699875.9052992,
+    "seen": 1788700198.787313,
+    "ast_hash": "87cb378cf47728993319c5681afccdac",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/freemarker2/freemarker2.js": {
+    "mtime": 1788699875.9052992,
+    "seen": 1788700198.787314,
+    "ast_hash": "cdc01646ff3a73c71c480cc143db64a6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/fsharp/fsharp.js": {
+    "mtime": 1788699875.9062989,
+    "seen": 1788700198.7873147,
+    "ast_hash": "6cdc2077996ddf5385ec724461ffbbbd",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/go/go.js": {
+    "mtime": 1788699875.9062989,
+    "seen": 1788700198.7873154,
+    "ast_hash": "da56abe3f11797a37bc4c6765778a46d",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/graphql/graphql.js": {
+    "mtime": 1788699875.9062989,
+    "seen": 1788700198.7873166,
+    "ast_hash": "764a23e61ebf40ec51f2045293df39d6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/handlebars/handlebars.js": {
+    "mtime": 1788699875.9072952,
+    "seen": 1788700198.7873175,
+    "ast_hash": "f6af0ae55a3befd0e98bd93e86c0af00",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/hcl/hcl.js": {
+    "mtime": 1788699875.9082963,
+    "seen": 1788700198.7873182,
+    "ast_hash": "7eb5bfb23959a934277b975b0649742a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/html/html.js": {
+    "mtime": 1788699875.9082963,
+    "seen": 1788700198.7873192,
+    "ast_hash": "ad97e18377b44a25c6048574a3134632",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ini/ini.js": {
+    "mtime": 1788699875.909299,
+    "seen": 1788700198.7873204,
+    "ast_hash": "82cb89283ea5598ce86a2b6d459ea230",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/java/java.js": {
+    "mtime": 1788699875.909299,
+    "seen": 1788700198.787321,
+    "ast_hash": "8361d1730952a9020ae5ed1c0ee71ac9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/javascript/javascript.js": {
+    "mtime": 1788699875.909996,
+    "seen": 1788700198.787324,
+    "ast_hash": "92f3cf8b52b3733bf3091bc7d2d0abef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/julia/julia.js": {
+    "mtime": 1788699875.909996,
+    "seen": 1788700198.787325,
+    "ast_hash": "f080787c9e0348d9b7be8a35d9b338fc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/kotlin/kotlin.js": {
+    "mtime": 1788699875.9110081,
+    "seen": 1788700198.7873256,
+    "ast_hash": "7d9e018e55afe2868acf4b72532ae1fe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/less/less.js": {
+    "mtime": 1788699875.9110081,
+    "seen": 1788700198.7873268,
+    "ast_hash": "9dbb2a6c6b1d56e6ba91dfbf4999a73e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/lexon/lexon.js": {
+    "mtime": 1788699875.912005,
+    "seen": 1788700198.7873275,
+    "ast_hash": "c8e78491bd1b9963512e5b997a4f287f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/liquid/liquid.js": {
+    "mtime": 1788699875.9128995,
+    "seen": 1788700198.7873285,
+    "ast_hash": "bf9e8c37d34d8ec3f4a92fc89d49b87a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/lua/lua.js": {
+    "mtime": 1788699875.9134066,
+    "seen": 1788700198.7873292,
+    "ast_hash": "7a2a8c294b8e5a9d1f968d4e20b2900a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/m3/m3.js": {
+    "mtime": 1788699875.9137664,
+    "seen": 1788700198.7873304,
+    "ast_hash": "b53f8c711b25cd65d3e5a446fd0104c5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/markdown/markdown.js": {
+    "mtime": 1788699875.9142702,
+    "seen": 1788700198.787331,
+    "ast_hash": "4f10e38af16f045c30f07f9e3e10d2a4",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mdx/mdx.js": {
+    "mtime": 1788699875.9148035,
+    "seen": 1788700198.7873318,
+    "ast_hash": "6a413a3219ab271992e3c90061bf2f3e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mips/mips.js": {
+    "mtime": 1788699875.9153438,
+    "seen": 1788700198.7873325,
+    "ast_hash": "3f072330e7ebacbc3a019baf0bbab5e5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/msdax/msdax.js": {
+    "mtime": 1788699875.9158823,
+    "seen": 1788700198.7873337,
+    "ast_hash": "e77987531c93d25146fcaecb54995196",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mysql/mysql.js": {
+    "mtime": 1788699875.9164195,
+    "seen": 1788700198.7873347,
+    "ast_hash": "cc9a8d968c6250eef9424197fd4edac0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/objective-c/objective-c.js": {
+    "mtime": 1788699875.9169815,
+    "seen": 1788700198.7873356,
+    "ast_hash": "1f9df59fd0c4a7eef25dcf60108327d5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pascal/pascal.js": {
+    "mtime": 1788699875.917593,
+    "seen": 1788700198.7873366,
+    "ast_hash": "2ce65828df9dc5a63c5058e296bb7cf1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pascaligo/pascaligo.js": {
+    "mtime": 1788699875.9186797,
+    "seen": 1788700198.7873375,
+    "ast_hash": "d7e79cfa18e75098b48d7fe99d2a67fe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/perl/perl.js": {
+    "mtime": 1788699875.9186797,
+    "seen": 1788700198.7873385,
+    "ast_hash": "ca1ee6f5e35bbc556b95f519bad8e79e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pgsql/pgsql.js": {
+    "mtime": 1788699875.9196973,
+    "seen": 1788700198.7873392,
+    "ast_hash": "1ba4a229caf9ad5757e20c6e76ad8a42",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/php/php.js": {
+    "mtime": 1788699875.920964,
+    "seen": 1788700198.7873404,
+    "ast_hash": "795d7edceb0f099c5ab5b97669edd52d",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pla/pla.js": {
+    "mtime": 1788699875.921479,
+    "seen": 1788700198.787341,
+    "ast_hash": "d8c6577c8166055b9fff92d4e57297e1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/postiats/postiats.js": {
+    "mtime": 1788699875.9220526,
+    "seen": 1788700198.7873418,
+    "ast_hash": "a63730565c5f64a9ce9966d6badb4b38",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/powerquery/powerquery.js": {
+    "mtime": 1788699875.9226413,
+    "seen": 1788700198.7873428,
+    "ast_hash": "0e39037e64b32f67a8a12cefed949cd8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/powershell/powershell.js": {
+    "mtime": 1788699875.923175,
+    "seen": 1788700198.7873435,
+    "ast_hash": "c505073d4c3e1c18cd8d30445bfffbae",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/protobuf/protobuf.js": {
+    "mtime": 1788699875.9237163,
+    "seen": 1788700198.787345,
+    "ast_hash": "7b949b17d63a5ace7a07c53519f7252c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pug/pug.js": {
+    "mtime": 1788699875.9242554,
+    "seen": 1788700198.787346,
+    "ast_hash": "61a4c0b78ecd30cf8a454854cc554ae9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/python/python.js": {
+    "mtime": 1788699875.924951,
+    "seen": 1788700198.7873466,
+    "ast_hash": "fb7a7d8db1657c443c810a133633dc16",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/qsharp/qsharp.js": {
+    "mtime": 1788699875.9262314,
+    "seen": 1788700198.7873476,
+    "ast_hash": "7b4139cdf999217c218a95f5f4c8fad5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/r/r.js": {
+    "mtime": 1788699875.9268007,
+    "seen": 1788700198.7873485,
+    "ast_hash": "056c68ff69d071a44828226c899ca3a8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/razor/razor.js": {
+    "mtime": 1788699875.9273915,
+    "seen": 1788700198.7873492,
+    "ast_hash": "89d796466817522dfded8872e0e323ef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/redis/redis.js": {
+    "mtime": 1788699875.927958,
+    "seen": 1788700198.7873502,
+    "ast_hash": "02941a199fe19ee132328607ce5facf2",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/redshift/redshift.js": {
+    "mtime": 1788699875.928494,
+    "seen": 1788700198.7873511,
+    "ast_hash": "24c9404b6573954cc9953ba04cfd761e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/restructuredtext/restructuredtext.js": {
+    "mtime": 1788699875.9290748,
+    "seen": 1788700198.787352,
+    "ast_hash": "91eb42f9945c3fc65ac12f5886d0af5f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ruby/ruby.js": {
+    "mtime": 1788699875.9296632,
+    "seen": 1788700198.787353,
+    "ast_hash": "15f95159b0dc80601ac224d8ca896cbe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/rust/rust.js": {
+    "mtime": 1788699875.9302177,
+    "seen": 1788700198.7873538,
+    "ast_hash": "cd8b5c9d956d87ba9d640c0e09a1b612",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sb/sb.js": {
+    "mtime": 1788699875.9307463,
+    "seen": 1788700198.787355,
+    "ast_hash": "45328c542313f4ead079270f6fdb8bcc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scala/scala.js": {
+    "mtime": 1788699875.9312866,
+    "seen": 1788700198.7873557,
+    "ast_hash": "04f8ed197f2877f16f13e51a0438b7d4",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scheme/scheme.js": {
+    "mtime": 1788699875.9318318,
+    "seen": 1788700198.7873566,
+    "ast_hash": "257c3767dff4282eb3f89d9d3d8cc06c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scss/scss.js": {
+    "mtime": 1788699875.9323792,
+    "seen": 1788700198.7873573,
+    "ast_hash": "7f5467096892d10f79c5fa265d109596",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/shell/shell.js": {
+    "mtime": 1788699875.9334652,
+    "seen": 1788700198.7873583,
+    "ast_hash": "a2badcd3ba6839dbd4c1a2f5c3068b84",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/solidity/solidity.js": {
+    "mtime": 1788699875.934062,
+    "seen": 1788700198.7873592,
+    "ast_hash": "b11c569025b5d824cefa390f14c64fd7",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sophia/sophia.js": {
+    "mtime": 1788699875.934062,
+    "seen": 1788700198.78736,
+    "ast_hash": "1c3b2c6677867f9243518f98802aca55",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sparql/sparql.js": {
+    "mtime": 1788699875.934665,
+    "seen": 1788700198.787361,
+    "ast_hash": "6ada2ac618e14ed2cc6688731df3fc23",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sql/sql.js": {
+    "mtime": 1788699875.9352002,
+    "seen": 1788700198.7873619,
+    "ast_hash": "2206de3e5b203ee0fc27bba0934cbd5c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/st/st.js": {
+    "mtime": 1788699875.9357386,
+    "seen": 1788700198.7873626,
+    "ast_hash": "fa0d0feee3e4a31cc59d7817a286d1e8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/swift/swift.js": {
+    "mtime": 1788699875.9362867,
+    "seen": 1788700198.7873635,
+    "ast_hash": "656c3f77f296cac831727a36ff08ec43",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/systemverilog/systemverilog.js": {
+    "mtime": 1788699875.9368465,
+    "seen": 1788700198.7873642,
+    "ast_hash": "0f315e003420f8044e789b615e368c6e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/tcl/tcl.js": {
+    "mtime": 1788699875.9373991,
+    "seen": 1788700198.7873654,
+    "ast_hash": "510e0fd711765e3a86c926a44d92531f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/twig/twig.js": {
+    "mtime": 1788699875.9379475,
+    "seen": 1788700198.7873664,
+    "ast_hash": "0932ec606ff67e7879269382ae46d368",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/typescript/typescript.js": {
+    "mtime": 1788699875.9379475,
+    "seen": 1788700198.787367,
+    "ast_hash": "b713a721e12ef255edbf3a8fe5d78ba1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/typespec/typespec.js": {
+    "mtime": 1788699875.9379475,
+    "seen": 1788700198.7873683,
+    "ast_hash": "e32576e1be9948c6fb873443f6da8abd",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/vb/vb.js": {
+    "mtime": 1788699875.9379475,
+    "seen": 1788700198.787369,
+    "ast_hash": "8b98e98c603a6b1a1e6ea7e8020f5ee0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/wgsl/wgsl.js": {
+    "mtime": 1788699875.9394844,
+    "seen": 1788700198.7873697,
+    "ast_hash": "4826365c74a1752dafd0a22563f1224f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/xml/xml.js": {
+    "mtime": 1788699875.9394844,
+    "seen": 1788700198.787371,
+    "ast_hash": "023ce87c415d3fd4294dc71a7eb2332a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/yaml/yaml.js": {
+    "mtime": 1788699875.9405067,
+    "seen": 1788700198.7873719,
+    "ast_hash": "8f87bce0e14d051349910bd04e3ed50f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/editor/editor.main.js": {
+    "mtime": 1788699875.964228,
+    "seen": 1788700198.7873728,
+    "ast_hash": "5ee8ed8319e8d41cf78346b4d921fcae",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/css/cssMode.js": {
+    "mtime": 1788699875.9658782,
+    "seen": 1788700198.7873738,
+    "ast_hash": "e4c4e048c8ee821e3f26cc95f766d7ef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/css/cssWorker.js": {
+    "mtime": 1788699875.9703975,
+    "seen": 1788700198.7873745,
+    "ast_hash": "ebbdf38a041456934e8bde5be6a0b583",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/html/htmlMode.js": {
+    "mtime": 1788699875.971592,
+    "seen": 1788700198.7873755,
+    "ast_hash": "ef48c76309b34415cf1754a0e61e4e6e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/html/htmlWorker.js": {
+    "mtime": 1788699875.9742937,
+    "seen": 1788700198.7873764,
+    "ast_hash": "a51ebcdbc4f70411e2cf8ae2d88083ff",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/json/jsonMode.js": {
+    "mtime": 1788699875.9753926,
+    "seen": 1788700198.787377,
+    "ast_hash": "26ed0d64b4d8f8d74425a8b58763b9d2",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/json/jsonWorker.js": {
+    "mtime": 1788699875.9770074,
+    "seen": 1788700198.7873778,
+    "ast_hash": "cdb275a92f3659e1b24b1094caeeddfa",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/typescript/tsMode.js": {
+    "mtime": 1788699875.9775412,
+    "seen": 1788700198.787379,
+    "ast_hash": "bafaf3858a53a6839737eb4fd09c5956",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/typescript/tsWorker.js": {
+    "mtime": 1788699876.0115125,
+    "seen": 1788700198.7873797,
+    "ast_hash": "2b3269f54a87145bad81bc0fa9c56183",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/loader.js": {
+    "mtime": 1788699876.0125144,
+    "seen": 1788700198.7873807,
+    "ast_hash": "e3328225c8b5ecbe398d5d0c651791e9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.de.js": {
+    "mtime": 1788699876.0138884,
+    "seen": 1788700198.7873816,
+    "ast_hash": "33a7714084496814b301da409f2e2377",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.es.js": {
+    "mtime": 1788699876.0161314,
+    "seen": 1788700198.7873826,
+    "ast_hash": "5ccd6a23ebba8424018008fd66c7dce0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.fr.js": {
+    "mtime": 1788699876.0173814,
+    "seen": 1788700198.7873833,
+    "ast_hash": "f51ae3e2162d9813a9e736748420a2f6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.it.js": {
+    "mtime": 1788699876.01794,
+    "seen": 1788700198.7873843,
+    "ast_hash": "ce88e1fa9811e9b4121d40b521b06b90",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ja.js": {
+    "mtime": 1788699876.0196161,
+    "seen": 1788700198.7873852,
+    "ast_hash": "3bab8f72adcefad87db829d9b25e48f0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ko.js": {
+    "mtime": 1788699876.0206988,
+    "seen": 1788700198.7873862,
+    "ast_hash": "4eca380b014d4e90e1d98a3a64dc255a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ru.js": {
+    "mtime": 1788699876.0229726,
+    "seen": 1788700198.787387,
+    "ast_hash": "becdd5b0be1fc962867c3a3d585e1615",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.zh-cn.js": {
+    "mtime": 1788699876.0241094,
+    "seen": 1788700198.7873878,
+    "ast_hash": "27eb9f2be7c08fa74741bf4f775001c8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.zh-tw.js": {
+    "mtime": 1788699876.0258,
+    "seen": 1788700198.787389,
+    "ast_hash": "62f065fde9e2464d7e552250f9530b23",
     "semantic_hash": ""
   }
 }
