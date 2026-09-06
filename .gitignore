@@ -2,6 +2,7 @@
 *.apk
 !app/src/main/assets/*.apk
 !app/src/main/assets/companion/*.apk
+apk/
 *.aar
 *.ap_
 *.aab
