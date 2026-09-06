@@ -508,29 +508,12 @@ fun ProfileScreen(
                                 }
                                 Spacer(modifier = Modifier.width(14.dp))
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            "CodeOSS Extension Pack",
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 14.sp,
-                                            color = MaterialTheme.colorScheme.onBackground
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .background(Color(0xFFFFD600))
-                                                .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(6.dp))
-                                                .padding(horizontal = 5.dp, vertical = 1.dp)
-                                        ) {
-                                            Text(
-                                                "✨ PRO",
-                                                fontSize = 9.sp,
-                                                fontWeight = FontWeight.Black,
-                                                color = Color.Black
-                                            )
-                                        }
-                                    }
+                                    Text(
+                                        "CodeOSS Extension Pack",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
                                     Text(
                                         if (isCompanionInstalled) "Ubuntu Terminal + VS Code • Active" else "Minimal Ubuntu Terminal & VS Code • Tap to Install",
                                         fontSize = 11.sp,

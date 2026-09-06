@@ -497,9 +497,6 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            // 2. UNDER DEVELOPMENT BANNER: Placed at the bottom of the page above the Bottom Navigation
-            BottomDevBanner()
-
             // Subtle spacer for small white margin above bottom navigation bar
             Spacer(modifier = Modifier.height(2.dp))
         }
@@ -1256,90 +1253,6 @@ private fun SectionHeading(source: QuestionSource, onSuggestNew: (() -> Unit)? =
     }
 }
 
-@Composable
-private fun BottomDevBanner() {
-    val bb = brutalBorderColor()
-    val bs = brutalShadowColor()
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 4.dp, bottom = 2.dp)
-            .padding(end = 4.dp, bottom = 4.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset(x = 4.dp, y = 4.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(bs)
-        )
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(2.dp, bb),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(Color(0xFF2563EB), Color(0xFF7C3AED))
-                            )
-                        )
-                        .border(BorderStroke(1.5.dp, bb), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        Icons.Filled.Build,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "UNDER DEVELOPMENT",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 0.8.sp
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFF2563EB).copy(alpha = 0.15f))
-                                .padding(horizontal = 5.dp, vertical = 1.dp)
-                        ) {
-                            Text("BETA", fontSize = 9.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF2563EB))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "One builder. One app. Full version coming eventually.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp,
-                        lineHeight = 15.sp
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun SuggestTopicDialog(
