@@ -66,9 +66,9 @@
     "semantic_hash": "64b34688fff4026464e8c9dac46940e8"
   },
   "app/src/main/java/com/vastavik/computer/di/AppModule.kt": {
-    "mtime": 1788639138.4447975,
-    "seen": 1788642668.6200645,
-    "ast_hash": "1d57698b7f9f03933644e3412b3d4b82",
+    "mtime": 1788693153.162008,
+    "seen": 1788693648.1015515,
+    "ast_hash": "6be31a95a4cf690aff633ecae2b23585",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/components/CommonComponents.kt": {
@@ -168,9 +168,9 @@
     "semantic_hash": "0966bdacd6a9fbedd2aa229d63f87e89"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/editor/CodeEditorScreen.kt": {
-    "mtime": 1788692333.1856596,
-    "seen": 1788692501.8804817,
-    "ast_hash": "9cb45ab245e38b2d3851a3c70648cbb7",
+    "mtime": 1788692751.8077717,
+    "seen": 1788693648.1016018,
+    "ast_hash": "a3b452aee3cda876852f656173cd8175",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/editor/OcrExerciseScreen.kt": {
@@ -450,10 +450,10 @@
     "semantic_hash": "0e51b430d164f544f9e592c7b9369163"
   },
   "settings.gradle.kts": {
-    "mtime": 1787566030.2194643,
-    "seen": 1788377409.1632948,
-    "ast_hash": "7203ac9e2649f9a1dc41615c5a95c04b",
-    "semantic_hash": "7203ac9e2649f9a1dc41615c5a95c04b"
+    "mtime": 1788692695.2145038,
+    "seen": 1788693648.1017253,
+    "ast_hash": "f5f411b341511281022c648c598fba3a",
+    "semantic_hash": ""
   },
   "README.md": {
     "mtime": 1788504398.23411,
@@ -468,9 +468,9 @@
     "semantic_hash": "8bf98568a0262cb39f3a991729becc4f"
   },
   "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt": {
-    "mtime": 1788691794.3479059,
-    "seen": 1788692501.8803408,
-    "ast_hash": "d411cd47bc6bd7d24374cbf143fe922f",
+    "mtime": 1788693153.1598663,
+    "seen": 1788693648.101487,
+    "ast_hash": "c318a8a568c7bb5822ef906aabef2310",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/AuthInterceptor.kt": {
@@ -810,9 +810,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
-    "mtime": 1788691446.1504734,
-    "seen": 1788692501.880601,
-    "ast_hash": "5ae2811f9b9788a88d3653c04809de1e",
+    "mtime": 1788692636.6681461,
+    "seen": 1788693648.1016839,
+    "ast_hash": "1b83cff90186dd567b95093243fa9b34",
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
@@ -828,15 +828,33 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
-    "mtime": 1788692185.4572868,
-    "seen": 1788692501.88065,
-    "ast_hash": "5cd21bbb84c38c9210126f37be273bc3",
+    "mtime": 1788692619.710765,
+    "seen": 1788693648.1017215,
+    "ast_hash": "72022e7e8614b6a7bbfd9a3075788d38",
     "semantic_hash": ""
   },
   "companion-codeoss/README.md": {
     "mtime": 1788692202.067497,
     "seen": 1788692501.8806946,
     "ast_hash": "21a1e1170e0c1780ac464f13134ebfd9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/BackendLoadBalancer.kt": {
+    "mtime": 1788693153.1604068,
+    "seen": 1788693648.1014936,
+    "ast_hash": "22dd0fca5fd092aec679c84a8aebdc45",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/LoadBalancerInterceptor.kt": {
+    "mtime": 1788693153.1609433,
+    "seen": 1788693648.1015015,
+    "ast_hash": "d68360beac974efab692e7e9cf35052e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/java/com/vastavik/codeoss/UbuntuTerminalEngine.kt": {
+    "mtime": 1788692603.7232013,
+    "seen": 1788693648.1017234,
+    "ast_hash": "a3885a1deee33dd0a36213b95efe112d",
     "semantic_hash": ""
   }
 }
