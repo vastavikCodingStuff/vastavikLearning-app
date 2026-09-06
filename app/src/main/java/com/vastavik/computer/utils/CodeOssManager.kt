@@ -40,7 +40,7 @@ object CodeOssManager {
 
     // Default GitHub Release asset download URL for the companion extension
     const val DEFAULT_DOWNLOAD_URL =
-        "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.33/vastavik-codeoss-extension.apk"
+        "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.34/vastavik-codeoss-extension.apk"
 
     sealed class DownloadState {
         object Idle : DownloadState()
@@ -253,6 +253,7 @@ object CodeOssManager {
                 putExtra(EXTRA_LANGUAGE, language)
                 putExtra(EXTRA_QUESTION, question)
                 putExtra(EXTRA_ACTION, action)
+                putExtra("extra_mistral_api_key", com.vastavik.computer.BuildConfig.MISTRAL_API_KEY)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             if (intent.resolveActivity(context.packageManager) != null) {
@@ -265,6 +266,7 @@ object CodeOssManager {
                     launchIntent.putExtra(EXTRA_LANGUAGE, language)
                     launchIntent.putExtra(EXTRA_QUESTION, question)
                     launchIntent.putExtra(EXTRA_ACTION, action)
+                    launchIntent.putExtra("extra_mistral_api_key", com.vastavik.computer.BuildConfig.MISTRAL_API_KEY)
                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(launchIntent)
                     true
