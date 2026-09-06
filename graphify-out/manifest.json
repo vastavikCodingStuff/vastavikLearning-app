@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788699875.7828705,
-    "seen": 1788700198.7871327,
-    "ast_hash": "594409545f14f68038e117927af0dfe1",
+    "mtime": 1788700454.09287,
+    "seen": 1788701068.591749,
+    "ast_hash": "4fdeba558a363b1438a7004b807f0125",
     "semantic_hash": ""
   },
   "app/google-services.json": {
@@ -12,9 +12,9 @@
     "semantic_hash": "a684bab956cc13dedf16e5176eb18be0"
   },
   "app/src/main/java/com/vastavik/computer/MainActivity.kt": {
-    "mtime": 1788642740.615651,
-    "seen": 1788643632.8036106,
-    "ast_hash": "dd0c93253a8cf810f9723e832d4de050",
+    "mtime": 1788700491.4017313,
+    "seen": 1788701068.5917635,
+    "ast_hash": "31d8136fafe4f5c0cab80d381f004c7c",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/VastavikApplication.kt": {
@@ -312,9 +312,9 @@
     "semantic_hash": "97a5a8c434aeec5dd92a960ea4a9bd0d"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeScreen.kt": {
-    "mtime": 1788648204.1310265,
-    "seen": 1788648886.418738,
-    "ast_hash": "7b26b1f647acfd26eeedbc330f30a0f8",
+    "mtime": 1788700414.2690213,
+    "seen": 1788701068.5919068,
+    "ast_hash": "0b6c894c1bb5b37532efa3e427ce2377",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeViewModel.kt": {
@@ -324,9 +324,9 @@
     "semantic_hash": "e6137d2b157bc2974b9349ec284165ae"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileScreen.kt": {
-    "mtime": 1788691968.8296769,
-    "seen": 1788692501.8805578,
-    "ast_hash": "ce29cc9d51a3ade1e7a6554ec467c64d",
+    "mtime": 1788700422.6045961,
+    "seen": 1788701068.5919132,
+    "ast_hash": "53448e96e4d568dca44ab80e98b9dbb9",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileViewModel.kt": {
@@ -798,15 +798,15 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
-    "mtime": 1788699875.8912811,
-    "seen": 1788700198.7872713,
-    "ast_hash": "a614f508de437fa09936976439a9b995",
+    "mtime": 1788700462.3390985,
+    "seen": 1788701068.5919387,
+    "ast_hash": "a637451a4a49148a3c15b3522874a116",
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
-    "mtime": 1788699875.8922813,
-    "seen": 1788700198.7872927,
-    "ast_hash": "3d9ca7ccbae68a7292f63bd6e41afd0c",
+    "mtime": 1788700442.4465468,
+    "seen": 1788701068.5919702,
+    "ast_hash": "f67034dc0d13acf96b1cf94008ea256b",
     "semantic_hash": ""
   },
   "companion-codeoss/scripts/start-ubuntu.sh": {
@@ -852,9 +852,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/index.html": {
-    "mtime": 1788699875.8922813,
-    "seen": 1788700198.7874136,
-    "ast_hash": "117e5fce4feee35e828c690238c6762d",
+    "mtime": 1788700448.6203797,
+    "seen": 1788701068.59217,
+    "ast_hash": "3d02f213be32e54ab7ee4ee7510fa266",
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/vs/base/worker/workerMain.js": {
@@ -1461,6 +1461,78 @@
     "mtime": 1788699876.0258,
     "seen": 1788700198.787389,
     "ast_hash": "62f065fde9e2464d7e552250f9530b23",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/NoInternetBanner.kt": {
+    "mtime": 1788700485.254519,
+    "seen": 1788701068.5918367,
+    "ast_hash": "dd18c66c83b171d33243bac62094a3e1",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/NetworkStatusObserver.kt": {
+    "mtime": 1788700477.4143257,
+    "seen": 1788701068.5919518,
+    "ast_hash": "4dfdc046ffdac15d5dcc2d70569c9406",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1788700428.2095048,
+    "seen": 1788701068.5921714,
+    "ast_hash": "d6041d9f5682a800a88b3d0c9c00cc6a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
+    "mtime": 1788700428.2107005,
+    "seen": 1788701068.5921733,
+    "ast_hash": "1d5af0d5cebc278e7d6380d520a99b4b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1788700428.1975112,
+    "seen": 1788701068.5921745,
+    "ast_hash": "8793f575d1d2fc3c0dcec3a0ae70099c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
+    "mtime": 1788700428.1985056,
+    "seen": 1788701068.592176,
+    "ast_hash": "75b91c6b74caab0b468d824866a40bb3",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1788700428.222737,
+    "seen": 1788701068.5921774,
+    "ast_hash": "8b0f827d1c519204e8287f22812da73e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
+    "mtime": 1788700428.2247436,
+    "seen": 1788701068.5921786,
+    "ast_hash": "e8b6ae45a61eb036766315f2a106066f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1788700428.2378833,
+    "seen": 1788701068.59218,
+    "ast_hash": "ac29b33daeab55fd7f0963cfdb63a075",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
+    "mtime": 1788700428.2416406,
+    "seen": 1788701068.5921812,
+    "ast_hash": "0a1dfcd30360378974bcc54364973091",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1788700428.2640264,
+    "seen": 1788701068.5921826,
+    "ast_hash": "3bb89fd85d1ccfe96b37fb71a277f0dc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
+    "mtime": 1788700428.2690244,
+    "seen": 1788701068.5921838,
+    "ast_hash": "86191664ff7370aab31b13651c013275",
     "semantic_hash": ""
   }
 }

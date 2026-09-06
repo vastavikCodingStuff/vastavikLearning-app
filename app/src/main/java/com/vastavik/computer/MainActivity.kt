@@ -103,6 +103,11 @@ class MainActivity : ComponentActivity() {
                         onNavigate = { route -> navController.navigate(route) }
                     )
 
+                    // NeoBrutalistic No-Internet notification banner
+                    com.vastavik.computer.ui.components.NoInternetBannerHost(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
+                    )
+
                     // Admin-only floating debug banner showing Vastavik AI call logs (can be toggled in Admin Dashboard)
                     if (isAdmin && isEngineLogsEnabled) {
                         com.vastavik.computer.ui.components.DebugLogBoxOverlay(
