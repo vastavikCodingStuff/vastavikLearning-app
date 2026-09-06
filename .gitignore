@@ -7,6 +7,10 @@ apk/
 *.ap_
 *.aab
 
+# Release notes (publish directly to GitHub Releases, not in git history)
+RELEASE_NOTES_*.md
+app/src/main/assets/RELEASE_NOTES_*.md
+
 # Files for the ART/Dalvik VM
 *.dex
 
