@@ -106,11 +106,14 @@ class MainActivity : ComponentActivity() {
                     settings.apply {
                         javaScriptEnabled = true
                         domStorageEnabled = true
+                        databaseEnabled = true
                         allowFileAccess = true
                         allowContentAccess = true
                         useWideViewPort = true
                         loadWithOverviewMode = true
                         cacheMode = WebSettings.LOAD_DEFAULT
+                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                        javaScriptCanOpenWindowsAutomatically = true
                     }
 
                     // Register Javascript bridge
@@ -126,6 +129,45 @@ class MainActivity : ComponentActivity() {
                                         null
                                     )
                                 }
+                            }
+
+                            @JavascriptInterface
+                            fun isCodeServerOnline(): Boolean {
+                                return UbuntuTerminalEngine.isCodeServerRunning()
+                            }
+
+                            @JavascriptInterface
+                            fun connectCodeServer(serverUrl: String) {
+                                post {
+                                    val target = if (serverUrl.isBlank()) "http://127.0.0.1:8080/" else serverUrl
+                                    loadUrl(target)
+                                }
+                            }
+
+                            @JavascriptInterface
+                            fun loadOfflineIde() {
+                                post {
+                                    loadUrl("file:///android_asset/vscode/index.html")
+                                }
+                            }
+
+                            @JavascriptInterface
+                            fun listFiles(): String {
+                                val list = UbuntuTerminalEngine.listWorkspaceFiles(context)
+                                val jsonArray = list.joinToString(prefix = "[", postfix = "]") { f ->
+                                    "{\"name\":\"${f["name"]}\",\"isDirectory\":${f["isDirectory"]},\"size\":${f["size"]}}"
+                                }
+                                return jsonArray
+                            }
+
+                            @JavascriptInterface
+                            fun createFile(filename: String): Boolean {
+                                return UbuntuTerminalEngine.createFile(context, filename)
+                            }
+
+                            @JavascriptInterface
+                            fun deleteFile(filename: String): Boolean {
+                                return UbuntuTerminalEngine.deleteFile(context, filename)
                             }
 
                             @JavascriptInterface
@@ -187,5 +229,16 @@ class MainActivity : ComponentActivity() {
             },
             modifier = Modifier.fillMaxSize()
         )
+    }
+
+    override fun onBackPressed() {
+        val wv = webViewInstance
+        if (wv != null && wv.url != null && !wv.url!!.startsWith("file:///android_asset/vscode/index.html")) {
+            wv.loadUrl("file:///android_asset/vscode/index.html")
+        } else if (wv != null && wv.canGoBack()) {
+            wv.goBack()
+        } else {
+            super.onBackPressed()
+        }
     }
 }

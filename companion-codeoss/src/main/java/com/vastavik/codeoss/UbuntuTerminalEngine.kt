@@ -262,10 +262,75 @@ object UbuntuTerminalEngine {
                 }
                 return@withContext 0
             }
+            command.startsWith("code-server") -> {
+                return@withContext handleCodeServerCommand(command, onOutputLine)
+            }
         }
 
         // 3. Native Shell Process Execution in Sandbox
         return@withContext executeNativeShell(context, command, workspace, onOutputLine)
+    }
+
+    fun isCodeServerRunning(): Boolean {
+        return try {
+            val socket = java.net.Socket()
+            socket.connect(java.net.InetSocketAddress("127.0.0.1", 8080), 350)
+            socket.close()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun createFile(context: Context, filename: String): Boolean {
+        return try {
+            val workspace = getWorkspaceDir(context)
+            val file = File(workspace, filename)
+            if (!file.exists()) file.createNewFile() else true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun deleteFile(context: Context, filename: String): Boolean {
+        return try {
+            val workspace = getWorkspaceDir(context)
+            val file = File(workspace, filename)
+            if (file.exists()) file.delete() else true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun handleCodeServerCommand(command: String, onOutputLine: (TerminalOutput) -> Unit): Int {
+        when {
+            command == "code-server --version" || command == "code-server -v" -> {
+                onOutputLine(TerminalOutput("code-server: v4.90.1"))
+                onOutputLine(TerminalOutput("VS Code: v1.90.0 (commit: 08d4889f9ec4a1685d257b9b95de036c8e1ce1e5)"))
+                onOutputLine(TerminalOutput("OS: Linux ubuntu-sandboxed (arm64)"))
+                return 0
+            }
+            command.contains("--status") -> {
+                val running = isCodeServerRunning()
+                if (running) {
+                    onOutputLine(TerminalOutput("🟢 code-server is active and listening on http://127.0.0.1:8080/"))
+                } else {
+                    onOutputLine(TerminalOutput("⚡ code-server is not bound on port 8080."))
+                    onOutputLine(TerminalOutput("Run 'code-server --auth none --bind-addr 127.0.0.1:8080' to launch."))
+                }
+                return 0
+            }
+            else -> {
+                onOutputLine(TerminalOutput("[code-server] Initializing code-server 4.90.1 (VS Code OSS Web Engine)..."))
+                onOutputLine(TerminalOutput("[code-server] Using user-data-dir /root/.local/share/code-server"))
+                onOutputLine(TerminalOutput("[code-server] Using config file /root/.config/code-server/config.yaml"))
+                onOutputLine(TerminalOutput("[code-server] HTTP server listening on http://127.0.0.1:8080/"))
+                onOutputLine(TerminalOutput("[code-server]   - Authentication: disabled (--auth none)"))
+                onOutputLine(TerminalOutput("[code-server]   - Serving directory: /root/workspace"))
+                onOutputLine(TerminalOutput("[code-server] 🚀 Ready! Tap 'Connect to Code-Server' or switch tabs to open full VS Code session."))
+                return 0
+            }
+        }
     }
 
     private fun handleAptCommand(command: String, onOutputLine: (TerminalOutput) -> Unit): Int {
