@@ -223,6 +223,9 @@ fun CodeEditorScreen(
     val effectiveInitLang = CodeEditorSharedState.activeLanguage.ifBlank { initialLanguage }.ifBlank { "Python" }
     val effectiveInitCode = CodeEditorSharedState.activeCode.ifBlank { initialCode }.ifBlank { defaultCode(effectiveInitLang) }
     val effectiveInitQuestion = CodeEditorSharedState.activeQuestion.ifBlank { initialQuestion }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val isCompanionInstalled = remember { com.vastavik.computer.utils.CodeOssManager.isCompanionInstalled(context) }
+    var showExtensionPrompt by remember { mutableStateOf(false) }
 
     var language by remember(effectiveInitLang) { mutableStateOf(effectiveInitLang) }
     var code by remember(effectiveInitCode) { mutableStateOf(effectiveInitCode) }
@@ -250,7 +253,6 @@ fun CodeEditorScreen(
     }
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
-    val context = androidx.compose.ui.platform.LocalContext.current
     var showRunInputDialog by remember { mutableStateOf(false) }
 
     fun executeCode() {
@@ -383,6 +385,28 @@ fun CodeEditorScreen(
                             tint = if (showQuestion) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
+
+                    // CodeOSS (Ubuntu Terminal + VS Code) Quick Launcher
+                    IconButton(onClick = {
+                        if (isCompanionInstalled) {
+                            com.vastavik.computer.utils.CodeOssManager.launchCodeOss(
+                                context = context,
+                                code = code,
+                                language = language,
+                                question = question,
+                                action = "RUN"
+                            )
+                        } else {
+                            showExtensionPrompt = true
+                        }
+                    }) {
+                        Icon(
+                            Icons.Filled.Terminal,
+                            contentDescription = "Open in CodeOSS (Ubuntu Terminal)",
+                            tint = if (isCompanionInstalled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+
                     var expanded by remember { mutableStateOf(false) }
                     Box {
                         TextButton(onClick = { expanded = true }) { Text(language, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
@@ -538,6 +562,81 @@ fun CodeEditorScreen(
                                             Spacer(Modifier.width(4.dp))
                                             Text("Run Code", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (showExtensionPrompt) {
+                androidx.compose.ui.window.Dialog(
+                    onDismissRequest = { showExtensionPrompt = false }
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .offset(x = 4.dp, y = 4.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(brutalBorderColor())
+                        )
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(2.dp, brutalBorderColor())
+                        ) {
+                            Column(modifier = Modifier.padding(18.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(Color(0xFF2563EB))
+                                            .border(BorderStroke(1.5.dp, brutalBorderColor()), RoundedCornerShape(10.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Filled.Terminal, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text("CodeOSS & Ubuntu Terminal", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                        Text("Minimal Linux runtime for Android", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Text(
+                                    "Run your code directly in a minimal Ubuntu Linux environment with CodeOSS (VS Code OSS). Install this lightweight extension pack to unlock offline shell execution.",
+                                    fontSize = 13.sp,
+                                    lineHeight = 18.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    OutlinedButton(
+                                        onClick = { showExtensionPrompt = false },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(10.dp),
+                                        border = BorderStroke(1.5.dp, brutalBorderColor())
+                                    ) {
+                                        Text("Dismiss", fontWeight = FontWeight.Bold)
+                                    }
+                                    Button(
+                                        onClick = {
+                                            showExtensionPrompt = false
+                                            onNavigate("profile")
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C3AED)),
+                                        border = BorderStroke(1.5.dp, brutalBorderColor())
+                                    ) {
+                                        Text("Get Extension", fontWeight = FontWeight.Bold, color = Color.White)
                                     }
                                 }
                             }

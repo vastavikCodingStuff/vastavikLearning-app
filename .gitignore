@@ -1,6 +1,7 @@
 # Built application files
 *.apk
 !app/src/main/assets/*.apk
+!app/src/main/assets/companion/*.apk
 *.aar
 *.ap_
 *.aab

@@ -21,9 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.zIndex
 import com.vastavik.computer.ui.screens.onboarding.SettingsViewModel
+import com.vastavik.computer.utils.CodeOssManager
 import com.vastavik.computer.ui.theme.BrutalCard
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
@@ -41,10 +49,40 @@ fun ProfileScreen(
     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
     val isUpdateAvailable = updateInfo?.isUpdateAvailable == true
 
+    var isCompanionInstalled by remember { mutableStateOf(CodeOssManager.isCompanionInstalled(context)) }
+    var isCodeOssPreferred by remember { mutableStateOf(CodeOssManager.isCodeOssPreferred(context)) }
+    var showCodeOssSheet by remember { mutableStateOf(false) }
+    val downloadState by CodeOssManager.downloadState.collectAsState()
+
+    // Shimmer animation for the extension pack option
+    val infiniteTransition = rememberInfiniteTransition(label = "codeoss_shine")
+    val shineOffset by infiniteTransition.animateFloat(
+        initialValue = -300f,
+        targetValue = 900f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shineOffset"
+    )
+    val shineBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFFFD600),
+            Color(0xFFFF6D00),
+            Color(0xFF8B5CF6),
+            Color(0xFF00E5FF),
+            Color(0xFFFFD600)
+        ),
+        start = Offset(shineOffset, 0f),
+        end = Offset(shineOffset + 350f, 350f)
+    )
+
     LaunchedEffect(Unit) {
         if (updateInfo == null) {
             com.vastavik.computer.utils.AppUpdater.checkGitHubRelease()
         }
+        isCompanionInstalled = CodeOssManager.isCompanionInstalled(context)
+        isCodeOssPreferred = CodeOssManager.isCodeOssPreferred(context)
     }
 
     Scaffold(
@@ -432,6 +470,98 @@ fun ProfileScreen(
                     backgroundColor = MaterialTheme.colorScheme.surface
                 ) {
                     Column {
+                        // Shining First Option: CodeOSS Extension Pack (Ubuntu Terminal + VS Code)
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { showCodeOssSheet = true }
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(
+                                                Color(0xFF7C3AED).copy(alpha = 0.08f),
+                                                Color(0xFFFFD600).copy(alpha = 0.08f)
+                                            )
+                                        )
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(
+                                            Brush.linearGradient(
+                                                listOf(Color(0xFF2563EB), Color(0xFF7C3AED))
+                                            )
+                                        )
+                                        .border(BorderStroke(2.dp, shineBrush), RoundedCornerShape(10.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Terminal,
+                                        contentDescription = "CodeOSS Extension",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(14.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            "CodeOSS Extension Pack",
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.onBackground
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(Color(0xFFFFD600))
+                                                .border(BorderStroke(1.dp, Color.Black), RoundedCornerShape(6.dp))
+                                                .padding(horizontal = 5.dp, vertical = 1.dp)
+                                        ) {
+                                            Text(
+                                                "✨ PRO",
+                                                fontSize = 9.sp,
+                                                fontWeight = FontWeight.Black,
+                                                color = Color.Black
+                                            )
+                                        }
+                                    }
+                                    Text(
+                                        if (isCompanionInstalled) "Ubuntu Terminal + VS Code • Active" else "Minimal Ubuntu Terminal & VS Code • Tap to Install",
+                                        fontSize = 11.sp,
+                                        fontWeight = if (!isCompanionInstalled) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (!isCompanionInstalled) Color(0xFFD97706) else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isCompanionInstalled) Color(0xFFDCFCE7) else Color(0xFFFEF3C7))
+                                        .border(
+                                            BorderStroke(1.dp, if (isCompanionInstalled) Color(0xFF16A34A) else Color(0xFFD97706)),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        if (isCompanionInstalled) "ACTIVE" else "INSTALL",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isCompanionInstalled) Color(0xFF15803D) else Color(0xFFB45309)
+                                    )
+                                }
+                            }
+                            HorizontalDivider(
+                                thickness = 1.5.dp,
+                                color = bb
+                            )
+                        }
+
                         val menuItems = buildList {
                             add(Quadruple("Edit Profile", "Manage info & avatar", Icons.Filled.Edit, "edit_profile"))
                             add(Quadruple("Select Course", "Choose your path", Icons.Filled.MenuBook, "course"))
@@ -597,6 +727,331 @@ fun ProfileScreen(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(18.dp)
                             )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (showCodeOssSheet) {
+            androidx.compose.ui.window.Dialog(
+                onDismissRequest = { showCodeOssSheet = false },
+                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.94f)
+                        .wrapContentHeight()
+                        .padding(end = 4.dp, bottom = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .offset(x = 5.dp, y = 5.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(bb)
+                    )
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(2.dp, bb)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(18.dp)
+                        ) {
+                            // Header with Terminal Icon & Close Button
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(Color(0xFF2563EB))
+                                        .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(10.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Terminal,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "Vastavik CodeOSS Studio",
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        "Ubuntu Linux Server & Integrated Terminal",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(
+                                    onClick = { showCodeOssSheet = false },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(Icons.Filled.Close, contentDescription = "Close")
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // Feature Breakdown Cards
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // Card 1: Minimal Ubuntu
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.4f)), RoundedCornerShape(10.dp))
+                                        .padding(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("🐧", fontSize = 20.sp)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            "Minimal Ubuntu Terminal",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                        Text(
+                                            "Stripped to raw bash + coreutils with zero background overhead. Real Linux execution without root.",
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                // Card 2: Proper VS Code OSS
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.4f)), RoundedCornerShape(10.dp))
+                                        .padding(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("💻", fontSize = 20.sp)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            "CodeOSS (VS Code Web Engine)",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                        Text(
+                                            "Official VS Code OSS core with multi-file tabs, file tree, syntax highlights & open-vsx extensions.",
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+
+                                // Card 3: Modular Companion APK
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                        .border(BorderStroke(1.dp, bb.copy(alpha = 0.4f)), RoundedCornerShape(10.dp))
+                                        .padding(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("📦", fontSize = 20.sp)
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column {
+                                        Text(
+                                            "Separate APK Extension Pack",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                        Text(
+                                            "Keeps the main app lightweight. If uninstalled, the default built-in editor stays active seamlessly.",
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Installation / Action Area
+                            if (isCompanionInstalled) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(Color(0xFFDCFCE7))
+                                            .border(BorderStroke(1.dp, Color(0xFF16A34A)), RoundedCornerShape(10.dp))
+                                            .padding(10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = Color(0xFF15803D))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Column {
+                                            Text("Extension Installed & Ready", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF15803D))
+                                            Text("Package: com.vastavik.codeoss", fontSize = 11.sp, color = Color(0xFF166534))
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(10.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                val newState = !isCodeOssPreferred
+                                                isCodeOssPreferred = newState
+                                                CodeOssManager.setCodeOssPreferred(context, newState)
+                                            }
+                                            .padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            checked = isCodeOssPreferred,
+                                            onCheckedChange = {
+                                                isCodeOssPreferred = it
+                                                CodeOssManager.setCodeOssPreferred(context, it)
+                                            }
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Use CodeOSS as primary code editor", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    Box(modifier = Modifier.fillMaxWidth().padding(end = 3.dp, bottom = 3.dp)) {
+                                        Box(
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .offset(x = 3.dp, y = 3.dp)
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .background(bs)
+                                        )
+                                        Button(
+                                            onClick = {
+                                                showCodeOssSheet = false
+                                                CodeOssManager.launchCodeOss(context)
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB)),
+                                            shape = RoundedCornerShape(10.dp),
+                                            border = BorderStroke(1.5.dp, bb)
+                                        ) {
+                                            Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = Color.White)
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text("Open CodeOSS Studio", fontWeight = FontWeight.Bold, color = Color.White)
+                                        }
+                                    }
+                                }
+                            } else {
+                                when (val state = downloadState) {
+                                    is CodeOssManager.DownloadState.Idle -> {
+                                        Box(modifier = Modifier.fillMaxWidth().padding(end = 3.dp, bottom = 3.dp)) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .matchParentSize()
+                                                    .offset(x = 3.dp, y = 3.dp)
+                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .background(bs)
+                                            )
+                                            Button(
+                                                onClick = {
+                                                    CodeOssManager.downloadCompanion(context) { file ->
+                                                        isCompanionInstalled = CodeOssManager.isCompanionInstalled(context)
+                                                    }
+                                                },
+                                                modifier = Modifier.fillMaxWidth(),
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C3AED)),
+                                                shape = RoundedCornerShape(10.dp),
+                                                border = BorderStroke(1.5.dp, bb)
+                                            ) {
+                                                Icon(Icons.Filled.Download, contentDescription = null, tint = Color.White)
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text("Download & Install Extension", fontWeight = FontWeight.Bold, color = Color.White)
+                                            }
+                                        }
+                                    }
+                                    is CodeOssManager.DownloadState.Downloading -> {
+                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Text("Downloading Extension...", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                                Text("${state.progress}%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF7C3AED))
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            LinearProgressIndicator(
+                                                progress = { state.progress / 100f },
+                                                modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                                                color = Color(0xFF7C3AED)
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                "${state.downloadedBytes / (1024 * 1024)} MB / ${state.totalBytes / (1024 * 1024)} MB",
+                                                fontSize = 11.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                    is CodeOssManager.DownloadState.ReadyToInstall -> {
+                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                            Text("Download complete! Ready to install.", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF15803D))
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Button(
+                                                onClick = {
+                                                    val intent = CodeOssManager.buildInstallIntent(context, state.apkFile)
+                                                    if (intent != null) context.startActivity(intent)
+                                                },
+                                                modifier = Modifier.fillMaxWidth(),
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF16A34A)),
+                                                shape = RoundedCornerShape(10.dp),
+                                                border = BorderStroke(1.5.dp, bb)
+                                            ) {
+                                                Icon(Icons.Filled.InstallMobile, contentDescription = null, tint = Color.White)
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text("Install Now", fontWeight = FontWeight.Bold, color = Color.White)
+                                            }
+                                        }
+                                    }
+                                    is CodeOssManager.DownloadState.Error -> {
+                                        Column(modifier = Modifier.fillMaxWidth()) {
+                                            Text("Error: ${state.message}", fontSize = 11.sp, color = Color(0xFFDC2626))
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Button(
+                                                onClick = {
+                                                    CodeOssManager.downloadCompanion(context)
+                                                },
+                                                modifier = Modifier.fillMaxWidth(),
+                                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+                                                shape = RoundedCornerShape(10.dp),
+                                                border = BorderStroke(1.5.dp, bb)
+                                            ) {
+                                                Text("Retry Download", fontWeight = FontWeight.Bold, color = Color.White)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

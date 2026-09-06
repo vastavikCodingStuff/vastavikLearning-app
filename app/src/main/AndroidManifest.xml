@@ -30,6 +30,14 @@
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
+    <!-- Inter-App Extension Pack Visibility -->
+    <queries>
+        <package android:name="com.vastavik.codeoss" />
+        <intent>
+            <action android:name="com.vastavik.codeoss.OPEN_EDITOR" />
+        </intent>
+    </queries>
+
     <application
         android:name=".VastavikApplication"
         android:allowBackup="true"

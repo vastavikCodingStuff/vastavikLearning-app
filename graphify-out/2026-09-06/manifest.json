@@ -168,9 +168,9 @@
     "semantic_hash": "0966bdacd6a9fbedd2aa229d63f87e89"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/editor/CodeEditorScreen.kt": {
-    "mtime": 1788648172.7095184,
-    "seen": 1788648886.4187007,
-    "ast_hash": "0d3de61b2b1c2dc4695d3897f94ec7d8",
+    "mtime": 1788692333.1856596,
+    "seen": 1788692501.8804817,
+    "ast_hash": "9cb45ab245e38b2d3851a3c70648cbb7",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/editor/OcrExerciseScreen.kt": {
@@ -324,9 +324,9 @@
     "semantic_hash": "e6137d2b157bc2974b9349ec284165ae"
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileScreen.kt": {
-    "mtime": 1788639138.4463036,
-    "seen": 1788642668.6201158,
-    "ast_hash": "6208389bec949eaad09cb573c9897179",
+    "mtime": 1788691968.8296769,
+    "seen": 1788692501.8805578,
+    "ast_hash": "ce29cc9d51a3ade1e7a6554ec467c64d",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileViewModel.kt": {
@@ -468,9 +468,9 @@
     "semantic_hash": "8bf98568a0262cb39f3a991729becc4f"
   },
   "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt": {
-    "mtime": 1788639138.4405842,
-    "seen": 1788642668.620035,
-    "ast_hash": "168f195dd4ff8093a843bb8296e76d50",
+    "mtime": 1788691794.3479059,
+    "seen": 1788692501.8803408,
+    "ast_hash": "d411cd47bc6bd7d24374cbf143fe922f",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/AuthInterceptor.kt": {
@@ -648,10 +648,10 @@
     "semantic_hash": "4d06c7c0d67c4f8e5f1b9a5018223897"
   },
   "tools/publish_release.ps1": {
-    "mtime": 1788490079.4935548,
-    "seen": 1788530227.0389273,
-    "ast_hash": "e357c16986c4c7ce7b9f19dd7830c783",
-    "semantic_hash": "e357c16986c4c7ce7b9f19dd7830c783"
+    "mtime": 1788649282.633304,
+    "seen": 1788649333.1369696,
+    "ast_hash": "5b498f9fc7e02edec5bb4c18068d96f3",
+    "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
     "mtime": 1788639137.9118347,
@@ -798,15 +798,45 @@
     "semantic_hash": ""
   },
   "RELEASE_NOTES_v1.0.32.md": {
-    "mtime": 1788648654.2231314,
-    "seen": 1788648886.418807,
-    "ast_hash": "1ffa763bc64c52939b69b3d9012961a0",
+    "mtime": 1788649247.4659352,
+    "seen": 1788649333.136977,
+    "ast_hash": "9d8a7e8914fb030f12cba8c0e9469c6e",
     "semantic_hash": ""
   },
   "app/src/main/assets/RELEASE_NOTES_v1.0.32.md": {
-    "mtime": 1788648654.2231314,
-    "seen": 1788648886.418824,
-    "ast_hash": "1ffa763bc64c52939b69b3d9012961a0",
+    "mtime": 1788649253.3517818,
+    "seen": 1788649333.1369896,
+    "ast_hash": "9d8a7e8914fb030f12cba8c0e9469c6e",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
+    "mtime": 1788691446.1504734,
+    "seen": 1788692501.880601,
+    "ast_hash": "5ae2811f9b9788a88d3653c04809de1e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/build.gradle.kts": {
+    "mtime": 1788692166.91827,
+    "seen": 1788692501.8806446,
+    "ast_hash": "98485f0601810c31d8052bb19d16c852",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/scripts/start-ubuntu.sh": {
+    "mtime": 1788692194.1622846,
+    "seen": 1788692501.8806474,
+    "ast_hash": "99b9000da86fa029863ec906d77ef36b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
+    "mtime": 1788692185.4572868,
+    "seen": 1788692501.88065,
+    "ast_hash": "5cd21bbb84c38c9210126f37be273bc3",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/README.md": {
+    "mtime": 1788692202.067497,
+    "seen": 1788692501.8806946,
+    "ast_hash": "21a1e1170e0c1780ac464f13134ebfd9",
     "semantic_hash": ""
   }
 }

@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "VastavikCode"
 include(":app")
+include(":companion-codeoss")
