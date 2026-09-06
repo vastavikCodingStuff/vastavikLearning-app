@@ -10,8 +10,11 @@ object ApiConfig {
     // Environment Presets
     const val URL_LOCAL_EMULATOR = "http://10.0.2.2:8000/"
     const val URL_RENDER_CLOUD = "https://vastaviklearning-backend-app.onrender.com/"
-    const val URL_RAILWAY_CLOUD = "https://vastavik-backend.up.railway.app/"
+    const val URL_RAILWAY_CLOUD = "https://vastaviklearning-backend-app.up.railway.app/"
     const val URL_PRODUCTION = "https://api.vastaviklearning.com/"
+
+    // Load-balanced candidates (Render + Railway). Order = default preference.
+    val LOAD_BALANCED_URLS = listOf(URL_RENDER_CLOUD, URL_RAILWAY_CLOUD)
 
     val BASE_URL: String
         get() {

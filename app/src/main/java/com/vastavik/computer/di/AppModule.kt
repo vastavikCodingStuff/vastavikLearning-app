@@ -53,14 +53,29 @@ object AppModule {
     fun provideAuthInterceptor(tokenManager: com.vastavik.computer.data.api.TokenManager): AuthInterceptor =
         AuthInterceptor(tokenManager)
 
+
+    @Provides
+    @Singleton
+    fun provideBackendLoadBalancer(): com.vastavik.computer.data.api.BackendLoadBalancer =
+        com.vastavik.computer.data.api.BackendLoadBalancer()
+
+    @Provides
+    @Singleton
+    fun provideLoadBalancerInterceptor(
+        loadBalancer: com.vastavik.computer.data.api.BackendLoadBalancer
+    ): com.vastavik.computer.data.api.LoadBalancerInterceptor =
+        com.vastavik.computer.data.api.LoadBalancerInterceptor(loadBalancer)
+
     @Provides
     @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
-        tokenAuthenticator: com.vastavik.computer.data.api.TokenAuthenticator
+        tokenAuthenticator: com.vastavik.computer.data.api.TokenAuthenticator,
+        loadBalancerInterceptor: com.vastavik.computer.data.api.LoadBalancerInterceptor
     ): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
         return OkHttpClient.Builder()
+            .addInterceptor(loadBalancerInterceptor)   // rewrite host first
             .addInterceptor(authInterceptor)
             .authenticator(tokenAuthenticator)
             .addInterceptor(logging)
@@ -69,6 +84,7 @@ object AppModule {
             .writeTimeout(ApiConfig.WRITE_TIMEOUT_SEC, TimeUnit.SECONDS)
             .build()
     }
+
 
     @Provides
     @Singleton
