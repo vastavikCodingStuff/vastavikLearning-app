@@ -1,44 +1,44 @@
 # Graph Report - vastavikLearning-app  (2026-09-06)
 
 ## Corpus Check
-- 143 files · ~121,619 words
+- 145 files · ~122,535 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1309 nodes · 2677 edges · 82 communities (68 shown, 14 thin omitted)
+- 1323 nodes · 2689 edges · 90 communities (76 shown, 14 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 56 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4997e7a5`
+- Built from commit: `be526f9d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - brutalBorderColor
 - AppModule
-- JSONObject
+- VastavikAiDiskCache
 - ChatScreen.kt
-- TelegramNotificationManager
+- MainActivity
 - PracticeScreen.kt
 - AppUpdater
 - codeoss/MainActivity.kt
 - CommonComponents.kt
-- MeetingForegroundService.kt
+- BrutalCard
 - QuizModel
 - AuthViewModel
 - MeetingClient
 - WebRtcMeetingClient
-- StudentSelection
-- MeetingModels.kt
 - CourseModel
+- MeetingModels.kt
+- LearningViewModel
 - MeetingEvent
 - MeetingViewModel
 - QuizTakingScreen.kt
 - VastavikApiRepository
 - FirestoreRepository
 - LocalMeetingClient
-- SettingsViewModel
+- HomeScreen.kt
 - DeviceSecurityChecker
 - DebugLogBox
 - ChatModel.kt
@@ -61,37 +61,45 @@
 - graphify.md
 - WebRtcSignalingClient
 - VastavikApiService
-- R
+- VastavikYouTubePlayer.kt
 - CommonResponse
 - TokenManager
 - OcrExerciseScreen.kt
 - VastavikAiStreamer.kt
 - TokenAuthenticator.kt
-- neoShape
+- AppNavHost
 - 🚀 Key Highlights in this Release
 - WhiteboardTool
-- .cleanOcrCode
+- PredictOutputSetScreen.kt
 - 🚀 Key Highlights in this Release
 - VideoLessonViewModel.kt
 - .executeCode
 - Resource
 - 🚀 Key Highlights in this Release
-- MainActivity
+- VastavikAi
 - 🚀 Key Highlights in this Release
 - AiConversationCache
 - RazorpayPaymentMethod
 - CodeEditorScreen.kt
 - UbuntuTerminalEngine
 - LoadBalancerInterceptor
-- FirebaseMessagingService
-- ThemePreferences
+- StudentConversationManager
+- PaymentHistoryScreen.kt
 - start-ubuntu.sh
 - NoteResponse
 - 🚀 Key Highlights in this Release
 - Vastavik CodeOSS Extension Pack (Companion Module)
 - 🚀 Key Highlights in this Release
 - BackendLoadBalancer
-- Judge0Service
+- JSONObject
+- PYQScreen.kt
+- 🚀 Key Highlights in this Release
+- Participant
+- WebSocketListener
+- 🚀 Key Highlights in this Release
+- AuthInterceptor
+- .createPaymentOrder
+- SegmentType
 
 ## God Nodes (most connected - your core abstractions)
 1. `brutalBorderColor()` - 107 edges
@@ -120,50 +128,46 @@
 ## Import Cycles
 - None detected.
 
-## Communities (82 total, 14 thin omitted)
+## Communities (90 total, 14 thin omitted)
 
 ### Community 0 - "brutalBorderColor"
-Cohesion: 0.05
-Nodes (96): ArrowButton(), BannerAccent, DEV, PROMO, BannerCard(), BannerPage, BannersPagerOverlay(), androidx (+88 more)
+Cohesion: 0.11
+Nodes (36): DebugLogBoxOverlay(), Modifier, ChatBubble(), ClassLobbyCard(), ControlButton(), formatTime(), ImageVector, Modifier (+28 more)
 
 ### Community 1 - "AppModule"
-Cohesion: 0.14
-Nodes (11): AuthInterceptor, Interceptor, Response, AppModule, com, Context, FirebaseAuth, FirebaseFirestore (+3 more)
-
-### Community 2 - "JSONObject"
-Cohesion: 0.28
-Nodes (3): Context, VastavikAiDiskCache, JSONObject
+Cohesion: 0.17
+Nodes (8): AppModule, com, Context, FirebaseAuth, FirebaseFirestore, SharedPreferences, OkHttpClient, Retrofit
 
 ### Community 3 - "ChatScreen.kt"
-Cohesion: 0.10
-Nodes (24): StudentChatMessage, Context, ListenerRegistration, Response, StateFlow, WebSocket, StudentConversationManager, WebSocketListener (+16 more)
+Cohesion: 0.23
+Nodes (14): callVastavikAiChat(), ChatSyntaxColors, highlightCode(), androidx, Color, com, Modifier, MarkdownSegment (+6 more)
 
-### Community 4 - "TelegramNotificationManager"
-Cohesion: 0.20
-Nodes (11): Modifier, TelegramNotificationCard(), TelegramNotificationHost(), Context, StateFlow, TelegramBannerData, TelegramBannerType, APP_UPDATE (+3 more)
+### Community 4 - "MainActivity"
+Cohesion: 0.05
+Nodes (31): Bundle, ComponentActivity, Intent, MainActivity, Modifier, TelegramNotificationCard(), TelegramNotificationHost(), androidx (+23 more)
 
 ### Community 5 - "PracticeScreen.kt"
-Cohesion: 0.09
-Nodes (45): WaveformVisualizer(), BottomDevBanner(), callVastavikAiGenerateMCQTopics(), callVastavikAiGeneratePredictOutput(), callVastavikAiGenerateQuestions(), CodingCard(), CodingContent(), CodingItem (+37 more)
+Cohesion: 0.13
+Nodes (34): WaveformVisualizer(), callVastavikAiGenerateMCQTopics(), callVastavikAiGeneratePredictOutput(), callVastavikAiGenerateQuestions(), CodingCard(), CodingContent(), CodingItem, CodingPromptDialog() (+26 more)
 
 ### Community 6 - "AppUpdater"
-Cohesion: 0.10
-Nodes (18): android, AppUpdateInfo, DocumentSnapshot, AnnotatedString, Color, Modifier, MarkdownContent(), parseInlineMarkdown() (+10 more)
+Cohesion: 0.09
+Nodes (19): android, AppUpdateInfo, DocumentSnapshot, AnnotatedString, Color, Modifier, MarkdownContent(), parseInlineMarkdown() (+11 more)
 
 ### Community 7 - "codeoss/MainActivity.kt"
 Cohesion: 0.16
 Nodes (15): CodeOssMainScreen(), WebViewClient, CompanionTab, CODE_OSS, UBUNTU_TERMINAL, generateFallbackHtml(), Bundle, ComponentActivity (+7 more)
 
 ### Community 8 - "CommonComponents.kt"
-Cohesion: 0.12
-Nodes (35): appendFormattedText(), BottomNavItem(), ButtonVariant, Error, Outlined, Primary, Secondary, ChatBubble() (+27 more)
+Cohesion: 0.11
+Nodes (36): appendFormattedText(), BottomNavItem(), ButtonVariant, Error, Outlined, Primary, Secondary, ChatBubble() (+28 more)
 
-### Community 9 - "MeetingForegroundService.kt"
-Cohesion: 0.24
-Nodes (6): Intent, MeetingForegroundService, MeetingNotificationManager, IBinder, Notification, Service
+### Community 9 - "BrutalCard"
+Cohesion: 0.19
+Nodes (18): NinjaCelebrationOverlay(), DoubtSolvingScreen(), BrutalPlanCard(), PaymentScreen(), BugReportScreen(), ProfileScreen(), Quadruple, BrutalBoxCard() (+10 more)
 
 ### Community 10 - "QuizModel"
-Cohesion: 0.14
+Cohesion: 0.12
 Nodes (9): CodingChallenge, DocumentSnapshot, PYQModel, QuizModel, QuizQuestion, TestCase, StateFlow, ViewModel (+1 more)
 
 ### Community 11 - "AuthViewModel"
@@ -171,48 +175,48 @@ Cohesion: 0.07
 Nodes (14): AuthRepository, FirebaseAuth, FirebaseUser, Flow, AuthUiState, AuthViewModel, Context, FirebaseUser (+6 more)
 
 ### Community 12 - "MeetingClient"
-Cohesion: 0.11
-Nodes (4): LiveChatMessage, ReplyPreview, StateFlow, MeetingClient
+Cohesion: 0.09
+Nodes (8): ConnectionState, CONNECTED, CONNECTING, DISCONNECTED, FAILED, RECONNECTING, StateFlow, MeetingClient
 
 ### Community 13 - "WebRtcMeetingClient"
-Cohesion: 0.16
+Cohesion: 0.17
 Nodes (3): WebRtcSignal, ListenerRegistration, WebRtcMeetingClient
 
-### Community 14 - "StudentSelection"
+### Community 14 - "CourseModel"
 Cohesion: 0.15
-Nodes (7): BannerModel, DocumentSnapshot, PopularTopicModel, StudentSelection, HomeViewModel, StateFlow, ViewModel
+Nodes (8): BannerModel, DocumentSnapshot, PopularTopicModel, StudentSelection, CourseModel, HomeViewModel, StateFlow, ViewModel
 
 ### Community 15 - "MeetingModels.kt"
-Cohesion: 0.11
-Nodes (16): AuditLogEntry, ClassSession, MediaState, OFF, ON, Participant, ParticipantRole, ADMIN (+8 more)
-
-### Community 16 - "CourseModel"
 Cohesion: 0.12
-Nodes (7): CourseModel, DocumentSnapshot, PartModel, SubpartModel, StateFlow, ViewModel, LearningViewModel
+Nodes (14): AuditLogEntry, MediaState, OFF, ON, ParticipantRole, ADMIN, STARCAST, STUDENT (+6 more)
+
+### Community 16 - "LearningViewModel"
+Cohesion: 0.12
+Nodes (6): DocumentSnapshot, PartModel, SubpartModel, StateFlow, ViewModel, LearningViewModel
 
 ### Community 17 - "MeetingEvent"
 Cohesion: 0.10
 Nodes (21): AssignStarCast, ChatMessageSent, ClassStarted, EmojiReaction, FeatureToggle, Join, KickParticipant, Leave (+13 more)
 
 ### Community 18 - "MeetingViewModel"
-Cohesion: 0.08
-Nodes (9): ConnectionState, CONNECTED, CONNECTING, DISCONNECTED, FAILED, RECONNECTING, StateFlow, ViewModel (+1 more)
+Cohesion: 0.09
+Nodes (5): LiveChatMessage, ReplyPreview, StateFlow, ViewModel, MeetingViewModel
 
 ### Community 19 - "QuizTakingScreen.kt"
 Cohesion: 0.21
 Nodes (19): QuizManager, QuizQuestionData, callVastavikAiBrief(), containsCode(), drawPdfPageFrame(), androidx, AnnotatedString, Canvas (+11 more)
 
 ### Community 20 - "VastavikApiRepository"
-Cohesion: 0.11
-Nodes (11): Result, T, AppUpdateResponse, CurriculumResponse, HomeCatalogResponse, LessonResponse, PYQResponse, SearchResponse (+3 more)
+Cohesion: 0.09
+Nodes (14): CircuitBreaker, Result, T, RouteMaintenanceException, AppUpdateResponse, CurriculumResponse, HomeCatalogResponse, LessonResponse (+6 more)
 
 ### Community 21 - "FirestoreRepository"
-Cohesion: 0.14
-Nodes (6): DocumentSnapshot, UserModel, FirestoreRepository, FirebaseFirestore, Flow, Constants
+Cohesion: 0.20
+Nodes (3): FirestoreRepository, FirebaseFirestore, Flow
 
-### Community 23 - "SettingsViewModel"
-Cohesion: 0.23
-Nodes (8): androidx, ImageVector, SectionHeader(), SettingsRow(), SettingsScreen(), Flow, ViewModel, SettingsViewModel
+### Community 23 - "HomeScreen.kt"
+Cohesion: 0.18
+Nodes (20): ArrowButton(), BannerAccent, DEV, PROMO, BannerCard(), BannerPage, BannersPagerOverlay(), androidx (+12 more)
 
 ### Community 24 - "DeviceSecurityChecker"
 Cohesion: 0.32
@@ -231,8 +235,8 @@ Cohesion: 0.24
 Nodes (4): DocumentSnapshot, SubscriptionModel, SubscriptionPlan, TransactionModel
 
 ### Community 28 - "OnboardingViewModel"
-Cohesion: 0.22
-Nodes (3): StateFlow, ViewModel, OnboardingViewModel
+Cohesion: 0.16
+Nodes (5): DocumentSnapshot, UserModel, StateFlow, ViewModel, OnboardingViewModel
 
 ### Community 29 - "Vastavik Learning App"
 Cohesion: 0.22
@@ -251,8 +255,8 @@ Cohesion: 0.25
 Nodes (8): ElementType, ARROW, ELLIPSE, ERASER, LINE, PEN, RECTANGLE, TEXT
 
 ### Community 34 - "PeerChatClient"
-Cohesion: 0.22
-Nodes (6): isConnected, Response, WebSocket, PeerChatClient, message, sender
+Cohesion: 0.18
+Nodes (7): ApiConfig, isConnected, Response, WebSocket, PeerChatClient, message, sender
 
 ### Community 35 - "AuthResponse"
 Cohesion: 0.21
@@ -260,7 +264,7 @@ Nodes (5): AuthResponse, LoginRequest, OAuthGitHubRequest, OAuthGoogleRequest, S
 
 ### Community 36 - "BackendModels.kt"
 Cohesion: 0.18
-Nodes (10): BannerItem, ChatHistoryItem, ChatRequest, ChatResponse, CourseItem, CreateOrderRequest, CreateOrderResponse, PartItem (+2 more)
+Nodes (10): BannerItem, ChatHistoryItem, ChatRequest, ChatResponse, CourseItem, OcrCleanRequest, OcrCleanResponse, PartItem (+2 more)
 
 ### Community 37 - "DownloadProgressReceiver.kt"
 Cohesion: 0.53
@@ -283,16 +287,16 @@ Cohesion: 0.25
 Nodes (7): 1. High-Performance Vastavik AI Engine (`gemini-3.6-flash`), 2. Real-Time Admin Diagnostics Banner Box, 3. Student Info / Profile UI Refinements, 4. App Update Enhancements & Download Cancellation Fixes, 🛠 Fixes & Internal Changes, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.23
 
 ### Community 48 - "WebRtcSignalingClient"
-Cohesion: 0.17
-Nodes (8): ApiConfig, isConnected, Response, WebSocket, WebRtcSignalingClient, payloadJson, senderId, signalType
+Cohesion: 0.22
+Nodes (7): isConnected, Response, WebSocket, WebRtcSignalingClient, payloadJson, senderId, signalType
 
 ### Community 49 - "VastavikApiService"
 Cohesion: 0.16
 Nodes (6): RefreshTokenRequest, VastavikApiService, LessonModel, Call, MultipartBody, RequestBody
 
-### Community 50 - "R"
-Cohesion: 0.26
-Nodes (6): EngagementNotification, Context, Result, VastavikEngagementWorker, CoroutineWorker, R
+### Community 50 - "VastavikYouTubePlayer.kt"
+Cohesion: 0.17
+Nodes (9): HmacUtil, androidx, Modifier, VastavikYouTubePlayer(), AbstractYouTubePlayerListener, LifecycleEventObserver, Lifecycle, PlayerConstants (+1 more)
 
 ### Community 51 - "CommonResponse"
 Cohesion: 0.22
@@ -302,17 +306,13 @@ Nodes (4): CommonResponse, DeviceVerifyRequest, FcmTokenRequest, VisitedRequest
 Cohesion: 0.46
 Nodes (5): imageProxyToBitmap(), Bitmap, ImageCapture, ImageCaptureException, ImageProxy
 
-### Community 54 - "VastavikAiStreamer.kt"
-Cohesion: 0.29
-Nodes (5): CircuitBreaker, RouteMaintenanceException, Flow, VastavikAiStreamer, Exception
-
 ### Community 55 - "TokenAuthenticator.kt"
 Cohesion: 0.39
 Nodes (5): Response, TokenAuthenticator, Authenticator, Request, Route
 
-### Community 56 - "neoShape"
-Cohesion: 0.10
-Nodes (21): HmacUtil, androidx, Modifier, VastavikYouTubePlayer(), AbstractYouTubePlayerListener, LifecycleEventObserver, callVastavikAiInsight(), CodeNotesTab() (+13 more)
+### Community 56 - "AppNavHost"
+Cohesion: 0.12
+Nodes (29): AppNavHost(), ForgotPasswordScreen(), LoginScreen(), SignupScreen(), SplashScreen(), PeerChatScreen(), OcrExerciseScreen(), LobbyScreen() (+21 more)
 
 ### Community 57 - "🚀 Key Highlights in this Release"
 Cohesion: 0.20
@@ -322,21 +322,25 @@ Nodes (9): 1. Quiz PDF Safe-Area Formatter & Typography Overhaul, 2. Background 
 Cohesion: 0.17
 Nodes (14): Color, Modifier, NeoBrutalistWhiteboard(), WhiteboardTool, ARROW, ELLIPSE, ERASER, HAND (+6 more)
 
+### Community 59 - "PredictOutputSetScreen.kt"
+Cohesion: 0.28
+Nodes (10): getCanonicalOutputAndTrace(), isAnswerMatching(), OutputQuestion, PredictOutputSetScreen(), Canvas, Context, Paint, OutputCheckResult (+2 more)
+
 ### Community 60 - "🚀 Key Highlights in this Release"
 Cohesion: 0.22
 Nodes (8): 1. Always-On Admin Access & Offline Diagnostics, 2. FastAPI Backend Networking & Dual REST/gRPC Integration, 3. High Authentication, JWT Refresh & Cryptographic HMAC Verification, 4. Resilient Circuit Breaking & Route Maintenance Protection, 5. Real-Time Streaming & WebSockets, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.27, 🛠 Technical Details & Artifacts
 
 ### Community 63 - "Resource"
 Cohesion: 0.08
-Nodes (20): callVastavikAiChat(), com, CodeEditorSharedState, getBoardColor(), Color, PyqItem, PYQScreen(), Error (+12 more)
+Nodes (16): FirebaseMessagingService, Intent, MeetingForegroundService, MeetingNotificationManager, Error, Result, T, Loading (+8 more)
 
 ### Community 64 - "🚀 Key Highlights in this Release"
 Cohesion: 0.25
 Nodes (7): 1. Razorpay Integration & Complete PhonePe Direct Removal, 2. Official Tax Invoice & Payment Receipt PDF Generator, 3. Ninja Samurai Celebration Mode, 4. Unrestricted Administrator Access, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.30, 🛠 Technical Details & Artifacts
 
-### Community 65 - "MainActivity"
-Cohesion: 0.31
-Nodes (5): Bundle, ComponentActivity, Intent, MainActivity, VastavikTheme()
+### Community 65 - "VastavikAi"
+Cohesion: 0.26
+Nodes (6): AiEngineModel, GEMINI_36_HUMAN, GEMINI_37_DEMI_GOD, MISTRAL_GOD, VastavikAi, VastavikAiException
 
 ### Community 66 - "🚀 Key Highlights in this Release"
 Cohesion: 0.33
@@ -359,8 +363,16 @@ Cohesion: 0.46
 Nodes (3): Context, TerminalOutput, UbuntuTerminalEngine
 
 ### Community 71 - "LoadBalancerInterceptor"
-Cohesion: 0.53
+Cohesion: 0.70
 Nodes (3): Interceptor, Response, LoadBalancerInterceptor
+
+### Community 72 - "StudentConversationManager"
+Cohesion: 0.33
+Nodes (5): StudentChatMessage, Context, ListenerRegistration, StateFlow, StudentConversationManager
+
+### Community 73 - "PaymentHistoryScreen.kt"
+Cohesion: 0.39
+Nodes (5): PaymentHistoryItem, PaymentHistoryScreen(), Context, PaymentReceiptData, PaymentReceiptPdf
 
 ### Community 74 - "start-ubuntu.sh"
 Cohesion: 0.29
@@ -374,25 +386,53 @@ Nodes (6): 1. Code Editor Question Overview & Synchronization Overhaul, 2. Predi
 Cohesion: 0.29
 Nodes (6): 1. Code Editor Question Overview & Synchronization Overhaul, 2. Predict the Output Comprehensive Suite & Practice Clean-up, 3. In-App Update Download & Completion Experience, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.32, 🛠 Technical Details & Artifacts
 
+### Community 81 - "JSONObject"
+Cohesion: 0.31
+Nodes (3): ExecutionResult, Judge0Service, JSONObject
+
+### Community 82 - "PYQScreen.kt"
+Cohesion: 0.36
+Nodes (5): CodeEditorSharedState, getBoardColor(), Color, PyqItem, PYQScreen()
+
+### Community 83 - "🚀 Key Highlights in this Release"
+Cohesion: 0.29
+Nodes (6): 1. CodeOSS (VS Code OSS) & Minimal Ubuntu Linux Terminal Extension Pack, 2. Student Info (Profile) Shining Feature, 3. Built-In Editor Seamless Fallback & Inter-App Transfer, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.33, 🛠 Technical Details & Artifacts
+
+### Community 85 - "WebSocketListener"
+Cohesion: 0.48
+Nodes (3): Response, WebSocket, WebSocketListener
+
+### Community 86 - "🚀 Key Highlights in this Release"
+Cohesion: 0.29
+Nodes (6): 1. CodeOSS (VS Code OSS) & Minimal Ubuntu Linux Terminal Extension Pack, 2. Student Info (Profile) Shining Feature, 3. Built-In Editor Seamless Fallback & Inter-App Transfer, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.33, 🛠 Technical Details & Artifacts
+
+### Community 87 - "AuthInterceptor"
+Cohesion: 0.70
+Nodes (3): AuthInterceptor, Interceptor, Response
+
+### Community 89 - "SegmentType"
+Cohesion: 0.50
+Nodes (4): SegmentType, CODE, DIVIDER, TEXT
+
 ## Knowledge Gaps
-- **171 isolated node(s):** `CourseItem`, `BannerItem`, `TopicItem`, `PartItem`, `SubpartItem` (+166 more)
+- **179 isolated node(s):** `CourseItem`, `BannerItem`, `TopicItem`, `PartItem`, `SubpartItem` (+174 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `brutalBorderColor()` connect `brutalBorderColor` to `ChatScreen.kt`, `TelegramNotificationManager`, `PracticeScreen.kt`, `CodeEditorScreen.kt`, `AppUpdater`, `CommonComponents.kt`, `QuizTakingScreen.kt`, `OcrExerciseScreen.kt`, `WhiteboardTool`, `Resource`?**
-  _High betweenness centrality (0.127) - this node is a cross-community bridge._
-- **Why does `brutalShadowColor()` connect `brutalBorderColor` to `ChatScreen.kt`, `TelegramNotificationManager`, `PracticeScreen.kt`, `AppUpdater`, `CommonComponents.kt`, `QuizTakingScreen.kt`, `OcrExerciseScreen.kt`, `WhiteboardTool`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
-- **Why does `LessonModel` connect `VastavikApiService` to `CommonComponents.kt`, `CourseModel`, `FirestoreRepository`, `neoShape`, `VideoLessonViewModel.kt`?**
+- **Why does `brutalBorderColor()` connect `brutalBorderColor` to `ChatScreen.kt`, `MainActivity`, `PracticeScreen.kt`, `CodeEditorScreen.kt`, `AppUpdater`, `CommonComponents.kt`, `BrutalCard`, `PaymentHistoryScreen.kt`, `PYQScreen.kt`, `QuizTakingScreen.kt`, `OcrExerciseScreen.kt`, `HomeScreen.kt`, `AppNavHost`, `WhiteboardTool`, `PredictOutputSetScreen.kt`?**
+  _High betweenness centrality (0.124) - this node is a cross-community bridge._
+- **Why does `brutalShadowColor()` connect `brutalBorderColor` to `ChatScreen.kt`, `MainActivity`, `PracticeScreen.kt`, `AppUpdater`, `CommonComponents.kt`, `BrutalCard`, `QuizTakingScreen.kt`, `OcrExerciseScreen.kt`, `HomeScreen.kt`, `AppNavHost`, `WhiteboardTool`, `PredictOutputSetScreen.kt`?**
   _High betweenness centrality (0.087) - this node is a cross-community bridge._
+- **Why does `LessonModel` connect `VastavikApiService` to `CommonComponents.kt`, `LearningViewModel`, `FirestoreRepository`, `AppNavHost`, `VideoLessonViewModel.kt`?**
+  _High betweenness centrality (0.083) - this node is a cross-community bridge._
 - **What connects `CourseItem`, `BannerItem`, `TopicItem` to the rest of the system?**
-  _171 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _179 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `brutalBorderColor` be split into smaller, more focused modules?**
-  _Cohesion score 0.05123546511627907 - nodes in this community are weakly interconnected._
-- **Should `AppModule` be split into smaller, more focused modules?**
-  _Cohesion score 0.14153846153846153 - nodes in this community are weakly interconnected._
-- **Should `ChatScreen.kt` be split into smaller, more focused modules?**
-  _Cohesion score 0.09682539682539683 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11058823529411765 - nodes in this community are weakly interconnected._
+- **Should `MainActivity` be split into smaller, more focused modules?**
+  _Cohesion score 0.05493863237872589 - nodes in this community are weakly interconnected._
+- **Should `PracticeScreen.kt` be split into smaller, more focused modules?**
+  _Cohesion score 0.12762762762762764 - nodes in this community are weakly interconnected._
