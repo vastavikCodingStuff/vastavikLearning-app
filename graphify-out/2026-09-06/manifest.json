@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788648642.7093253,
-    "seen": 1788648886.4185677,
-    "ast_hash": "272d68f1c3e4efc796fea19a9ca229f8",
+    "mtime": 1788693868.8421948,
+    "seen": 1788695217.1721945,
+    "ast_hash": "b747ec1b67ecedf8a3926b186a7a08ec",
     "semantic_hash": ""
   },
   "app/google-services.json": {
@@ -810,9 +810,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
-    "mtime": 1788692636.6681461,
-    "seen": 1788693648.1016839,
-    "ast_hash": "1b83cff90186dd567b95093243fa9b34",
+    "mtime": 1788693881.5268173,
+    "seen": 1788695217.1725295,
+    "ast_hash": "c3346f399caf1a3309009f37dce3d939",
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
@@ -855,6 +855,18 @@
     "mtime": 1788692603.7232013,
     "seen": 1788693648.1017234,
     "ast_hash": "a3885a1deee33dd0a36213b95efe112d",
+    "semantic_hash": ""
+  },
+  "RELEASE_NOTES_v1.0.33.md": {
+    "mtime": 1788693895.9748816,
+    "seen": 1788695217.172616,
+    "ast_hash": "ff3fb0a03010c5ea8ed0576b5e9ba876",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.33.md": {
+    "mtime": 1788693895.9748816,
+    "seen": 1788695217.1726496,
+    "ast_hash": "ff3fb0a03010c5ea8ed0576b5e9ba876",
     "semantic_hash": ""
   }
 }
