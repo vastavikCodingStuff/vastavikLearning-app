@@ -1,5 +1,6 @@
 package com.vastavik.computer.data.repository
 
+import com.vastavik.computer.data.api.ApiConfig
 import com.vastavik.computer.data.api.CircuitBreaker.safeApiCall
 import com.vastavik.computer.data.api.TokenManager
 import com.vastavik.computer.data.api.VastavikApiService
@@ -96,6 +97,27 @@ class VastavikApiRepository @Inject constructor(
 
     fun logout() {
         tokenManager.clearTokens()
+    }
+
+    /**
+     * Send a batch of activity log entries to the backend. Returns true on
+     * confirmed 2xx response, false otherwise. Best-effort fire-and-forget.
+     */
+    suspend fun logActivity(payloadJson: String): Boolean {
+        return try {
+            val raw = okhttp3.RequestBody.create("application/json".toMediaTypeOrNull(), payloadJson)
+            val req = okhttp3.Request.Builder()
+                .url("${ApiConfig.BASE_URL.removeSuffix("/")}/api/v1/activity/log")
+                .post(raw)
+                .build()
+            val client = okhttp3.OkHttpClient.Builder()
+                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
+            client.newCall(req).execute().use { it.isSuccessful }
+        } catch (_: Exception) {
+            false
+        }
     }
 
     // ==========================================

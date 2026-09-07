@@ -84,6 +84,8 @@ class NotesViewModel @Inject constructor(
                 )
                 _notes.value = listOf(localNote) + _notes.value
             }
+            com.vastavik.computer.utils.ActivityLog.noteCreate(null, title, content.length)
+            com.vastavik.computer.utils.ActivityLog.flush(null)
         }
     }
 

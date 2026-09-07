@@ -49,6 +49,17 @@ fun AppNavHost(
     navController: NavHostController,
     startRoute: String = "splash"
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Auto-log every destination change so the user does not need to add
+    // explicit `ActivityLog.pageView(...)` calls at every onNavigate site.
+    androidx.compose.runtime.LaunchedEffect(navController) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            com.vastavik.computer.utils.ActivityLog.pageView(context, destination.route ?: "unknown")
+            com.vastavik.computer.utils.ActivityLog.flush(context)
+        }
+    }
+
     NavHost(navController = navController, startDestination = startRoute) {
         composable("splash") {
             SplashScreen(onNavigate = { route ->
@@ -129,10 +140,28 @@ fun AppNavHost(
                 navController.navigate(route)
             })
         }
-        composable("practice") {
-            PracticeScreen(onNavigate = { route ->
-                navController.navigate(route)
-            })
+        composable(
+            route = "practice?tab={tab}",
+            arguments = listOf(
+                navArgument("tab") {
+                    type = NavType.StringType
+                    defaultValue = "coding"
+                    nullable = true
+                }
+            )
+        ) { backStackEntry ->
+            val tab = backStackEntry.arguments?.getString("tab") ?: "coding"
+            val initialIndex = when (tab.lowercase()) {
+                "mcq", "mcqs" -> 0
+                "predict", "predict_output", "predict-the-output" -> 1
+                "coding" -> 2
+                "pyq", "pyqs" -> 3
+                else -> 2
+            }
+            PracticeScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                initialTabIndex = initialIndex
+            )
         }
         composable("chat") {
             ChatScreen(onNavigate = { route ->
@@ -296,7 +325,13 @@ fun AppNavHost(
             PredictOutputSetScreen(
                 setTitle = setTitle,
                 onNavigate = { route -> navController.navigate(route) },
-                onBack = { navController.popBackStack() }
+                onBack = {
+                    // Always return to the Practice page with the Predict the Output tab selected,
+                    // so the user does not land on the default Coding tab.
+                    navController.navigate("practice?tab=predict_output") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                }
             )
         }
         composable(route = "meeting_lobby/{classId}", arguments = listOf(navArgument("classId") { type = NavType.StringType })) { backStackEntry ->

@@ -646,6 +646,12 @@ fun BugReportScreen(onBack: () -> Unit) {
                                 } catch (_: Exception) {
                                     generatedTicketId = "VBUG-${Random.nextInt(10000, 99999)}"
                                 }
+                                com.vastavik.computer.utils.ActivityLog.bugReport(
+                                    context,
+                                    category = selectedCategory,
+                                    title = issueTitle
+                                )
+                                com.vastavik.computer.utils.ActivityLog.flush(context)
                                 isSubmitting = false
                                 showSuccessDialog = true
                             }

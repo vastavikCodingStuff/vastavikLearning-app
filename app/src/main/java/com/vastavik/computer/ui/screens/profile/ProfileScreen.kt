@@ -87,8 +87,9 @@ fun ProfileScreen(
         isCodeOssPreferred = CodeOssManager.isCodeOssPreferred(context)
         val prefs = context.getSharedPreferences("user_profile", android.content.Context.MODE_PRIVATE)
         val firebaseUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-        val savedName = prefs.getString("name", null) ?: firebaseUser?.displayName
-        if (!savedName.isNullOrBlank()) profileName = savedName
+        val rawName = prefs.getString("name", null) ?: firebaseUser?.displayName
+        val resolved = com.vastavik.computer.utils.DisplayName.resolveForUser(rawName, isAdmin)
+        if (resolved.isNotBlank()) profileName = resolved
         val savedEmail = firebaseUser?.email ?: prefs.getString("email", null)
         if (!savedEmail.isNullOrBlank()) profileEmail = savedEmail
     }
@@ -568,7 +569,6 @@ fun ProfileScreen(
                             add(Quadruple("Code Editor", "Practice live", Icons.Filled.Code, "code_editor"))
                             add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
                             add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
-                            add(Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"))
                             add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
                             add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
                             add(Quadruple("Bug Reporting", "Report issues & attach media", Icons.Filled.BugReport, "bug_report"))

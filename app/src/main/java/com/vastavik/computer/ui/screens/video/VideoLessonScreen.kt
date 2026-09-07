@@ -54,6 +54,7 @@ fun VideoLessonScreen(
     onBack: () -> Unit = {},
     viewModel: VideoLessonViewModel = hiltViewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
     var liked by remember { mutableStateOf(false) }
     var disliked by remember { mutableStateOf(false) }
@@ -108,11 +109,54 @@ fun VideoLessonScreen(
                     }
                 }
             } else {
+                var lastReportedSec by remember { mutableStateOf(-1) }
                 VastavikYouTubePlayer(
                     youtubeUrl = lesson?.youtubeUrl,
                     youtubeVideoId = lesson?.youtubeVideoId?.takeIf { it.isNotBlank() },
                     startSeconds = (lesson?.youtubePositionSec ?: 0).toFloat(),
-                    autoplay = true
+                    autoplay = true,
+                    onCurrentSecond = { sec ->
+                        val intSec = sec.toInt()
+                        // Throttle to one log event every 10 seconds, and also fire a
+                        // 25% / 50% / 75% / 100% milestone event.
+                        if (intSec > 0 && intSec - lastReportedSec >= 10) {
+                            lastReportedSec = intSec
+                            val dur = lesson?.durationSec?.toInt() ?: 0
+                            val pct = if (dur > 0) (intSec.toDouble() / dur) * 100.0 else 0.0
+                            com.vastavik.computer.utils.ActivityLog.videoWatch(
+                                context,
+                                lessonId = lessonId,
+                                currentSec = intSec,
+                                durationSec = dur,
+                                percent = pct
+                            )
+                            val milestone = when {
+                                pct >= 100.0 -> "100"
+                                pct >= 75.0 -> "75"
+                                pct >= 50.0 -> "50"
+                                pct >= 25.0 -> "25"
+                                else -> null
+                            }
+                            if (milestone != null) {
+                                com.vastavik.computer.utils.ActivityLog.log(
+                                    context,
+                                    "video_milestone",
+                                    mapOf(
+                                        "lesson_id" to lessonId,
+                                        "milestone_percent" to milestone,
+                                        "current_sec" to intSec
+                                    )
+                                )
+                                if (pct >= 95.0) {
+                                    com.vastavik.computer.utils.ActivityLog.lessonComplete(
+                                        context,
+                                        lessonId = lessonId,
+                                        courseId = courseId
+                                    )
+                                }
+                            }
+                        }
+                    }
                 )
             }
 
@@ -163,7 +207,10 @@ fun VideoLessonScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FilledTonalButton(
-                    onClick = { liked = !liked; if (liked) disliked = false },
+                    onClick = {
+                        liked = !liked; if (liked) disliked = false
+                        com.vastavik.computer.utils.ActivityLog.videoLike(context, lessonId, liked)
+                    },
                     shape = neoShape(20.dp),
                     colors = ButtonDefaults.filledTonalButtonColors(
                         containerColor = if (liked) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface
@@ -175,7 +222,10 @@ fun VideoLessonScreen(
                 }
                 Spacer(Modifier.width(12.dp))
                 FilledTonalButton(
-                    onClick = { disliked = !disliked; if (disliked) liked = false },
+                    onClick = {
+                        disliked = !disliked; if (disliked) liked = false
+                        com.vastavik.computer.utils.ActivityLog.log(context, "video_dislike", mapOf("lesson_id" to lessonId, "disliked" to disliked))
+                    },
                     shape = neoShape(20.dp),
                     colors = ButtonDefaults.filledTonalButtonColors(
                         containerColor = if (disliked) MaterialTheme.colorScheme.error.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface
