@@ -54,33 +54,50 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var hobbies by remember { mutableStateOf("") }
     var boardExpanded by remember { mutableStateOf(false) }
     var isSaving by remember { mutableStateOf(false) }
+    val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
 
     LaunchedEffect(Unit) {
         // 1. Load from local prefs and Firebase
         val prefs = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
         val firebaseUser = FirebaseAuth.getInstance().currentUser
+        val adminNow = com.vastavik.computer.utils.AdminSession.isAdmin.value
 
-        name = prefs.getString("name", null) ?: firebaseUser?.displayName ?: ""
+        val rawName = prefs.getString("name", null) ?: firebaseUser?.displayName ?: ""
+        name = com.vastavik.computer.utils.DisplayName.resolveForUser(rawName, adminNow)
         email = firebaseUser?.email ?: prefs.getString("email", "") ?: ""
-        school = prefs.getString("school", "") ?: ""
-        studentClass = prefs.getString("class", "") ?: ""
-        val savedBoard = prefs.getString("board", "") ?: "ICSE"
-        if (boards.contains(savedBoard)) {
-            board = savedBoard
+        // Admin profile shows "Admin" with no student details.
+        if (adminNow) {
+            school = ""
+            studentClass = ""
+            board = "ICSE"
+            dob = ""
+            hobbies = ""
+        } else {
+            school = prefs.getString("school", "") ?: ""
+            studentClass = prefs.getString("class", "") ?: ""
+            val savedBoard = prefs.getString("board", "") ?: "ICSE"
+            if (boards.contains(savedBoard)) {
+                board = savedBoard
+            }
+            dob = prefs.getString("dob", "") ?: ""
+            hobbies = prefs.getString("hobbies", "") ?: ""
         }
-        dob = prefs.getString("dob", "") ?: ""
-        hobbies = prefs.getString("hobbies", "") ?: ""
 
         // 2. Fetch latest from Backend API
         try {
             apiRepository?.getUserProfile()?.onSuccess { profile ->
-                if (profile.name.isNotBlank()) name = profile.name
-                if (profile.email.isNotBlank()) email = profile.email
-                if (!profile.school.isNullOrBlank()) school = profile.school
-                if (!profile.studentClass.isNullOrBlank()) studentClass = profile.studentClass
-                if (!profile.board.isNullOrBlank() && boards.contains(profile.board)) board = profile.board
-                if (!profile.dob.isNullOrBlank()) dob = profile.dob
-                if (!profile.hobbies.isNullOrBlank()) hobbies = profile.hobbies
+                if (adminNow) {
+                    name = com.vastavik.computer.utils.DisplayName.ADMIN
+                    email = profile.email.ifBlank { email }
+                } else {
+                    if (profile.name.isNotBlank()) name = com.vastavik.computer.utils.DisplayName.resolve(profile.name)
+                    if (profile.email.isNotBlank()) email = profile.email
+                    if (!profile.school.isNullOrBlank()) school = profile.school
+                    if (!profile.studentClass.isNullOrBlank()) studentClass = profile.studentClass
+                    if (!profile.board.isNullOrBlank() && boards.contains(profile.board)) board = profile.board
+                    if (!profile.dob.isNullOrBlank()) dob = profile.dob
+                    if (!profile.hobbies.isNullOrBlank()) hobbies = profile.hobbies
+                }
             }
         } catch (_: Exception) {}
     }
@@ -196,6 +213,8 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
             )
             Spacer(modifier = Modifier.height(16.dp))
 
+            if (!isAdmin) {
+
             // Class
             OutlinedTextField(
                 value = studentClass,
@@ -277,6 +296,33 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 singleLine = true
             )
             Spacer(modifier = Modifier.height(32.dp))
+
+            } else {
+                // Admin: short info card explaining why no student fields show.
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Administrator profile",
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "You are signed in as the app administrator. Class, board, school, " +
+                                "date of birth and hobbies are student-only fields and are not shown here.",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
 
             Button(
                 onClick = saveProfile,

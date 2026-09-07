@@ -18,8 +18,8 @@ android {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 40
-        versionName = "1.0.40"
+        versionCode = 41
+        versionName = "1.0.41"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true

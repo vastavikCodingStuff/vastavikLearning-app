@@ -28,6 +28,7 @@ import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -119,6 +120,7 @@ private fun convertSnippetToLanguage(code: String, lang: String): String {
 @Composable
 fun PracticeScreen(
     onNavigate: (String) -> Unit,
+    initialTabIndex: Int = 2,
     viewModel: PracticeViewModel = hiltViewModel()
 ) {
     val sirMcqs by viewModel.sirMcqs.collectAsState()
@@ -132,8 +134,9 @@ fun PracticeScreen(
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
 
-    var selectedTab by remember { mutableIntStateOf(2) } // Default to Coding: 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
-    var selectedSource by remember { mutableStateOf(QuestionSource.AI) } // 1. Top Toggle AI vs Sir
+    // 0: MCQs, 1: Predict the Output, 2: Coding, 3: PYQs
+    var selectedTab by rememberSaveable { mutableIntStateOf(initialTabIndex.coerceIn(0, 3)) }
+    var selectedSource by remember { mutableStateOf(QuestionSource.AI) }
     val tabs = listOf("MCQs", "Predict the Output", "Coding", "PYQs")
 
     // Active AI coding item for Vastavik AI solution sheet
@@ -449,6 +452,11 @@ fun PracticeScreen(
                         onNavigate = onNavigate,
                         onSolveSet = { item ->
                             val encoded = Uri.encode(item.title, "UTF-8")
+                            com.vastavik.computer.utils.ActivityLog.log(
+                                context,
+                                "predict_output_set_opened",
+                                mapOf("set_title" to item.title, "source" to selectedSource.name)
+                            )
                             onNavigate("predict_output_set/$encoded")
                         },
                         dynamicSirItems = sirPredict

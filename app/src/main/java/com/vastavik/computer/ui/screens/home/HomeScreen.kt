@@ -60,19 +60,19 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
     var showBanners by remember { mutableStateOf(!bannersShown) }
-    var displayName by remember { mutableStateOf("Student") }
+    var displayName by remember { mutableStateOf(com.vastavik.computer.utils.DisplayName.STUDENT_FALLBACK) }
+    val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
 
     LaunchedEffect(Unit) {
         com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
         val prefs = context.getSharedPreferences("user_profile", android.content.Context.MODE_PRIVATE)
         val firebaseUser = try { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser } catch (_: Exception) { null }
-        val savedName = prefs.getString("name", null) ?: firebaseUser?.displayName
-        if (!savedName.isNullOrBlank()) {
-            displayName = savedName
-        } else {
-            val emailName = firebaseUser?.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
-            if (!emailName.isNullOrBlank()) displayName = emailName
-        }
+        val rawName = prefs.getString("name", null) ?: firebaseUser?.displayName
+        val emailPart = firebaseUser?.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
+        displayName = com.vastavik.computer.utils.DisplayName.resolveForUser(
+            rawName = rawName ?: emailPart,
+            isAdmin = isAdmin
+        )
     }
     val bannerPages = remember {
         listOf(
@@ -202,6 +202,12 @@ private fun HomeTab(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
+        // Mandatory update banner — appears first so it cannot be missed.
+        item {
+            com.vastavik.computer.ui.components.MandatoryUpdateBanner(
+                onClick = { onNavigate("app_update") }
+            )
+        }
         item {
             VastavikTopBar(
                 onProfileClick = { onNavigate("profile") },

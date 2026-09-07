@@ -54,7 +54,8 @@ fun VastavikYouTubePlayer(
     autoplay: Boolean = true,
     modifier: Modifier = Modifier,
     onReady: (() -> Unit)? = null,
-    onError: ((String) -> Unit)? = null
+    onError: ((String) -> Unit)? = null,
+    onCurrentSecond: ((Float) -> Unit)? = null
 ) {
     val videoId = remember(youtubeUrl, youtubeVideoId) {
         youtubeVideoId?.takeIf { it.length == 11 } ?: youtubeUrl?.let { HmacUtil.extractVideoId(it) }
@@ -127,6 +128,10 @@ fun VastavikYouTubePlayer(
 
                         override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
                             if (state == PlayerConstants.PlayerState.PLAYING) isLoading = false
+                        }
+
+                        override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                            onCurrentSecond?.invoke(second)
                         }
                     }, iFrameOptions)
                 }

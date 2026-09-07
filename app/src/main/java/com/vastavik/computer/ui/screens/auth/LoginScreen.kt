@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,9 +40,11 @@ import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 import com.vastavik.computer.utils.AdminSession
 import kotlinx.coroutines.launch
+import com.vastavik.computer.utils.ActivityLog
 
 private val PrimaryIndigo = Color(0xFF2563EB)
 private val AdminRed = Color(0xFFDC2626)
+private val GithubBlack = Color(0xFF24292F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,15 +56,16 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
+    var showAdminConfirm by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val coroutineScope = rememberCoroutineScope()
 
-    // Security: block system back from the login screen so user cannot accidentally
-    // back out into the foreground app (e.g. web search results).
+    // Security: block system back from the login screen.
     BackHandler(enabled = true) { /* swallow */ }
 
+    // Google Sign-In
     val googleSignInClient: GoogleSignInClient = remember {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.default_web_client_id))
@@ -78,8 +82,24 @@ fun LoginScreen(
                 val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                 val account = task.getResult(ApiException::class.java)
                 val idToken = account?.idToken
+                val email = account?.email
                 if (!idToken.isNullOrEmpty()) {
+                    ActivityLog.log(context, "login_google_success", mapOf("email" to (email ?: "")))
                     viewModel.signInWithGoogle(idToken)
+                } else if (email != null) {
+                    // OAuth client not configured on Firebase but the user picked an account.
+                    // Fall back to Firebase's built-in signInWithCredential on the email
+                    // by requesting a token via the FirebaseAuth current user path.
+                    ActivityLog.log(context, "login_google_no_idtoken_fallback", mapOf("email" to email))
+                    // Try the credential path directly through the AuthViewModel.
+                    val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken ?: "", null)
+                    // No idToken means we cannot build a credential — surface a clear error.
+                    android.widget.Toast.makeText(
+                        context,
+                        "Google sign-in is missing the OAuth client configuration. " +
+                            "Set default_web_client_id in strings.xml to your Firebase Web client ID.",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
                 } else {
                     android.widget.Toast.makeText(context, "Google sign-in failed: no token", android.widget.Toast.LENGTH_SHORT).show()
                 }
@@ -97,30 +117,40 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Box(modifier = Modifier.padding(bottom = 20.dp)) {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // ---- Computer / Brand icon (TAP = admin login) ----
+            Box(
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .clickable {
+                        ActivityLog.log(context, "login_admin_icon_tap", mapOf("source" to "login_screen"))
+                        showAdminConfirm = true
+                    }
+            ) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
                         .offset(x = 5.dp, y = 5.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(18.dp))
                         .background(bs)
                 )
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(84.dp)
+                        .clip(RoundedCornerShape(18.dp))
                         .background(PrimaryIndigo)
-                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(16.dp)),
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(18.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.LaptopChromebook,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Vastavik - tap to login as Admin",
+                        modifier = Modifier.size(42.dp),
                         tint = Color.White
                     )
                 }
@@ -132,113 +162,183 @@ fun LoginScreen(
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Sign in to continue your learning journey",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(20.dp))
 
-            // ===========================================================
-            // Swipeable Auth Method Carousel
-            // Page 0: Google Sign-In (initial)
-            // Page 1: Email + Password (default existing form)
-            // Page 2: Direct Admin Login (swipe to reveal)
-            // ===========================================================
-            var currentAuthPage by remember { mutableIntStateOf(0) }
-            val authPagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 0) { 3 }
+            Spacer(modifier = Modifier.height(28.dp))
 
-            androidx.compose.runtime.LaunchedEffect(authPagerState.currentPage) {
-                currentAuthPage = authPagerState.currentPage
-            }
+            // ---- Email ----
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true
+            )
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 280.dp)
+            // ---- Password ----
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                trailingIcon = {
+                    IconButton(onClick = { obscurePassword = !obscurePassword }) {
+                        Icon(
+                            imageVector = if (obscurePassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = "Toggle password"
+                        )
+                    }
+                },
+                visualTransformation = if (obscurePassword) PasswordVisualTransformation() else VisualTransformation.None,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = bb,
+                    focusedBorderColor = bb,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true
+            )
+            TextButton(
+                onClick = { onNavigate("forgot_password") },
+                modifier = Modifier.align(Alignment.End)
             ) {
-                androidx.compose.foundation.pager.HorizontalPager(
-                    state = authPagerState,
-                    modifier = Modifier.fillMaxSize(),
-                    userScrollEnabled = true
-                ) { page ->
-                    when (page) {
-                        0 -> GoogleSignInPage(
-                            onGoogleClick = { googleLauncher.launch(googleSignInClient.signInIntent) },
-                            onEmailLogin = {
-                                coroutineScope.launch {
-                                    authPagerState.animateScrollToPage(1)
-                                }
-                            },
-                            bb = bb,
-                            bs = bs,
-                            isLoading = uiState.isLoading
-                        )
-                        1 -> EmailLoginPage(
-                            email = email,
-                            password = password,
-                            onEmailChange = { email = it },
-                            onPasswordChange = { password = it },
-                            obscurePassword = obscurePassword,
-                            onToggleObscure = { obscurePassword = !obscurePassword },
-                            onSubmit = {
-                                if (email.isNotBlank() && password.isNotBlank()) {
-                                    viewModel.signIn(email.trim(), password.trim(), context)
-                                } else {
-                                    android.widget.Toast.makeText(context, "Please enter your email and password", android.widget.Toast.LENGTH_SHORT).show()
-                                }
-                            },
-                            onForgotPassword = { onNavigate("forgot_password") },
-                            bb = bb,
-                            bs = bs,
-                            isLoading = uiState.isLoading
-                        )
-                        2 -> AdminLoginPage(
-                            onAdminClick = {
-                                email = AdminSession.ADMIN_EMAIL
-                                password = AdminSession.ADMIN_PASSWORD
-                                viewModel.loginAsAdmin(context)
-                            },
-                            bb = bb,
-                            bs = bs,
-                            isLoading = uiState.isLoading
-                        )
+                Text("Forgot Password?", color = PrimaryIndigo, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // ---- Log In ----
+            Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 5.dp, y = 5.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bs)
+                )
+                Button(
+                    onClick = {
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            ActivityLog.log(context, "login_email_submit", mapOf("email" to email.trim()))
+                            viewModel.signIn(email.trim(), password.trim(), context)
+                        } else {
+                            android.widget.Toast.makeText(context, "Please enter your email and password", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+                    enabled = !uiState.isLoading
+                ) {
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                    } else {
+                        Text("Log In", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
 
-            // Page indicator dots
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(3) { i ->
-                    val active = i == currentAuthPage
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // ---- Google ----
+            Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 5.dp, y = 5.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bs)
+                )
+                Button(
+                    onClick = { googleLauncher.launch(googleSignInClient.signInIntent) },
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color(0xFF1F1F1F)),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                ) {
                     Box(
                         modifier = Modifier
-                            .height(6.dp)
-                            .width(if (active) 22.dp else 6.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(if (active) PrimaryIndigo else MaterialTheme.colorScheme.outlineVariant)
-                    )
+                            .size(22.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF4285F4)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("G", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text("Sign in with Google", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = when (currentAuthPage) {
-                    0 -> "Swipe left for email login • Swipe again for admin"
-                    1 -> "Swipe left for admin login"
-                    else -> "Swipe right to go back"
-                },
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
+            Spacer(modifier = Modifier.height(10.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // ---- GitHub ----
+            Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .offset(x = 5.dp, y = 5.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bs)
+                )
+                Button(
+                    onClick = {
+                        ActivityLog.log(context, "login_github_clicked", emptyMap())
+                        android.widget.Toast.makeText(
+                            context,
+                            "GitHub sign-in is being configured. Please use email login for now.",
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    },
+                    enabled = !uiState.isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = GithubBlack, contentColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Code,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text("Sign in with GitHub", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -255,7 +355,30 @@ fun LoginScreen(
                     modifier = Modifier.clickable { onNavigate("signup") }
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+
+    if (showAdminConfirm) {
+        AlertDialog(
+            onDismissRequest = { showAdminConfirm = false },
+            title = { Text("Sign in as Admin?", fontWeight = FontWeight.ExtraBold) },
+            text = { Text("You are about to sign in using the administrator account. This is reserved for the app owner.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showAdminConfirm = false
+                    ActivityLog.log(context, "login_admin_confirmed", mapOf("email" to AdminSession.ADMIN_EMAIL))
+                    email = AdminSession.ADMIN_EMAIL
+                    password = AdminSession.ADMIN_PASSWORD
+                    viewModel.loginAsAdmin(context)
+                }) {
+                    Text("Continue", fontWeight = FontWeight.Bold, color = AdminRed)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAdminConfirm = false }) { Text("Cancel") }
+            }
+        )
     }
 
     LaunchedEffect(uiState.isSuccess) {
@@ -272,272 +395,3 @@ fun LoginScreen(
         }
     }
 }
-
-@Composable
-private fun GoogleSignInPage(
-    onGoogleClick: () -> Unit,
-    onEmailLogin: () -> Unit,
-    bb: Color,
-    bs: Color,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 4.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFFF5F5F5))
-                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "G", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF4285F4))
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            "Continue with Google",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "Fastest way to sign in. We never post anything on your behalf.",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(18.dp))
-        Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(x = 5.dp, y = 5.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(bs)
-            )
-            Button(
-                onClick = onGoogleClick,
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color(0xFF1F1F1F)),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp, color = PrimaryIndigo)
-                } else {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(22.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF4285F4)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("G", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("Sign in with Google", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        TextButton(onClick = onEmailLogin) {
-            Text("Use email & password instead", color = PrimaryIndigo, fontWeight = FontWeight.SemiBold)
-        }
-        Spacer(Modifier.weight(1f))
-    }
-}
-
-@Composable
-private fun EmailLoginPage(
-    email: String,
-    password: String,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    obscurePassword: Boolean,
-    onToggleObscure: () -> Unit,
-    onSubmit: () -> Unit,
-    onForgotPassword: () -> Unit,
-    bb: Color,
-    bs: Color,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 4.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(4.dp))
-        OutlinedTextField(
-            value = email,
-            onValueChange = onEmailChange,
-            label = { Text("Email") },
-            leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = bb,
-                focusedBorderColor = bb,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        OutlinedTextField(
-            value = password,
-            onValueChange = onPasswordChange,
-            label = { Text("Password") },
-            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
-            trailingIcon = {
-                IconButton(onClick = onToggleObscure) {
-                    Icon(
-                        imageVector = if (obscurePassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                        contentDescription = "Toggle password"
-                    )
-                }
-            },
-            visualTransformation = if (obscurePassword) PasswordVisualTransformation() else VisualTransformation.None,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = bb,
-                focusedBorderColor = bb,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                focusedContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
-        )
-        TextButton(
-            onClick = onForgotPassword,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("Forgot Password?", color = PrimaryIndigo, fontWeight = FontWeight.Bold)
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(x = 5.dp, y = 5.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(bs)
-            )
-            Button(
-                onClick = onSubmit,
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
-                } else {
-                    Text("Log In", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AdminLoginPage(
-    onAdminClick: () -> Unit,
-    bb: Color,
-    bs: Color,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 4.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.weight(1f))
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(AdminRed.copy(alpha = 0.1f))
-                .border(BorderStroke(1.5.dp, AdminRed), RoundedCornerShape(16.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Filled.AdminPanelSettings,
-                contentDescription = null,
-                tint = AdminRed,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            "Direct Admin Login",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "Restricted to the app owner. Do not use unless you are the administrator.",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(18.dp))
-        Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .offset(x = 5.dp, y = 5.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(bs)
-            )
-            Button(
-                onClick = onAdminClick,
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(BorderStroke(2.dp, AdminRed), RoundedCornerShape(12.dp)),
-                colors = ButtonDefaults.buttonColors(containerColor = AdminRed),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
-                } else {
-                    Icon(Icons.Filled.AdminPanelSettings, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Login as Admin", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-        Spacer(Modifier.weight(1f))
-    }
-}
-
-private val CircleShape = androidx.compose.foundation.shape.CircleShape

@@ -43,6 +43,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Track app-open / app-background so the activity log captures session boundaries.
+        com.vastavik.computer.utils.ActivityLog.appOpen(this)
+        com.vastavik.computer.utils.ActivityLog.flush(this)
+
         // Request POST_NOTIFICATIONS permission on Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -150,6 +154,12 @@ class MainActivity : ComponentActivity() {
         } catch (e: Exception) {
             Log.w("MainActivity", "High refresh rate request failed: ${e.message}")
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        com.vastavik.computer.utils.ActivityLog.appBackground(this)
+        com.vastavik.computer.utils.ActivityLog.flush(this)
     }
 
     override fun onNewIntent(intent: Intent) {
