@@ -56,9 +56,13 @@ data class UserProfileResponse(
     val role: String = "student",
     @SerializedName("is_premium") val isPremium: Boolean = false,
     val board: String? = "ICSE",
+    @SerializedName("student_class") val studentClass: String? = "Class 10",
     @SerializedName("preferred_language") val preferredLanguage: String? = "Java",
+    val languages: List<String> = listOf("Java", "Python", "JavaScript", "SQL"),
     @SerializedName("streak_count") val streakCount: Int = 0,
-    @SerializedName("lessons_completed") val lessonsCompleted: Int = 0
+    @SerializedName("lessons_completed") val lessonsCompleted: Int = 0,
+    @SerializedName("completion_rate") val completionRate: Double = 0.0,
+    @SerializedName("payment_details") val paymentDetails: List<Map<String, Any>> = emptyList()
 )
 
 // ==========================================
@@ -122,7 +126,9 @@ data class LessonResponse(
     @SerializedName("code_sample") val codeSample: String = "",
     val notes: String = "",
     @SerializedName("is_premium") val isPremium: Boolean = false,
-    val order: Int = 0
+    val order: Int = 0,
+    @SerializedName("video_format") val videoFormat: String = "screen_recording",
+    @SerializedName("shorts_url") val shortsUrl: String? = null
 )
 
 data class VisitedRequest(
@@ -260,4 +266,96 @@ data class AppUpdateResponse(
     @SerializedName("download_url") val downloadUrl: String = "",
     val changelog: String = "",
     @SerializedName("is_mandatory") val isMandatory: Boolean = false
+)
+
+// ==========================================
+// Practice Sir Models
+// ==========================================
+
+data class MCQItemDto(
+    val id: String = "",
+    val title: String = "",
+    val sub: String = "",
+    val question: String? = null,
+    val options: List<String> = emptyList(),
+    @SerializedName("correct_index") val correctIndex: Int = 0,
+    val explanation: String? = null,
+    val subject: String = "Java",
+    val topic: String = "OOP",
+    val difficulty: String = "Easy",
+    val source: String = "sir"
+)
+
+data class CodingExerciseDto(
+    val id: String = "",
+    val title: String = "",
+    val difficulty: String = "Easy",
+    val topic: String = "Arrays",
+    val language: String = "java",
+    val description: String? = null,
+    @SerializedName("starter_code") val starterCode: String? = null,
+    @SerializedName("solution_code") val solutionCode: String? = null,
+    @SerializedName("test_cases") val testCases: List<Map<String, String>> = emptyList(),
+    val source: String = "sir"
+)
+
+data class PredictOutputSetDto(
+    val id: String = "",
+    @SerializedName("set_number") val setNumber: Int = 1,
+    val title: String = "",
+    val topic: String = "",
+    @SerializedName("question_count") val questionCount: String = "10 Questions",
+    val difficulty: String = "Easy",
+    @SerializedName("code_snippet") val codeSnippet: String = "",
+    @SerializedName("expected_output") val expectedOutput: String? = null,
+    val source: String = "sir"
+)
+
+data class QuizSetDto(
+    val id: String = "",
+    val title: String = "",
+    val subject: String = "Java",
+    @SerializedName("question_count") val questionCount: Int = 10,
+    @SerializedName("created_at") val createdAt: String = "",
+    @SerializedName("course_id") val courseId: String? = null
+)
+
+// ==========================================
+// Course Progress Models
+// ==========================================
+
+data class CourseProgressDto(
+    @SerializedName("course_id") val courseId: String = "",
+    @SerializedName("course_title") val courseTitle: String = "",
+    @SerializedName("total_parts") val totalParts: Int = 0,
+    @SerializedName("completed_parts") val completedParts: Int = 0,
+    @SerializedName("completion_percent") val completionPercent: Double = 0.0,
+    @SerializedName("visited_part_ids") val visitedPartIds: List<String> = emptyList()
+)
+
+data class ProgressSummaryDto(
+    @SerializedName("total_courses_enrolled") val totalCoursesEnrolled: Int = 0,
+    @SerializedName("overall_completion_percent") val overallCompletionPercent: Double = 0.0,
+    val courses: List<CourseProgressDto> = emptyList()
+)
+
+// ==========================================
+// AI Session Models
+// ==========================================
+
+data class AiSessionDto(
+    @SerializedName("session_id") val sessionId: String = "",
+    val title: String? = "AI Tutoring Session",
+    @SerializedName("model_used") val modelUsed: String = "mistral-god",
+    @SerializedName("message_count") val messageCount: Int = 0,
+    @SerializedName("created_at") val createdAt: String = "",
+    @SerializedName("updated_at") val updatedAt: String = ""
+)
+
+data class UpdateProfileRequest(
+    val name: String? = null,
+    @SerializedName("student_class") val studentClass: String? = null,
+    val board: String? = null,
+    @SerializedName("preferred_language") val preferredLanguage: String? = null,
+    val languages: List<String>? = null
 )

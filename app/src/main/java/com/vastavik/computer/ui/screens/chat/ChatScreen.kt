@@ -157,7 +157,49 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
         }
     }
 
+    suspend fun callBackendAiChat(prompt: String, sessionId: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val base = com.vastavik.computer.data.api.ApiConfig.BASE_URL.trimEnd('/')
+                val url = URL("$base/api/v1/ai/chat")
+                val conn = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    connectTimeout = 7000
+                    readTimeout = 12000
+                    doOutput = true
+                    setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                    setRequestProperty("User-Agent", "VastavikLearningApp/${BuildConfig.VERSION_NAME}")
+                }
+                val historyArray = JSONArray()
+                messages.takeLast(6).forEach { msg ->
+                    historyArray.put(JSONObject().apply {
+                        put("role", if (msg.isUser) "user" else "assistant")
+                        put("content", msg.text)
+                    })
+                }
+                val payload = JSONObject().apply {
+                    put("prompt", prompt)
+                    put("session_id", sessionId)
+                    put("history", historyArray)
+                }
+                conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+                if (conn.responseCode in 200..299) {
+                    val respText = conn.inputStream.bufferedReader().readText()
+                    val json = JSONObject(respText)
+                    val reply = json.optString("reply", "")
+                    if (reply.isNotBlank()) reply else null
+                } else null
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
     suspend fun askVastavikAi(prompt: String): String {
+        val backendResp = callBackendAiChat(prompt, activeConversationId)
+        if (!backendResp.isNullOrBlank()) {
+            return backendResp
+        }
         return withContext(Dispatchers.IO) {
             callVastavikAiChat(selectedAiModel, messages + ChatMessage(prompt, isUser = true))
         }

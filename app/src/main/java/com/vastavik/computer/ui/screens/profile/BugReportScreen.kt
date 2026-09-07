@@ -42,8 +42,14 @@ import com.vastavik.computer.ui.theme.BrutalDefaults
 import com.vastavik.computer.ui.theme.NeoBrutalistColors
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
+import com.vastavik.computer.data.api.ApiConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -588,8 +594,58 @@ fun BugReportScreen(onBack: () -> Unit) {
                         if (issueTitle.isNotBlank() && issueDescription.isNotBlank() && !isSubmitting) {
                             isSubmitting = true
                             coroutineScope.launch {
-                                delay(1200) // Simulate packaging report and media upload
-                                generatedTicketId = "VBUG-${Random.nextInt(10000, 99999)}"
+                                try {
+                                    val diagJson = JSONObject().apply {
+                                        put("app_version", BuildConfig.VERSION_NAME)
+                                        put("build_code", BuildConfig.VERSION_CODE)
+                                        put("manufacturer", Build.MANUFACTURER)
+                                        put("model", Build.MODEL)
+                                        put("os_release", Build.VERSION.RELEASE)
+                                        put("api_level", Build.VERSION.SDK_INT)
+                                        put("severity", selectedSeverity)
+                                        put("steps", stepsToReproduce)
+                                    }.toString()
+
+                                    val boundary = "Boundary-${System.currentTimeMillis()}"
+                                    val base = ApiConfig.BASE_URL.trimEnd('/')
+                                    val url = URL("$base/api/v1/system/bug-report")
+                                    val conn = withContext(Dispatchers.IO) {
+                                        (url.openConnection() as HttpURLConnection).apply {
+                                            requestMethod = "POST"
+                                            setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+                                            doOutput = true
+                                            connectTimeout = 10000
+                                            readTimeout = 15000
+
+                                            outputStream.use { os ->
+                                                val writer = os.bufferedWriter()
+                                                fun writeField(name: String, value: String) {
+                                                    writer.write("--$boundary\r\n")
+                                                    writer.write("Content-Disposition: form-data; name=\"$name\"\r\n\r\n")
+                                                    writer.write(value)
+                                                    writer.write("\r\n")
+                                                }
+                                                writeField("title", issueTitle)
+                                                writeField("description", issueDescription)
+                                                writeField("category", selectedCategory)
+                                                writeField("device_diagnostics", diagJson)
+                                                writer.write("--$boundary--\r\n")
+                                                writer.flush()
+                                            }
+                                        }
+                                    }
+                                    val code = withContext(Dispatchers.IO) { conn.responseCode }
+                                    if (code in 200..299) {
+                                        val resp = withContext(Dispatchers.IO) { conn.inputStream.bufferedReader().readText() }
+                                        val json = JSONObject(resp)
+                                        generatedTicketId = json.optString("ticket_id", "VBUG-${Random.nextInt(10000, 99999)}")
+                                    } else {
+                                        generatedTicketId = "VBUG-${Random.nextInt(10000, 99999)}"
+                                    }
+                                    withContext(Dispatchers.IO) { conn.disconnect() }
+                                } catch (_: Exception) {
+                                    generatedTicketId = "VBUG-${Random.nextInt(10000, 99999)}"
+                                }
                                 isSubmitting = false
                                 showSuccessDialog = true
                             }

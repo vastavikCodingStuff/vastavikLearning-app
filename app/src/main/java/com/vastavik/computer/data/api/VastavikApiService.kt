@@ -37,6 +37,9 @@ interface VastavikApiService {
     @GET("api/v1/user/profile")
     suspend fun getUserProfile(): UserProfileResponse
 
+    @PUT("api/v1/user/profile")
+    suspend fun updateUserProfile(@Body request: UpdateProfileRequest): UserProfileResponse
+
     // ==========================================
     // Catalog & Curriculum
     // ==========================================
@@ -52,6 +55,12 @@ interface VastavikApiService {
 
     @POST("api/v1/progress/visited")
     suspend fun markPartVisited(@Body request: VisitedRequest): CommonResponse
+
+    @GET("api/v1/courses/{courseId}/progress")
+    suspend fun getCourseProgress(@Path("courseId") courseId: String): CourseProgressDto
+
+    @GET("api/v1/progress/summary")
+    suspend fun getProgressSummary(): ProgressSummaryDto
 
     // Legacy endpoint compatibility
     @GET("api/lessons/{lessonId}")
@@ -70,6 +79,46 @@ interface VastavikApiService {
 
     @POST("api/v1/ai/chat")
     suspend fun sendAiChat(@Body request: ChatRequest): ChatResponse
+
+    @GET("api/v1/ai/sessions")
+    suspend fun getAiSessions(): List<AiSessionDto>
+
+    @GET("api/v1/ai/sessions/{sessionId}")
+    suspend fun getAiSessionMessages(@Path("sessionId") sessionId: String): Map<String, Any>
+
+    @DELETE("api/v1/ai/sessions/{sessionId}")
+    suspend fun deleteAiSession(@Path("sessionId") sessionId: String): CommonResponse
+
+    // ==========================================
+    // Practice Sir
+    // ==========================================
+
+    @GET("api/v1/practice/mcq")
+    suspend fun getMcqs(
+        @Query("subject") subject: String? = null,
+        @Query("topic") topic: String? = null,
+        @Query("difficulty") difficulty: String? = null,
+        @Query("source") source: String? = null
+    ): List<MCQItemDto>
+
+    @GET("api/v1/practice/coding")
+    suspend fun getCodingExercises(
+        @Query("language") language: String? = null,
+        @Query("difficulty") difficulty: String? = null,
+        @Query("source") source: String? = null
+    ): List<CodingExerciseDto>
+
+    @GET("api/v1/practice/predict-output")
+    suspend fun getPredictOutputSets(
+        @Query("topic") topic: String? = null,
+        @Query("source") source: String? = null
+    ): List<PredictOutputSetDto>
+
+    @GET("api/v1/practice/quiz")
+    suspend fun getQuizzes(
+        @Query("subject") subject: String? = null,
+        @Query("course_id") courseId: String? = null
+    ): List<QuizSetDto>
 
     // ==========================================
     // Code Runner & OCR
@@ -102,7 +151,9 @@ interface VastavikApiService {
     suspend fun getPyqs(
         @Query("board") board: String? = null,
         @Query("year") year: String? = null,
-        @Query("subject") subject: String? = null
+        @Query("subject") subject: String? = null,
+        @Query("grade") grade: String? = null,
+        @Query("source") source: String? = null
     ): List<PYQResponse>
 
     // ==========================================

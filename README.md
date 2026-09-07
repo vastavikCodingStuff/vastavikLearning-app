@@ -124,7 +124,7 @@ com.vastavik.computer
     JUDGE0_AUTH_TOKEN=your_judge0_auth_token_here
 
     # Backend Endpoint Configuration
-    BACKEND_BASE_URL=https://vastavik-admin-backend.onrender.com
+    BACKEND_BASE_URL=https://vastaviklearning-backend-app.onrender.com
     API_KEY_ID=android-prod
     API_KEY_SECRET=your_hmac_secret_here
    ```

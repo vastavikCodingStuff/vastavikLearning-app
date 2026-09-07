@@ -13,6 +13,7 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID
+import com.vastavik.computer.data.api.ApiConfig
 
 data class AiConversation(
     val id: String = UUID.randomUUID().toString(),
@@ -162,10 +163,7 @@ object AiConversationCache {
 }
 
 object AiConversationSyncManager {
-    // Configured server endpoint (ready for when backend server is deployed)
-    private const val DEFAULT_SERVER_ENDPOINT = "https://api.vastavik.computer/api/v1/ai/conversations/telemetry"
-
-    fun syncConversationToServer(conversation: AiConversation) {
+    fun syncConversationToServer(conversation: AiConversation, authToken: String? = null) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val payload = JSONObject().apply {
@@ -185,22 +183,26 @@ object AiConversationSyncManager {
                     put("messages", msgsArray)
                 }
 
-                val url = URL(DEFAULT_SERVER_ENDPOINT)
+                val base = ApiConfig.BASE_URL.trimEnd('/')
+                val url = URL("$base/api/v1/ai/conversations/telemetry")
                 val conn = (url.openConnection() as HttpURLConnection).apply {
                     requestMethod = "POST"
-                    connectTimeout = 3000
-                    readTimeout = 3000
+                    connectTimeout = 4000
+                    readTimeout = 4000
                     doOutput = true
                     setRequestProperty("Content-Type", "application/json; charset=utf-8")
                     setRequestProperty("User-Agent", "VastavikLearningApp/${BuildConfig.VERSION_NAME}")
+                    if (!authToken.isNullOrBlank()) {
+                        setRequestProperty("Authorization", "Bearer $authToken")
+                    }
                 }
                 conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
                 val code = conn.responseCode
                 Log.d("AiConversationSync", "Server response code: $code")
             } catch (e: Exception) {
-                // Graceful fallback: Backend server is not yet deployed.
+                // Graceful fallback: Backend server may be offline or unreachable.
                 // Log silently; this MUST NEVER break, interrupt, or delay the AI chat.
-                Log.d("AiConversationSync", "Server sync skipped (server offline or unavailable): ${e.message}")
+                Log.d("AiConversationSync", "Server sync skipped: ${e.message}")
             }
         }
     }

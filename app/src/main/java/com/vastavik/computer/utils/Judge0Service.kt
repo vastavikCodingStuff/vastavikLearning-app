@@ -8,8 +8,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Code execution service backed by self-hosted Judge0.
- * Endpoint: http://139.84.172.230:2358/submissions?base64_encoded=false&wait=true (wait=true = synchronous)
+ * Code execution service with dual execution path:
+ * 1. Primary: Vastavik Backend Proxy (/api/v1/code/execute) which logs student telemetry to Firestore.
+ * 2. Fallback: Direct self-hosted Judge0 VPS (http://139.84.172.230:2358) if backend route is unavailable.
  */
 object Judge0Service {
 
@@ -23,6 +24,14 @@ object Judge0Service {
         else -> null
     }
 
+    private fun languageNameFor(languageId: Int): String = when (languageId) {
+        62 -> "java"
+        71 -> "python"
+        54 -> "cpp"
+        63 -> "javascript"
+        else -> "java"
+    }
+
     data class ExecutionResult(
         val success: Boolean,
         val output: String,
@@ -33,6 +42,50 @@ object Judge0Service {
 
     suspend fun runCode(languageId: Int, sourceCode: String, stdin: String = ""): ExecutionResult =
         withContext(Dispatchers.IO) {
+            // 1. Try Backend Proxy First (Provides telemetry & logs to code_executions)
+            try {
+                val backendBase = com.vastavik.computer.data.api.ApiConfig.BASE_URL.trimEnd('/')
+                val backendUrl = "$backendBase/api/v1/code/execute"
+                val conn = URL(backendUrl).openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.setRequestProperty("Accept", "application/json")
+                conn.connectTimeout = 8000
+                conn.readTimeout = 12000
+                conn.doOutput = true
+
+                val payload = JSONObject().apply {
+                    put("language", languageNameFor(languageId))
+                    put("source_code", sourceCode)
+                    put("stdin", stdin)
+                }
+                conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+
+                val code = conn.responseCode
+                if (code in 200..299) {
+                    val resp = conn.inputStream.bufferedReader().use { it.readText() }
+                    val json = JSONObject(resp)
+                    val success = json.optBoolean("success", false)
+                    val stdout = json.optString("stdout", "")
+                    val stderr = json.optString("stderr", "")
+                    val time = if (json.isNull("execution_time")) null else json.optString("execution_time", "")
+                    val mem = if (json.isNull("memory_kb")) null else json.optInt("memory_kb", 0).takeIf { it > 0 }
+                    val desc = json.optString("status_description", if (success) "Accepted" else "Execution Failed")
+                    conn.disconnect()
+                    return@withContext ExecutionResult(
+                        success = success,
+                        output = if (success) stdout else stderr.ifBlank { stdout },
+                        executionTime = time,
+                        memoryKb = mem,
+                        statusDescription = desc
+                    )
+                }
+                conn.disconnect()
+            } catch (_: Exception) {
+                // Backend proxy unavailable, fallback to direct Judge0
+            }
+
+            // 2. Direct Judge0 VPS Fallback
             val conn = URL(JUDGE0_URL).openConnection() as HttpURLConnection
             try {
                 conn.requestMethod = "POST"
