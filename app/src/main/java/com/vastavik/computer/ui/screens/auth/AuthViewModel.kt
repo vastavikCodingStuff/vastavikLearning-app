@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.vastavik.computer.data.repository.AuthRepository
+import com.vastavik.computer.data.repository.VastavikApiRepository
 import com.vastavik.computer.utils.AdminSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val apiRepository: VastavikApiRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState())
     val uiState = _uiState.asStateFlow()
@@ -46,16 +48,13 @@ class AuthViewModel @Inject constructor(
                     context?.let { AdminSession.setAdminLoggedIn(it, true) }
                     AdminSession.update(null)
 
-                    // Attempt background Firebase sync for admin without blocking if it errors
+                    // Attempt background sync for admin
                     try {
-                        try {
-                            authRepository.signInWithEmail(email, password)
-                        } catch (_: Exception) {
-                            authRepository.signUpWithEmail(email, password)
-                        }
-                    } catch (_: Exception) {
-                        // Ignore Firebase failures for admin; local session guarantees direct access
-                    }
+                        apiRepository.login(email, password)
+                    } catch (_: Exception) {}
+                    try {
+                        authRepository.signInWithEmail(email, password)
+                    } catch (_: Exception) {}
 
                     _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
                     return@launch
@@ -65,11 +64,38 @@ class AuthViewModel @Inject constructor(
                     throw IllegalStateException("Incorrect password for admin.")
                 }
 
-                authRepository.signInWithEmail(email, password)
-                FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
-                _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                // 1. Primary: Login via production Backend API (eliminates Firebase 500 error)
+                val apiResult = apiRepository.login(email.trim(), password)
+                if (apiResult.isSuccess && apiResult.getOrNull()?.success == true) {
+                    // Background sync with Firebase if reachable
+                    try {
+                        authRepository.signInWithEmail(email.trim(), password)
+                        FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
+                    } catch (_: Exception) {}
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                    return@launch
+                }
+
+                // 2. Fallback: Firebase Auth SDK
+                try {
+                    authRepository.signInWithEmail(email.trim(), password)
+                    FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                } catch (fbErr: Exception) {
+                    val rawMsg = fbErr.message ?: ""
+                    val cleanMsg = when {
+                        rawMsg.contains("500") || rawMsg.contains("internal", ignoreCase = true) ->
+                            apiResult.getOrNull()?.errorMessage ?: "Invalid email or password. Please try again."
+                        rawMsg.contains("user-not-found") || rawMsg.contains("wrong-password") || rawMsg.contains("INVALID_LOGIN_CREDENTIALS") ->
+                            "Invalid email or password."
+                        else ->
+                            apiResult.getOrNull()?.errorMessage ?: fbErr.message ?: "Sign in failed. Please check your credentials."
+                    }
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = cleanMsg)
+                }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign in failed")
+                val cleanError = if (e.message?.contains("500") == true) "Unable to connect to authentication service." else (e.message ?: "Sign in failed")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = cleanError)
             }
         }
     }
@@ -103,7 +129,7 @@ class AuthViewModel @Inject constructor(
         signIn(AdminSession.ADMIN_EMAIL, AdminSession.ADMIN_PASSWORD, context)
     }
 
-    fun signUp(email: String, password: String) {
+    fun signUp(email: String, password: String, name: String = "", board: String = "ICSE") {
         if (email.trim().equals(AdminSession.ADMIN_EMAIL, ignoreCase = true)) {
             _uiState.value = _uiState.value.copy(error = "This email is reserved. Students must use their own account.")
             return
@@ -111,11 +137,48 @@ class AuthViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true, error = null, isSuccess = false)
         viewModelScope.launch {
             try {
-                authRepository.signUpWithEmail(email, password)
-                FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
-                _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                val studentName = name.ifBlank {
+                    email.substringBefore("@").replaceFirstChar { it.uppercase() }
+                }
+
+                // 1. Primary: Register on production Backend API
+                val apiResult = apiRepository.signup(
+                    email = email.trim(),
+                    password = password,
+                    name = studentName,
+                    board = board
+                )
+
+                if (apiResult.isSuccess && apiResult.getOrNull()?.success == true) {
+                    // Background Firebase Auth registration if available
+                    try {
+                        authRepository.signUpWithEmail(email.trim(), password)
+                        FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
+                    } catch (_: Exception) {}
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                    return@launch
+                }
+
+                // 2. Fallback: Firebase Auth SDK
+                try {
+                    authRepository.signUpWithEmail(email.trim(), password)
+                    FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                } catch (fbErr: Exception) {
+                    val rawMsg = fbErr.message ?: ""
+                    val cleanMsg = when {
+                        rawMsg.contains("500") || rawMsg.contains("internal", ignoreCase = true) ->
+                            apiResult.getOrNull()?.errorMessage ?: "Sign up encountered a server error. Please try again in a few moments."
+                        rawMsg.contains("email-already-in-use") ->
+                            "An account with this email address already exists. Please log in."
+                        else ->
+                            apiResult.getOrNull()?.errorMessage ?: fbErr.message ?: "Sign up failed"
+                    }
+                    _uiState.value = _uiState.value.copy(isLoading = false, error = cleanMsg)
+                }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "Sign up failed")
+                val cleanError = if (e.message?.contains("500") == true) "Registration temporarily unavailable. Please try again." else (e.message ?: "Sign up failed")
+                _uiState.value = _uiState.value.copy(isLoading = false, error = cleanError)
             }
         }
     }
@@ -128,6 +191,17 @@ class AuthViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isLoading = true, error = null, isSuccess = false)
         viewModelScope.launch {
             try {
+                // Try backend Google OAuth
+                val apiRes = apiRepository.loginWithGoogle(idToken)
+                if (apiRes.isSuccess && apiRes.getOrNull()?.success == true) {
+                    try {
+                        authRepository.signInWithGoogle(idToken)
+                        FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
+                    } catch (_: Exception) {}
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
+                    return@launch
+                }
+
                 authRepository.signInWithGoogle(idToken)
                 FirebaseAuth.getInstance().currentUser?.let { syncUserDocument(it) }
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)

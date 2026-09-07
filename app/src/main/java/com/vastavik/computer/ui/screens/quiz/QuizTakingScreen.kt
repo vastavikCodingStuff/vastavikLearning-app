@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.vastavik.computer.BuildConfig
+import com.vastavik.computer.ui.components.VsCodeSnippetView
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.Dispatchers
@@ -640,20 +641,25 @@ fun QuizTakingScreen(
                     val questionText = questions[currentQuestion].question
                     val hasCode = containsCode(questionText)
 
-                    Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
-                        Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            border = BorderStroke(2.dp, bb),
-                            elevation = CardDefaults.cardElevation(0.dp)
-                        ) {
-                            if (hasCode) {
-                                Column(modifier = Modifier.padding(16.dp).heightIn(min = 120.dp, max = 300.dp).verticalScroll(rememberScrollState())) {
-                                    Text(questionText, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onBackground, fontFamily = FontFamily.Monospace, lineHeight = 20.sp)
-                                }
-                            } else {
+                    if (hasCode) {
+                        Box(modifier = Modifier.padding(bottom = 6.dp)) {
+                            VsCodeSnippetView(
+                                code = questionText,
+                                language = "java",
+                                showLineNumbers = true,
+                                maxHeight = 300.dp
+                            )
+                        }
+                    } else {
+                        Box(modifier = Modifier.padding(end = 5.dp, bottom = 5.dp)) {
+                            Box(modifier = Modifier.matchParentSize().offset(x = 5.dp, y = 5.dp).clip(RoundedCornerShape(16.dp)).background(bs))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                border = BorderStroke(2.dp, bb),
+                                elevation = CardDefaults.cardElevation(0.dp)
+                            ) {
                                 Column(modifier = Modifier.padding(20.dp)) {
                                     Text(questionText, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                                 }

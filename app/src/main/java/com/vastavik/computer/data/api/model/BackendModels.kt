@@ -57,6 +57,9 @@ data class UserProfileResponse(
     @SerializedName("is_premium") val isPremium: Boolean = false,
     val board: String? = "ICSE",
     @SerializedName("student_class") val studentClass: String? = "Class 10",
+    val school: String? = null,
+    val dob: String? = null,
+    val hobbies: String? = null,
     @SerializedName("preferred_language") val preferredLanguage: String? = "Java",
     val languages: List<String> = listOf("Java", "Python", "JavaScript", "SQL"),
     @SerializedName("streak_count") val streakCount: Int = 0,
@@ -356,6 +359,9 @@ data class UpdateProfileRequest(
     val name: String? = null,
     @SerializedName("student_class") val studentClass: String? = null,
     val board: String? = null,
+    val school: String? = null,
+    val dob: String? = null,
+    val hobbies: String? = null,
     @SerializedName("preferred_language") val preferredLanguage: String? = null,
     val languages: List<String>? = null
 )

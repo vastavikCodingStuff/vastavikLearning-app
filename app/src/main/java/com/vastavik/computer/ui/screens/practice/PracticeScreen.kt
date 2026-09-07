@@ -69,64 +69,21 @@ import androidx.compose.ui.text.withStyle
 import com.vastavik.computer.utils.VastavikAi
 import com.vastavik.computer.utils.VastavikAiDiskCache
 import com.vastavik.computer.utils.OutputCheckResult
+import com.vastavik.computer.ui.components.VsCodeSnippetView
+import com.vastavik.computer.ui.components.buildVsCodeAnnotatedString
 
 private enum class QuestionSource(val label: String, val tagBg: Color, val tagText: Color) {
     AI("AI-Generated", Color(0xFF2563EB), Color.White),
     SIR("Sir-Generated", Color(0xFFF59E0B), Color(0xFF0F172A))
 }
 
+private data class PracticeTopic(val title: String, val questionCount: String, val difficulty: String)
 private data class MCQItem(val title: String, val sub: String, val source: QuestionSource)
 private data class PredictOutputItem(val setNumber: Int, val title: String, val topic: String, val questionCount: String, val difficulty: String, val codeSnippet: String, val source: QuestionSource)
 private data class CodingItem(val title: String, val difficulty: String, val topic: String, val source: QuestionSource)
 private data class PYQItem(val title: String, val questions: String, val source: QuestionSource)
 
-private val practiceKeywords = setOf(
-    "class", "public", "static", "void", "main", "String", "int", "double", "float", "char", "boolean",
-    "if", "else", "for", "while", "do", "switch", "case", "default", "break", "continue", "return",
-    "def", "import", "from", "print", "range", "len", "in", "True", "False", "None", "let", "const", "var"
-)
-
-private fun highlightPracticeCode(code: String): AnnotatedString = buildAnnotatedString {
-    val lines = code.split("\n")
-    lines.forEachIndexed { lineIdx, line ->
-        var i = 0
-        while (i < line.length) {
-            if ((line[i] == '/' && i + 1 < line.length && line[i + 1] == '/') || line[i] == '#') {
-                withStyle(SpanStyle(color = Color(0xFF6A9955))) { append(line.substring(i)) }
-                i = line.length
-            } else if (line[i] == '"' || line[i] == '\'') {
-                val q = line[i]
-                var j = i + 1
-                while (j < line.length && line[j] != q) {
-                    if (line[j] == '\\') j++
-                    j++
-                }
-                j = minOf(j + 1, line.length)
-                withStyle(SpanStyle(color = Color(0xFFCE9178))) { append(line.substring(i, j)) }
-                i = j
-            } else if (line[i].isDigit()) {
-                var j = i
-                while (j < line.length && (line[j].isDigit() || line[j] == '.')) j++
-                withStyle(SpanStyle(color = Color(0xFFB5CEA8))) { append(line.substring(i, j)) }
-                i = j
-            } else if (line[i].isLetter() || line[i] == '_') {
-                var j = i
-                while (j < line.length && (line[j].isLetterOrDigit() || line[j] == '_')) j++
-                val word = line.substring(i, j)
-                if (word in practiceKeywords) {
-                    withStyle(SpanStyle(color = Color(0xFFC586C0), fontWeight = FontWeight.Bold)) { append(word) }
-                } else {
-                    withStyle(SpanStyle(color = Color(0xFFD4D4D4))) { append(word) }
-                }
-                i = j
-            } else {
-                withStyle(SpanStyle(color = Color(0xFF9CDCFE))) { append(line[i].toString()) }
-                i++
-            }
-        }
-        if (lineIdx < lines.lastIndex) append("\n")
-    }
-}
+private fun highlightPracticeCode(code: String): AnnotatedString = buildVsCodeAnnotatedString(code)
 
 private fun convertSnippetToLanguage(code: String, lang: String): String {
     return when (lang) {
@@ -2785,41 +2742,14 @@ private fun PredictOutputCard(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Code Snippet Preview Box
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
-                    border = BorderStroke(1.dp, bb.copy(alpha = 0.25f)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(10.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Filled.Terminal,
-                                contentDescription = null,
-                                tint = Color(0xFF2563EB),
-                                modifier = Modifier.size(13.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Code Tracing Preview",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = item.codeSnippet,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            lineHeight = 15.sp,
-                            maxLines = 4,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
+                // Code Snippet Preview Box with VS Code syntax highlighting
+                VsCodeSnippetView(
+                    code = item.codeSnippet,
+                    language = "java",
+                    showLineNumbers = true,
+                    allowCopy = false,
+                    maxHeight = 160.dp
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 

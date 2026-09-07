@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vastavik.computer.ui.components.VsCodeSnippetView
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 import com.vastavik.computer.utils.OutputCheckResult
@@ -565,41 +566,12 @@ fun PredictOutputSetScreen(
 
                                 Spacer(Modifier.height(10.dp))
 
-                                // Code Snippet Box
-                                Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = Color(0xFF181825),
-                                    border = BorderStroke(1.dp, bb.copy(alpha = 0.35f)),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Column(modifier = Modifier.padding(10.dp)) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                                Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(Color(0xFFEF4444)))
-                                                Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
-                                                Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(Color(0xFF10B981)))
-                                            }
-                                            Text(
-                                                text = selectedLanguage,
-                                                fontFamily = FontFamily.Monospace,
-                                                fontSize = 9.sp,
-                                                color = Color(0xFF94A3B8)
-                                            )
-                                        }
-                                        Spacer(Modifier.height(6.dp))
-                                        Text(
-                                            text = getCodeSnippet(q, selectedLanguage),
-                                            fontFamily = FontFamily.Monospace,
-                                            fontSize = 11.5.sp,
-                                            lineHeight = 16.sp,
-                                            color = Color(0xFFD4D4D4)
-                                        )
-                                    }
-                                }
+                                // Code Snippet Box with authentic VS Code Dark Modern theme
+                                VsCodeSnippetView(
+                                    code = getCodeSnippet(q, selectedLanguage),
+                                    language = selectedLanguage,
+                                    showLineNumbers = true
+                                )
 
                                 Spacer(Modifier.height(10.dp))
 
@@ -787,41 +759,12 @@ fun PredictOutputSetScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    // Code Card with Syntax-like Dark Preview
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF181825),
-                        border = BorderStroke(2.dp, bb),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Box(modifier = Modifier.size(9.dp).clip(CircleShape).background(Color(0xFFEF4444)))
-                                    Box(modifier = Modifier.size(9.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
-                                    Box(modifier = Modifier.size(9.dp).clip(CircleShape).background(Color(0xFF10B981)))
-                                }
-                                Text(
-                                    text = "$selectedLanguage • ${currentQ.topic.take(24)}...",
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 10.sp,
-                                    color = Color(0xFF94A3B8)
-                                )
-                            }
-                            Spacer(Modifier.height(10.dp))
-                            Text(
-                                text = getCodeSnippet(currentQ, selectedLanguage),
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 12.sp,
-                                lineHeight = 18.sp,
-                                color = Color(0xFFD4D4D4)
-                            )
-                        }
-                    }
+                    // Code Card with authentic VS Code Dark Modern syntax highlighting
+                    VsCodeSnippetView(
+                        code = getCodeSnippet(currentQ, selectedLanguage),
+                        language = selectedLanguage,
+                        showLineNumbers = true
+                    )
 
                     Spacer(Modifier.height(14.dp))
 

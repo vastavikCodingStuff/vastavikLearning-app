@@ -22,6 +22,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+import dagger.hilt.EntryPoint
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface RepositoryEntryPoint {
+    fun vastavikApiRepository(): VastavikApiRepository
+}
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {

@@ -86,7 +86,8 @@ RULES:
 - For Class 5-8 students: use very simple explanations with real-life analogies
 - For Class 9-12 students: can include more technical depth
 - Always be encouraging and supportive
-- Format code with ```code blocks when showing examples"""
+- Format code with ```code blocks when showing examples
+- You have complete mastery over all Vastavik Practice modules: Predict the Output sets (Loop Tracing, String Operations, Array Indexing), MCQs, Coding Challenges (Prime, Spy, Neon, Palindrome, Piglatin, Binary Search, Bubble Sort), and ICSE/CBSE Past Year Questions. When students ask about Practice sets or Predict the Output questions, provide exact step-by-step traces, variable state tables, and the final output."""
 
 private suspend fun callVastavikAiChat(
     engineModel: com.vastavik.computer.utils.AiEngineModel,
@@ -612,51 +613,46 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                     value = inputText,
                                     onValueChange = { inputText = it },
                                     placeholder = { Text("Ask anything...", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                                    trailingIcon = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.padding(end = 4.dp)
-                                        ) {
-                                            // While typing the Mic icon is removed!
-                                            if (inputText.isEmpty()) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .size(34.dp)
-                                                        .clip(CircleShape)
-                                                        .background(MaterialTheme.colorScheme.primary)
-                                                        .border(BorderStroke(1.5.dp, bb), CircleShape)
-                                                        .clickable { isVoiceMode = true },
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Icon(
-                                                        Icons.Filled.Mic,
-                                                        contentDescription = "Voice input",
-                                                        tint = Color.White,
-                                                        modifier = Modifier.size(17.dp)
+                                    leadingIcon = {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(start = 6.dp)
+                                                .size(34.dp)
+                                                .clip(CircleShape)
+                                                .background(if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                                .border(BorderStroke(1.5.dp, bb), CircleShape)
+                                                .clickable {
+                                                    imagePickerLauncher.launch(
+                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                                     )
-                                                }
-                                                Spacer(Modifier.width(6.dp))
-                                            }
-
-                                            // Attachment icon stays on the right of the mic button
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.AttachFile,
+                                                contentDescription = "Attach image",
+                                                tint = if (attachedImages.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    },
+                                    trailingIcon = {
+                                        if (inputText.isEmpty()) {
                                             Box(
                                                 modifier = Modifier
+                                                    .padding(end = 6.dp)
                                                     .size(34.dp)
                                                     .clip(CircleShape)
-                                                    .background(if (attachedImages.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                                    .background(MaterialTheme.colorScheme.primary)
                                                     .border(BorderStroke(1.5.dp, bb), CircleShape)
-                                                    .clickable {
-                                                        imagePickerLauncher.launch(
-                                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                                        )
-                                                    },
+                                                    .clickable { isVoiceMode = true },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
-                                                    Icons.Filled.AttachFile,
-                                                    contentDescription = "Attach image",
-                                                    tint = if (attachedImages.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.size(18.dp)
+                                                    Icons.Filled.Mic,
+                                                    contentDescription = "Voice input",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(17.dp)
                                                 )
                                             }
                                         }
