@@ -555,12 +555,6 @@ fun ProfileScreen(
 
                         val menuItems = buildList {
                             add(Quadruple("Edit Profile", "Manage info & avatar", Icons.Filled.Edit, "edit_profile"))
-                            add(Quadruple("Select Course", "Choose your path", Icons.Filled.MenuBook, "course"))
-                            add(Quadruple("Online Class", "Join live session", Icons.Filled.VideoCall, "meeting_lobby/default_live_class"))
-                            add(Quadruple("Code Editor", "Practice live", Icons.Filled.Code, "code_editor"))
-                            add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
-                            add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
-                            add(Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"))
                             add(
                                 Quadruple(
                                     "App Update",
@@ -569,10 +563,18 @@ fun ProfileScreen(
                                     "app_update"
                                 )
                             )
+                            add(Quadruple("Select Course", "Choose your path", Icons.Filled.MenuBook, "course"))
+                            add(Quadruple("Online Class", "Join live session", Icons.Filled.VideoCall, "meeting_lobby/default_live_class"))
+                            add(Quadruple("Code Editor", "Practice live", Icons.Filled.Code, "code_editor"))
+                            add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
+                            add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
+                            add(Quadruple("Notifications", "Alerts & updates", Icons.Filled.Notifications, "notifications"))
                             add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
                             add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
                             add(Quadruple("Bug Reporting", "Report issues & attach media", Icons.Filled.BugReport, "bug_report"))
-                            add(Quadruple("Admin Access", "Engine controls & diagnostics", Icons.Filled.AdminPanelSettings, "admin"))
+                            if (isAdmin) {
+                                add(Quadruple("Admin Access", "Engine controls & diagnostics", Icons.Filled.AdminPanelSettings, "admin"))
+                            }
                         }
 
                         val comingSoonTitles = setOf("Select Course", "Online Class", "OCR Exercise")

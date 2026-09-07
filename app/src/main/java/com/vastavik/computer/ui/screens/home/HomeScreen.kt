@@ -57,8 +57,23 @@ private var bannersShown = false
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 1) { 5 }
     val coroutineScope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
     var showBanners by remember { mutableStateOf(!bannersShown) }
+    var displayName by remember { mutableStateOf("Student") }
+
+    LaunchedEffect(Unit) {
+        com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
+        val prefs = context.getSharedPreferences("user_profile", android.content.Context.MODE_PRIVATE)
+        val firebaseUser = try { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser } catch (_: Exception) { null }
+        val savedName = prefs.getString("name", null) ?: firebaseUser?.displayName
+        if (!savedName.isNullOrBlank()) {
+            displayName = savedName
+        } else {
+            val emailName = firebaseUser?.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() }
+            if (!emailName.isNullOrBlank()) displayName = emailName
+        }
+    }
     val bannerPages = remember {
         listOf(
             BannerPage(
@@ -83,11 +98,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             Triple("Data Structures", Color(0xFFF59E0B) to Color(0xFFF97316), "28 lessons"),
             Triple("Web Development", Color(0xFF06B6D4) to Color(0xFF3B82F6), "51 lessons")
         )
-    }
-
-    val context = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) {
-        com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
     }
 
     if (showBanners) {
@@ -164,7 +174,8 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     onNavigate = tabNav,
                     searchQuery = searchQuery,
                     onSearchChange = { searchQuery = it },
-                    courses = sampleCourses
+                    courses = sampleCourses,
+                    displayName = displayName
                 )
                 2 -> com.vastavik.computer.ui.screens.learning.LearningPathScreen(onNavigate = tabNav)
                 3 -> com.vastavik.computer.ui.screens.practice.PracticeScreen(onNavigate = tabNav)
@@ -180,7 +191,8 @@ private fun HomeTab(
     onNavigate: (String) -> Unit,
     searchQuery: String,
     onSearchChange: (String) -> Unit,
-    courses: List<Triple<String, Pair<Color, Color>, String>>
+    courses: List<Triple<String, Pair<Color, Color>, String>>,
+    displayName: String = "Student"
 ) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
@@ -361,7 +373,7 @@ private fun HomeTab(
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Text(
-                                        text = "Hello, Student \uD83D\uDC4B",
+                                        text = "Hello, $displayName 👋",
                                         fontSize = 26.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = Color.White
