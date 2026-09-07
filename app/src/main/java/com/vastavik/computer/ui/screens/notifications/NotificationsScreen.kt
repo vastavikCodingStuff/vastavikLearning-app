@@ -160,7 +160,8 @@ fun NotificationsScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                 when {
                                     isUpdate -> onNavigate("app_update")
                                     isPaymentDue || n.type == "promo" -> onNavigate("payment")
-                                    n.type == "new_lesson" -> onNavigate("video_lesson/1/1/1/1")
+                                    n.type == "new_lesson" -> onNavigate("learning_path")
+                                    n.type == "reminder" -> onNavigate("practice")
                                     else -> {}
                                 }
                             },

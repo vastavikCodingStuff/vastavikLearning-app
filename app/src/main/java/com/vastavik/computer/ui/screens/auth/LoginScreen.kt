@@ -99,7 +99,7 @@ fun LoginScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             Box(modifier = Modifier.padding(bottom = 20.dp)) {
                 Box(
@@ -139,7 +139,7 @@ fun LoginScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // ===========================================================
             // Swipeable Auth Method Carousel
@@ -157,7 +157,7 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(360.dp)
+                    .heightIn(min = 280.dp)
             ) {
                 androidx.compose.foundation.pager.HorizontalPager(
                     state = authPagerState,
@@ -210,7 +210,7 @@ fun LoginScreen(
             }
 
             // Page indicator dots
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -226,7 +226,7 @@ fun LoginScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = when (currentAuthPage) {
                     0 -> "Swipe left for email login • Swipe again for admin"
@@ -238,7 +238,7 @@ fun LoginScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 horizontalArrangement = Arrangement.Center,
@@ -291,15 +291,15 @@ private fun GoogleSignInPage(
         Spacer(Modifier.weight(1f))
         Box(
             modifier = Modifier
-                .size(72.dp)
-                .clip(RoundedCornerShape(18.dp))
+                .size(64.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(Color(0xFFF5F5F5))
-                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(18.dp)),
+                .border(BorderStroke(1.5.dp, bb), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "G", fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF4285F4))
+            Text(text = "G", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF4285F4))
         }
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             "Continue with Google",
             fontSize = 18.sp,
@@ -379,7 +379,7 @@ private fun EmailLoginPage(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 4.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(4.dp))
@@ -479,20 +479,20 @@ private fun AdminLoginPage(
         Spacer(Modifier.weight(1f))
         Box(
             modifier = Modifier
-                .size(72.dp)
-                .clip(RoundedCornerShape(18.dp))
+                .size(64.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .background(AdminRed.copy(alpha = 0.1f))
-                .border(BorderStroke(1.5.dp, AdminRed), RoundedCornerShape(18.dp)),
+                .border(BorderStroke(1.5.dp, AdminRed), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 Icons.Filled.AdminPanelSettings,
                 contentDescription = null,
                 tint = AdminRed,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             "Direct Admin Login",
             fontSize = 18.sp,
