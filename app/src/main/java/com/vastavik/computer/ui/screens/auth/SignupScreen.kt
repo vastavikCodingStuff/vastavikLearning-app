@@ -244,7 +244,7 @@ fun SignupScreen(
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             viewModel.clearSuccess()
-            onNavigate("home")
+            onNavigate("user_setup")
         }
     }
 

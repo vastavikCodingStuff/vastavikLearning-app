@@ -49,6 +49,8 @@ fun ProfileScreen(
     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
     val isUpdateAvailable = updateInfo?.isUpdateAvailable == true
 
+    var profileName by remember { mutableStateOf("Student") }
+    var profileEmail by remember { mutableStateOf("student@example.com") }
     var isCompanionInstalled by remember { mutableStateOf(CodeOssManager.isCompanionInstalled(context)) }
     var isCodeOssPreferred by remember { mutableStateOf(CodeOssManager.isCodeOssPreferred(context)) }
     var showCodeOssSheet by remember { mutableStateOf(false) }
@@ -83,6 +85,12 @@ fun ProfileScreen(
         }
         isCompanionInstalled = CodeOssManager.isCompanionInstalled(context)
         isCodeOssPreferred = CodeOssManager.isCodeOssPreferred(context)
+        val prefs = context.getSharedPreferences("user_profile", android.content.Context.MODE_PRIVATE)
+        val firebaseUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        val savedName = prefs.getString("name", null) ?: firebaseUser?.displayName
+        if (!savedName.isNullOrBlank()) profileName = savedName
+        val savedEmail = firebaseUser?.email ?: prefs.getString("email", null)
+        if (!savedEmail.isNullOrBlank()) profileEmail = savedEmail
     }
 
     Scaffold(
@@ -308,14 +316,14 @@ fun ProfileScreen(
                                     }
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
-                                        text = "Student",
+                                        text = profileName,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = Color.White
                                     )
                                     Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "student@example.com",
+                                        text = profileEmail,
                                         fontSize = 13.sp,
                                         color = Color.White.copy(alpha = 0.8f)
                                     )
