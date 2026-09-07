@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -330,23 +332,34 @@ fun VsCodeSnippetView(
                     Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(VsCodeBorder))
                 }
 
-                // Code Lines with Horizontal Scroll & Text Selection
-                SelectionContainer(
+                // Code Lines with Horizontal Scroll & Text Selection.
+                // We also intercept horizontal drag gestures so the parent HorizontalPager
+                // does not steal the swipe and switch tabs while the user is scrolling
+                // horizontally inside the code window.
+                Box(
                     modifier = Modifier
                         .weight(1f)
-                        .horizontalScroll(horizontalScroll)
-                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, _ -> /* consume */ }
+                        }
                 ) {
-                    Column {
-                        lines.forEach { line ->
-                            Text(
-                                text = highlightVsCodeLine(line),
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 12.5.sp,
-                                lineHeight = 19.sp,
-                                color = VsCodeForeground,
-                                softWrap = false
-                            )
+                    SelectionContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(horizontalScroll)
+                            .padding(horizontal = 12.dp, vertical = 10.dp)
+                    ) {
+                        Column {
+                            lines.forEach { line ->
+                                Text(
+                                    text = highlightVsCodeLine(line),
+                                    fontFamily = FontFamily.Monospace,
+                                    fontSize = 12.5.sp,
+                                    lineHeight = 19.sp,
+                                    color = VsCodeForeground,
+                                    softWrap = false
+                                )
+                            }
                         }
                     }
                 }

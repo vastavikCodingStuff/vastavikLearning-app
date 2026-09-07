@@ -81,9 +81,16 @@ fun AppNavHost(
         composable("forgot_password") {
             ForgotPasswordScreen(onNavigate = { route ->
                 navController.navigate(route) {
-                    popUpTo("forgot_password") { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
-            }, onBack = { navController.popBackStack() })
+            }, onBack = {
+                // Always go back to the login screen and clear the back-stack.
+                // Prevents the user from accidentally landing in the logged-in app
+                // via the system back button.
+                navController.navigate("login") {
+                    popUpTo(0) { inclusive = true }
+                }
+            })
         }
         composable("welcome") {
             WelcomeScreen(onNavigate = { route ->
