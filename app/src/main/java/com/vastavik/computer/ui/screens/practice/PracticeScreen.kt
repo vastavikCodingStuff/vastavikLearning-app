@@ -55,6 +55,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.vastavik.computer.data.api.model.MCQItemDto
+import com.vastavik.computer.data.api.model.CodingExerciseDto
+import com.vastavik.computer.data.api.model.PredictOutputSetDto
+import com.vastavik.computer.data.api.model.PYQResponse
 
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -155,7 +160,15 @@ private fun convertSnippetToLanguage(code: String, lang: String): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PracticeScreen(onNavigate: (String) -> Unit) {
+fun PracticeScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: PracticeViewModel = hiltViewModel()
+) {
+    val sirMcqs by viewModel.sirMcqs.collectAsState()
+    val sirCoding by viewModel.sirCoding.collectAsState()
+    val sirPredict by viewModel.sirPredict.collectAsState()
+    val sirPyqs by viewModel.sirPyqs.collectAsState()
+
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val context = LocalContext.current
@@ -471,7 +484,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                 when (selectedTab) {
                     0 -> MCQContent(
                         selectedSource = selectedSource,
-                        onNavigate = onNavigate
+                        onNavigate = onNavigate,
+                        dynamicSirItems = sirMcqs
                     )
                     1 -> PredictOutputContent(
                         selectedSource = selectedSource,
@@ -479,7 +493,8 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                         onSolveSet = { item ->
                             val encoded = Uri.encode(item.title, "UTF-8")
                             onNavigate("predict_output_set/$encoded")
-                        }
+                        },
+                        dynamicSirItems = sirPredict
                     )
                     2 -> CodingContent(
                         selectedSource = selectedSource,
@@ -488,11 +503,13 @@ fun PracticeScreen(onNavigate: (String) -> Unit) {
                             activeCodingItem = item
                             selectedLanguage = "Java"
                             loadVastavikAiSolution(item, "Java")
-                        }
+                        },
+                        dynamicSirItems = sirCoding
                     )
                     3 -> PYQContent(
                         selectedSource = selectedSource,
-                        onNavigate = onNavigate
+                        onNavigate = onNavigate,
+                        dynamicSirItems = sirPyqs
                     )
                 }
             }
@@ -2419,7 +2436,8 @@ private fun CodingPromptDialog(
 @Composable
 private fun MCQContent(
     selectedSource: QuestionSource,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    dynamicSirItems: List<MCQItemDto> = emptyList()
 ) {
     val context = LocalContext.current
     val saved = remember { VastavikAiDiskCache.getSavedMCQs(context) }
@@ -2437,11 +2455,23 @@ private fun MCQContent(
             }
         }
     }
-    val sirItems = remember { listOf(
-        MCQItem("Java Fundamentals", "20 questions", QuestionSource.SIR),
-        MCQItem("OOP Deep-Dive", "18 questions", QuestionSource.SIR),
-        MCQItem("Exception Handling", "12 questions", QuestionSource.SIR)
-    )}
+    val sirItems = remember(dynamicSirItems) {
+        if (dynamicSirItems.isNotEmpty()) {
+            dynamicSirItems.map {
+                MCQItem(
+                    title = it.title,
+                    sub = it.sub.ifBlank { "${it.question?.take(30) ?: "10 questions"}" },
+                    source = QuestionSource.SIR
+                )
+            }
+        } else {
+            listOf(
+                MCQItem("Java Fundamentals", "20 questions", QuestionSource.SIR),
+                MCQItem("OOP Deep-Dive", "18 questions", QuestionSource.SIR),
+                MCQItem("Exception Handling", "12 questions", QuestionSource.SIR)
+            )
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
@@ -2481,7 +2511,8 @@ private fun MCQContent(
 private fun PredictOutputContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit,
-    onSolveSet: (PredictOutputItem) -> Unit
+    onSolveSet: (PredictOutputItem) -> Unit,
+    dynamicSirItems: List<PredictOutputSetDto> = emptyList()
 ) {
     val context = LocalContext.current
     val saved = remember { VastavikAiDiskCache.getSavedPredictOutput(context) }
@@ -2544,44 +2575,60 @@ private fun PredictOutputContent(
         }
     }
 
-    val sirItems = remember { listOf(
-        PredictOutputItem(
-            setNumber = 1,
-            title = "Sir's Pick: Operator Precedence & Increments",
-            topic = "Operators & Expressions",
-            questionCount = "15 Questions",
-            difficulty = "Easy",
-            codeSnippet = "int x = 5;\nint y = ++x * 2 + x--;\nSystem.out.println(\"x=\" + x + \", y=\" + y);",
-            source = QuestionSource.SIR
-        ),
-        PredictOutputItem(
-            setNumber = 2,
-            title = "Sir's Pick: Nested Loops & Break/Continue",
-            topic = "Loop Constructs",
-            questionCount = "18 Questions",
-            difficulty = "Medium",
-            codeSnippet = "for(int i = 0; i < 3; i++) {\n    for(int j = 0; j < 3; j++) {\n        if(i == j) continue;\n        System.out.print(j);\n    }\n}",
-            source = QuestionSource.SIR
-        ),
-        PredictOutputItem(
-            setNumber = 3,
-            title = "Sir's Pick: Class 10 ICSE Board Snippets",
-            topic = "ICSE Board Questions",
-            questionCount = "20 Questions",
-            difficulty = "Hard",
-            codeSnippet = "char ch = 'B';\nint code = ch + 3;\nSystem.out.println((char)code + \":\" + code);",
-            source = QuestionSource.SIR
-        ),
-        PredictOutputItem(
-            setNumber = 4,
-            title = "Sir's Pick: Static Blocks & Constructors",
-            topic = "OOP Mechanics",
-            questionCount = "12 Questions",
-            difficulty = "Hard",
-            codeSnippet = "class Demo {\n    static int c = 10;\n    Demo() { c += 5; }\n}\n// Value of c after 2 instances?",
-            source = QuestionSource.SIR
-        )
-    )}
+    val sirItems = remember(dynamicSirItems) {
+        if (dynamicSirItems.isNotEmpty()) {
+            dynamicSirItems.map {
+                PredictOutputItem(
+                    setNumber = it.setNumber,
+                    title = it.title,
+                    topic = it.topic,
+                    questionCount = it.questionCount,
+                    difficulty = it.difficulty,
+                    codeSnippet = it.codeSnippet,
+                    source = QuestionSource.SIR
+                )
+            }
+        } else {
+            listOf(
+                PredictOutputItem(
+                    setNumber = 1,
+                    title = "Sir's Pick: Operator Precedence & Increments",
+                    topic = "Operators & Expressions",
+                    questionCount = "15 Questions",
+                    difficulty = "Easy",
+                    codeSnippet = "int x = 5;\nint y = ++x * 2 + x--;\nSystem.out.println(\"x=\" + x + \", y=\" + y);",
+                    source = QuestionSource.SIR
+                ),
+                PredictOutputItem(
+                    setNumber = 2,
+                    title = "Sir's Pick: Nested Loops & Break/Continue",
+                    topic = "Loop Constructs",
+                    questionCount = "18 Questions",
+                    difficulty = "Medium",
+                    codeSnippet = "for(int i = 0; i < 3; i++) {\n    for(int j = 0; j < 3; j++) {\n        if(i == j) continue;\n        System.out.print(j);\n    }\n}",
+                    source = QuestionSource.SIR
+                ),
+                PredictOutputItem(
+                    setNumber = 3,
+                    title = "Sir's Pick: Class 10 ICSE Board Snippets",
+                    topic = "ICSE Board Questions",
+                    questionCount = "20 Questions",
+                    difficulty = "Hard",
+                    codeSnippet = "char ch = 'B';\nint code = ch + 3;\nSystem.out.println((char)code + \":\" + code);",
+                    source = QuestionSource.SIR
+                ),
+                PredictOutputItem(
+                    setNumber = 4,
+                    title = "Sir's Pick: Static Blocks & Constructors",
+                    topic = "OOP Mechanics",
+                    questionCount = "12 Questions",
+                    difficulty = "Hard",
+                    codeSnippet = "class Demo {\n    static int c = 10;\n    Demo() { c += 5; }\n}\n// Value of c after 2 instances?",
+                    source = QuestionSource.SIR
+                )
+            )
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
@@ -2860,7 +2907,8 @@ private fun getSnippetForTopic(topic: String): String {
 private fun CodingContent(
     selectedSource: QuestionSource,
     onNavigate: (String) -> Unit,
-    onOpenVastavikAi: (CodingItem) -> Unit
+    onOpenVastavikAi: (CodingItem) -> Unit,
+    dynamicSirItems: List<CodingExerciseDto> = emptyList()
 ) {
     val context = LocalContext.current
     val saved = remember { VastavikAiDiskCache.getSavedCoding(context) }
@@ -2879,12 +2927,25 @@ private fun CodingContent(
             }
         }
     }
-    val sirItems = remember { listOf(
-        CodingItem("Array Rotation", "Easy", "Arrays", QuestionSource.SIR),
-        CodingItem("Palindrome Check", "Easy", "Strings", QuestionSource.SIR),
-        CodingItem("Custom Sort", "Medium", "Sorting", QuestionSource.SIR),
-        CodingItem("Constructor Chaining", "Medium", "OOP", QuestionSource.SIR)
-    )}
+    val sirItems = remember(dynamicSirItems) {
+        if (dynamicSirItems.isNotEmpty()) {
+            dynamicSirItems.map {
+                CodingItem(
+                    title = it.title,
+                    difficulty = it.difficulty,
+                    topic = it.topic,
+                    source = QuestionSource.SIR
+                )
+            }
+        } else {
+            listOf(
+                CodingItem("Array Rotation", "Easy", "Arrays", QuestionSource.SIR),
+                CodingItem("Palindrome Check", "Easy", "Strings", QuestionSource.SIR),
+                CodingItem("Custom Sort", "Medium", "Sorting", QuestionSource.SIR),
+                CodingItem("Constructor Chaining", "Medium", "OOP", QuestionSource.SIR)
+            )
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
@@ -2928,7 +2989,8 @@ private fun CodingContent(
 @Composable
 private fun PYQContent(
     selectedSource: QuestionSource,
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    dynamicSirItems: List<PYQResponse> = emptyList()
 ) {
     val context = LocalContext.current
     val saved = remember { VastavikAiDiskCache.getSavedPYQs(context) }
@@ -2945,10 +3007,22 @@ private fun PYQContent(
             }
         }
     }
-    val sirItems = remember { listOf(
-        PYQItem("Sir's Picks — Java", "30 questions", QuestionSource.SIR),
-        PYQItem("Sir's Picks — OOP", "25 questions", QuestionSource.SIR)
-    )}
+    val sirItems = remember(dynamicSirItems) {
+        if (dynamicSirItems.isNotEmpty()) {
+            dynamicSirItems.map {
+                PYQItem(
+                    title = "${it.board} ${it.year} — ${it.subject.ifBlank { "Computer Applications" }}",
+                    questions = if (it.marks > 0) "${it.marks} Marks" else "Board Question",
+                    source = QuestionSource.SIR
+                )
+            }
+        } else {
+            listOf(
+                PYQItem("Sir's Picks — Java", "30 questions", QuestionSource.SIR),
+                PYQItem("Sir's Picks — OOP", "25 questions", QuestionSource.SIR)
+            )
+        }
+    }
 
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {

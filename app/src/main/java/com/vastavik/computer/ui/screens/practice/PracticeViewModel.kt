@@ -2,71 +2,65 @@ package com.vastavik.computer.ui.screens.practice
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vastavik.computer.data.model.CodingChallenge
-import com.vastavik.computer.data.model.PYQModel
-import com.vastavik.computer.data.model.QuizModel
-import com.vastavik.computer.data.repository.FirestoreRepository
+import com.vastavik.computer.data.api.model.CodingExerciseDto
+import com.vastavik.computer.data.api.model.MCQItemDto
+import com.vastavik.computer.data.api.model.PredictOutputSetDto
+import com.vastavik.computer.data.api.model.PYQResponse
+import com.vastavik.computer.data.repository.VastavikApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PracticeViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository
+    private val repository: VastavikApiRepository
 ) : ViewModel() {
 
-    private val _generatedQuiz = MutableStateFlow<QuizModel?>(null)
-    val generatedQuiz = _generatedQuiz.asStateFlow()
+    private val _sirMcqs = MutableStateFlow<List<MCQItemDto>>(emptyList())
+    val sirMcqs = _sirMcqs.asStateFlow()
+
+    private val _sirCoding = MutableStateFlow<List<CodingExerciseDto>>(emptyList())
+    val sirCoding = _sirCoding.asStateFlow()
+
+    private val _sirPredict = MutableStateFlow<List<PredictOutputSetDto>>(emptyList())
+    val sirPredict = _sirPredict.asStateFlow()
+
+    private val _sirPyqs = MutableStateFlow<List<PYQResponse>>(emptyList())
+    val sirPyqs = _sirPyqs.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
-
-    val quizzesState: StateFlow<List<QuizModel>> = firestoreRepository.streamQuizzes()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val challengesState: StateFlow<List<CodingChallenge>> = firestoreRepository.streamCodingChallenges()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    val pyqsState: StateFlow<List<PYQModel>> = firestoreRepository.streamPYQs()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun generateQuiz(quiz: QuizModel) {
-        _isLoading.value = true
-        _error.value = null
-        viewModelScope.launch {
-            try {
-                firestoreRepository.createQuiz(quiz)
-                _generatedQuiz.value = quiz
-                _isLoading.value = false
-            } catch (e: Exception) {
-                _isLoading.value = false
-                _error.value = e.message ?: "Failed to generate quiz"
-            }
-        }
+    init {
+        loadSirContent()
     }
 
-    fun loadChallenges() {
-        _isLoading.value = true
-        _error.value = null
+    fun loadSirContent() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
+                repository.getMcqs(source = "sir").onSuccess { list ->
+                    if (list.isNotEmpty()) _sirMcqs.value = list
+                }
+
+                repository.getCodingExercises(source = "sir").onSuccess { list ->
+                    if (list.isNotEmpty()) _sirCoding.value = list
+                }
+
+                repository.getPredictOutputSets(source = "sir").onSuccess { list ->
+                    if (list.isNotEmpty()) _sirPredict.value = list
+                }
+
+                repository.getPyqs(source = "sir").onSuccess { list ->
+                    if (list.isNotEmpty()) _sirPyqs.value = list
+                }
+            } catch (_: Exception) {
+                // Offline fallback
+            } finally {
                 _isLoading.value = false
-            } catch (e: Exception) {
-                _isLoading.value = false
-                _error.value = e.message ?: "Failed to load challenges"
             }
         }
-    }
-
-    fun clearError() {
-        _error.value = null
     }
 }

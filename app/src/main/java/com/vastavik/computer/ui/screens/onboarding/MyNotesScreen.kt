@@ -15,29 +15,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.vastavik.computer.data.api.model.NoteResponse
 import com.vastavik.computer.ui.theme.VastavikColors
 import com.vastavik.computer.ui.theme.neoShape
 import com.vastavik.computer.ui.theme.neoCircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
-    var notes by remember { mutableStateOf(
-        listOf(
-            Pair("OOP Notes", "Classes, objects, inheritance..."),
-            Pair("Array Methods", "sort(), filter(), map()...")
-        )
-    ) }
+fun MyNotesScreen(
+    onNavigate: (String) -> Unit,
+    onBack: () -> Unit = {},
+    viewModel: NotesViewModel = hiltViewModel()
+) {
+    val notes by viewModel.notes.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }
     var newNoteTitle by remember { mutableStateOf("") }
+    var newNoteContent by remember { mutableStateOf("") }
+    var newNoteTag by remember { mutableStateOf("General") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Notes") },
+                title = { Text("My Notes & Revision") },
                 navigationIcon = {
                     IconButton(onClick = { onBack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.loadNotes() }) {
+                        Icon(Icons.Filled.Refresh, contentDescription = "Refresh Notes")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,7 +64,16 @@ fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        if (notes.isEmpty()) {
+        if (isLoading && notes.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (notes.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -75,6 +93,12 @@ fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "Tap the + button below to create your first revision note!",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                    )
                 }
             }
         } else {
@@ -83,7 +107,7 @@ fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(notes) { (title, content) ->
+                items(notes, key = { it.id }) { note ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = neoShape(12.dp),
@@ -102,11 +126,40 @@ fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
-                                Text(content, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        note.title,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                    if (note.tag.isNotBlank()) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Surface(
+                                            shape = RoundedCornerShape(4.dp),
+                                            color = MaterialTheme.colorScheme.primaryContainer
+                                        ) {
+                                            Text(
+                                                note.tag,
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                        }
+                                    }
+                                }
+                                if (note.content.isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        note.content,
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                             IconButton(onClick = {
-                                notes = notes.filter { it.first != title }
+                                viewModel.deleteNote(note.id)
                             }) {
                                 Icon(
                                     Icons.Filled.Delete,
@@ -124,20 +177,43 @@ fun MyNotesScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     if (showCreateDialog) {
         AlertDialog(
             onDismissRequest = { showCreateDialog = false },
-            title = { Text("Create Note") },
+            title = { Text("Create Revision Note") },
             text = {
-                OutlinedTextField(
-                    value = newNoteTitle,
-                    onValueChange = { newNoteTitle = it },
-                    label = { Text("Note title") },
-                    singleLine = true
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = newNoteTitle,
+                        onValueChange = { newNoteTitle = it },
+                        label = { Text("Note Title") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newNoteContent,
+                        onValueChange = { newNoteContent = it },
+                        label = { Text("Summary or Key Points") },
+                        minLines = 3,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newNoteTag,
+                        onValueChange = { newNoteTag = it },
+                        label = { Text("Tag (e.g. Java, OOP, SQL)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
                     if (newNoteTitle.isNotBlank()) {
-                        notes = notes + Pair(newNoteTitle, "")
+                        viewModel.createNote(
+                            title = newNoteTitle.trim(),
+                            content = newNoteContent.trim(),
+                            tag = newNoteTag.trim().ifBlank { "General" }
+                        )
                         newNoteTitle = ""
+                        newNoteContent = ""
+                        newNoteTag = "General"
                         showCreateDialog = false
                     }
                 }) {

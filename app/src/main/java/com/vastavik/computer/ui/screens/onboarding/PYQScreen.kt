@@ -32,7 +32,10 @@ import androidx.compose.ui.unit.sp
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.utils.VastavikAi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URLEncoder
+import com.vastavik.computer.data.api.ApiConfig
 import com.vastavik.computer.ui.screens.editor.CodeEditorSharedState
 
 data class PyqItem(
@@ -198,6 +201,54 @@ fun PYQScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     }
 
     var pyqList by remember { mutableStateOf(defaultPyqs) }
+
+    LaunchedEffect(selectedGrade, selectedBoard) {
+        withContext(Dispatchers.IO) {
+            try {
+                val base = ApiConfig.BASE_URL.trimEnd('/')
+                val boardParam = if (selectedBoard != "All") "&board=${java.net.URLEncoder.encode(selectedBoard, "UTF-8")}" else ""
+                val gradeParam = if (selectedGrade != "All") "&grade=${java.net.URLEncoder.encode(selectedGrade, "UTF-8")}" else ""
+                val url = java.net.URL("$base/api/v1/pyqs?source=sir$boardParam$gradeParam")
+                val conn = (url.openConnection() as java.net.HttpURLConnection).apply {
+                    requestMethod = "GET"
+                    connectTimeout = 4000
+                    readTimeout = 6000
+                }
+                if (conn.responseCode in 200..299) {
+                    val resp = conn.inputStream.bufferedReader().readText()
+                    val arr = org.json.JSONArray(resp)
+                    if (arr.length() > 0) {
+                        val fetched = mutableListOf<PyqItem>()
+                        for (i in 0 until arr.length()) {
+                            val obj = arr.getJSONObject(i)
+                            fetched.add(
+                                PyqItem(
+                                    id = obj.optString("id", "pyq_$i"),
+                                    board = obj.optString("board", selectedBoard.ifBlank { "ICSE" }),
+                                    grade = obj.optString("grade", if (selectedGrade != "All") selectedGrade else "Class 10"),
+                                    year = obj.optString("year", "2024"),
+                                    subject = obj.optString("subject", "Computer Applications"),
+                                    title = obj.optString("title", "Question ${i + 1}"),
+                                    marks = if (obj.optInt("marks", 0) > 0) "${obj.optInt("marks")} Marks" else "10 Marks",
+                                    questionText = obj.optString("question", ""),
+                                    markingScheme = obj.optString("marking_scheme", "Standard Marking"),
+                                    solution = obj.optString("solution", ""),
+                                    language = obj.optString("language", "Java")
+                                )
+                            )
+                        }
+                        if (fetched.isNotEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                pyqList = fetched + defaultPyqs.filter { def -> fetched.none { it.id == def.id } }
+                            }
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+                // Keep defaultPyqs gracefully
+            }
+        }
+    }
 
     val filteredPyqs = remember(pyqList, selectedGrade, selectedBoard, searchQuery) {
         pyqList.filter { item ->

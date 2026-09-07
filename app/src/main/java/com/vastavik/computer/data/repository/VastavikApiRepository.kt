@@ -141,13 +141,87 @@ class VastavikApiRepository @Inject constructor(
     suspend fun getPyqs(
         board: String? = null,
         year: String? = null,
-        subject: String? = null
+        subject: String? = null,
+        grade: String? = null,
+        source: String? = null
     ): Result<List<PYQResponse>> = safeApiCall {
-        api.getPyqs(board, year, subject)
+        api.getPyqs(board, year, subject, grade, source)
     }
 
     suspend fun searchCatalog(query: String): Result<SearchResponse> = safeApiCall {
         api.searchCatalog(query)
+    }
+
+    // ==========================================
+    // Practice Sir
+    // ==========================================
+
+    suspend fun getMcqs(
+        subject: String? = null,
+        topic: String? = null,
+        difficulty: String? = null,
+        source: String? = null
+    ): Result<List<MCQItemDto>> = safeApiCall {
+        api.getMcqs(subject, topic, difficulty, source)
+    }
+
+    suspend fun getCodingExercises(
+        language: String? = null,
+        difficulty: String? = null,
+        source: String? = null
+    ): Result<List<CodingExerciseDto>> = safeApiCall {
+        api.getCodingExercises(language, difficulty, source)
+    }
+
+    suspend fun getPredictOutputSets(
+        topic: String? = null,
+        source: String? = null
+    ): Result<List<PredictOutputSetDto>> = safeApiCall {
+        api.getPredictOutputSets(topic, source)
+    }
+
+    suspend fun getQuizzes(
+        subject: String? = null,
+        courseId: String? = null
+    ): Result<List<QuizSetDto>> = safeApiCall {
+        api.getQuizzes(subject, courseId)
+    }
+
+    // ==========================================
+    // Progress & Completion
+    // ==========================================
+
+    suspend fun getCourseProgress(courseId: String): Result<CourseProgressDto> = safeApiCall {
+        api.getCourseProgress(courseId)
+    }
+
+    suspend fun getProgressSummary(): Result<ProgressSummaryDto> = safeApiCall {
+        api.getProgressSummary()
+    }
+
+    // ==========================================
+    // AI Chat Sessions
+    // ==========================================
+
+    suspend fun getAiSessions(): Result<List<AiSessionDto>> = safeApiCall {
+        api.getAiSessions()
+    }
+
+    suspend fun getAiSessionMessages(sessionId: String): Result<Map<String, Any>> = safeApiCall {
+        api.getAiSessionMessages(sessionId)
+    }
+
+    suspend fun deleteAiSession(sessionId: String): Result<CommonResponse> = safeApiCall {
+        api.deleteAiSession(sessionId)
+    }
+
+
+    // ==========================================
+    // Profile Update
+    // ==========================================
+
+    suspend fun updateUserProfile(request: UpdateProfileRequest): Result<UserProfileResponse> = safeApiCall {
+        api.updateUserProfile(request)
     }
 
     // ==========================================
