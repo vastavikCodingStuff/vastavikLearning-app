@@ -1,5 +1,6 @@
 package com.vastavik.computer.ui.screens.onboarding
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +33,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.razorpay.Checkout
+import com.vastavik.computer.BuildConfig
+import com.vastavik.computer.data.api.model.PricingQuote
+import com.vastavik.computer.data.repository.VastavikApiRepository
 import com.vastavik.computer.ui.components.NinjaCelebrationOverlay
 import com.vastavik.computer.ui.theme.BrutalBoxCard
 import com.vastavik.computer.ui.theme.BrutalCard
@@ -41,10 +46,14 @@ import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.utils.AdminSession
 import com.vastavik.computer.utils.PaymentReceiptData
 import com.vastavik.computer.utils.PaymentReceiptPdf
-import kotlinx.coroutines.delay
+import com.vastavik.computer.utils.RazorpayBridge
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.File
-import java.util.UUID
 
 enum class RazorpayPaymentMethod(val label: String, val subtitle: String) {
     UPI_AUTOPAY("UPI AutoPay", "Mandate Authorization • 0% Fee • Cancel Anytime"),
@@ -86,57 +95,159 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     var showCelebration by remember { mutableStateOf(false) }
     var generatedReceiptFile by remember { mutableStateOf<File?>(null) }
 
-    val promoActive = true
-    val currentAmount = if (selectedPlan == "monthly") (if (promoActive) "149" else "299") else (if (promoActive) "999" else "1999")
-    val planDesc = if (selectedPlan == "monthly") "Vastavik Monthly Pro" else "Vastavik Yearly Pro"
-    val planPeriod = if (selectedPlan == "monthly") "30 Days" else "365 Days"
-    val baseAmount = if (selectedPlan == "monthly") "₹299" else "₹1,999"
-    val discountAmount = if (selectedPlan == "monthly") "₹150" else "₹1,000"
-    val gstAmount = if (selectedPlan == "monthly") "₹22.73" else "₹152.39"
+    var effectiveQuote by remember { mutableStateOf<PricingQuote?>(null) }
+    LaunchedEffect(context) {
+        try {
+            val repo = (context as? Activity)?.let {
+                EntryPointAccessors.fromActivity(it, PaymentRepoEntryPoint::class.java).repo()
+            }
+            effectiveQuote = repo?.getPricingQuote()?.getOrNull()
+        } catch (_: Exception) {}
+    }
 
-    // Razorpay Payment Execution Flow
+    var couponCode by remember { mutableStateOf("") }
+    var couponMessage by remember { mutableStateOf<String?>(null) }
+    var isApplyingCoupon by remember { mutableStateOf(false) }
+    val totalInr = effectiveQuote?.totalAmount ?: 0.0
+    val baseInr = effectiveQuote?.baseAmount ?: 0.0
+    val discountInr = effectiveQuote?.discountAmount ?: 0.0
+    val gstInr = effectiveQuote?.gstAmount ?: 0.0
+    val creditBalanceInr = effectiveQuote?.creditBalanceInr ?: 0.0
+
+    val currentAmount = if (totalInr > 0) "%.2f".format(totalInr) else "0.00"
+    val planDesc = "Vastavik Pro Monthly"
+    val planPeriod = "30 Days"
+    val baseAmount = if (baseInr > 0) "₹%.2f".format(baseInr) else "₹149.00"
+    val discountAmount = if (discountInr > 0) "₹%.2f".format(discountInr) else "₹0.00"
+    val gstAmount = if (gstInr > 0) "₹%.2f".format(gstInr) else "₹26.82"
+
+    fun launchRazorpayCheckout(orderId: String, amountPaise: Int, keyId: String, customerEmail: String, customerName: String) {
+        val activity = context as? Activity ?: return
+        RazorpayBridge.pendingOrderId = orderId
+        RazorpayBridge.onSuccess = { razorpayPaymentId ->
+            scope.launch {
+                try {
+                    val repo = EntryPointAccessors.fromActivity(activity, PaymentRepoEntryPoint::class.java).repo()
+                    repo?.verifyPayment(orderId, razorpayPaymentId ?: "", "sig_${razorpayPaymentId}")
+                } catch (_: Exception) {}
+                val receiptFile = PaymentReceiptPdf.generateReceipt(
+                    context,
+                    PaymentReceiptData(
+                        invoiceNumber = "INV-${System.currentTimeMillis().toString().takeLast(6)}",
+                        transactionId = razorpayPaymentId.ifBlank { orderId },
+                        orderId = orderId,
+                        planName = planDesc,
+                        planPeriod = planPeriod,
+                        amount = currentAmount,
+                        baseAmount = baseAmount,
+                        discountAmount = discountAmount,
+                        gstAmount = gstAmount,
+                        paymentMethod = "Razorpay (${selectedMethod.label})",
+                        gateway = "Razorpay",
+                        customerName = customerName,
+                        customerEmail = customerEmail
+                    )
+                )
+                generatedReceiptFile = receiptFile
+                isProcessing = false
+                showPaySheet = false
+                showCelebration = true
+            }
+        }
+        RazorpayBridge.onError = { _, description ->
+            scope.launch {
+                isProcessing = false
+                snackbarHostState.showSnackbar("Payment failed: ${description ?: "unknown"}")
+            }
+        }
+        val checkout = Checkout()
+        checkout.setKeyID(keyId)
+        try {
+            val options = JSONObject().apply {
+                put("name", "Vastavik Learning")
+                put("description", "Vastavik Pro Monthly Subscription")
+                put("order_id", orderId)
+                put("currency", "INR")
+                put("amount", amountPaise)
+                put("prefill.email", customerEmail)
+                put("prefill.contact", "")
+                put("theme.color", "#1F2937")
+            }
+            checkout.open(activity, options)
+        } catch (e: Exception) {
+            scope.launch {
+                isProcessing = false
+                snackbarHostState.showSnackbar("Could not open Razorpay: ${e.message}")
+            }
+        }
+    }
+
     fun processRazorpayPayment() {
         scope.launch {
             isProcessing = true
-            delay(1000) // Razorpay secure transaction simulation
-
             val user = try { FirebaseAuth.getInstance().currentUser } catch (_: Exception) { null }
             val customerEmail = user?.email ?: "student@vastaviklearning.com"
             val customerName = user?.displayName ?: "Vastavik Student"
 
-            val txId = "pay_rzp_" + UUID.randomUUID().toString().replace("-", "").take(14)
-            val orderId = "order_rzp_" + UUID.randomUUID().toString().replace("-", "").take(14)
-            val invNumber = "INV-2026-RZP-" + (100000..999999).random()
-
-            val methodLabel = when (selectedMethod) {
-                RazorpayPaymentMethod.UPI_AUTOPAY -> "UPI AutoPay (Mandate Active)"
-                RazorpayPaymentMethod.UPI_STANDARD -> "Standard UPI (${upiId.ifEmpty { "UPI Instant" }})"
-                RazorpayPaymentMethod.CARD -> "$cardType Card (•••• ${cardNumber.takeLast(4).ifEmpty { "4242" }})"
-                RazorpayPaymentMethod.NETBANKING -> "NetBanking ($selectedBank)"
+            try {
+                val activity = context as? Activity
+                val repo = activity?.let { EntryPointAccessors.fromActivity(it, PaymentRepoEntryPoint::class.java).repo() }
+                val resp = repo?.createPaymentOrder(planId = "monthly_pro", couponCode = couponCode.takeIf { it.isNotBlank() })?.getOrNull()
+                if (resp == null) {
+                    isProcessing = false
+                    snackbarHostState.showSnackbar("Could not create order. Please try again.")
+                    return@launch
+                }
+                if (resp.skipPayment) {
+                    val receiptFile = PaymentReceiptPdf.generateReceipt(
+                        context,
+                        PaymentReceiptData(
+                            invoiceNumber = "INV-${System.currentTimeMillis().toString().takeLast(6)}",
+                            transactionId = resp.orderId,
+                            orderId = resp.orderId,
+                            planName = planDesc,
+                            planPeriod = planPeriod,
+                            amount = "0.00",
+                            baseAmount = baseAmount,
+                            discountAmount = "₹%.2f".format(discountInr),
+                            gstAmount = "₹0.00",
+                            paymentMethod = if (couponCode.isNotBlank()) "Offline coupon" else "Credits",
+                            gateway = "Internal",
+                            customerName = customerName,
+                            customerEmail = customerEmail
+                        )
+                    )
+                    generatedReceiptFile = receiptFile
+                    isProcessing = false
+                    showPaySheet = false
+                    showCelebration = true
+                    return@launch
+                }
+                val keyId = BuildConfig.RAZORPAY_KEY_ID.ifBlank { "rzp_test_local" }
+                launchRazorpayCheckout(resp.orderId, resp.amountPaise, keyId, customerEmail, customerName)
+            } catch (e: Exception) {
+                isProcessing = false
+                snackbarHostState.showSnackbar("Payment error: ${e.message}")
             }
+        }
+    }
 
-            val receiptData = PaymentReceiptData(
-                invoiceNumber = invNumber,
-                transactionId = txId,
-                orderId = orderId,
-                planName = planDesc,
-                planPeriod = planPeriod,
-                amount = currentAmount,
-                baseAmount = baseAmount,
-                discountAmount = discountAmount,
-                gstAmount = gstAmount,
-                paymentMethod = methodLabel,
-                gateway = "Razorpay",
-                customerName = customerName,
-                customerEmail = customerEmail
-            )
-
-            val receiptFile = PaymentReceiptPdf.generateReceipt(context, receiptData)
-            generatedReceiptFile = receiptFile
-
-            isProcessing = false
-            showPaySheet = false
-            showCelebration = true
+    suspend fun applyCoupon() {
+        if (couponCode.isBlank()) return
+        isApplyingCoupon = true
+        try {
+            val activity = context as? Activity
+            val repo = activity?.let { EntryPointAccessors.fromActivity(it, PaymentRepoEntryPoint::class.java).repo() }
+            val r = repo?.redeemCoupon(couponCode.trim())?.getOrNull()
+            couponMessage = r?.message ?: if (r?.success == true) "Coupon applied" else "Invalid coupon"
+            if (r?.success == true) {
+                couponCode = ""
+                effectiveQuote = repo.getPricingQuote().getOrNull()
+            }
+        } catch (e: Exception) {
+            couponMessage = "Coupon error: ${e.message}"
+        } finally {
+            isApplyingCoupon = false
         }
     }
 
@@ -255,7 +366,7 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
 
                 Spacer(Modifier.height(12.dp))
 
-                if (promoActive) {
+                if (discountInr > 0) {
                     BrutalCard(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
@@ -291,22 +402,54 @@ fun PaymentScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                 // Subscription Plan Selection
                 BrutalPlanCard(
                     title = "Monthly Pro",
-                    price = if (promoActive) "₹149" else "₹299",
+                    price = if (totalInr > 0) "₹%.2f".format(totalInr) else "₹149.00",
                     period = "/month",
-                    originalPrice = if (promoActive) "₹299" else null,
+                    originalPrice = if (discountInr > 0) "₹149.00" else null,
                     isSelected = selectedPlan == "monthly",
                     onClick = { selectedPlan = "monthly" }
                 )
-                Spacer(Modifier.height(10.dp))
-                BrutalPlanCard(
-                    title = "Yearly Pro",
-                    price = if (promoActive) "₹999" else "₹1,999",
-                    period = "/year",
-                    originalPrice = if (promoActive) "₹1,999" else null,
-                    badge = "SAVE 50%",
-                    isSelected = selectedPlan == "yearly",
-                    onClick = { selectedPlan = "yearly" }
-                )
+
+                Spacer(Modifier.height(14.dp))
+
+                // Offline coupon code
+                BrutalCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    backgroundColor = Color(0xFFEFF6FF)
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.ConfirmationNumber, contentDescription = null, tint = Color(0xFF1D4ED8), modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Have an offline coupon code?", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF1E3A8A))
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = couponCode,
+                                onValueChange = { couponCode = it.uppercase() },
+                                modifier = Modifier.weight(1f),
+                                singleLine = true,
+                                placeholder = { Text("Enter code") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Button(
+                                onClick = { scope.launch { applyCoupon() } },
+                                enabled = !isApplyingCoupon && couponCode.isNotBlank(),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp)
+                            ) {
+                                Text(if (isApplyingCoupon) "..." else "Apply")
+                            }
+                        }
+                        couponMessage?.let { msg ->
+                            Spacer(Modifier.height(8.dp))
+                            Text(msg, fontSize = 12.sp, color = Color(0xFF1E40AF))
+                        }
+                    }
+                }
 
                 Spacer(Modifier.height(18.dp))
 
@@ -915,4 +1058,10 @@ private fun BrutalPlanCard(
             }
         }
     }
+}
+
+@EntryPoint
+@InstallIn(ActivityComponent::class)
+interface PaymentRepoEntryPoint {
+    fun repo(): VastavikApiRepository
 }

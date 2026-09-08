@@ -50,7 +50,8 @@ class AuthViewModel @Inject constructor(
 
                     // Attempt background sync for admin
                     try {
-                        apiRepository.login(email, password)
+                        val fp = context?.let { com.vastavik.computer.utils.DeviceFingerprint.get(it) }
+                        apiRepository.login(email, password, fp)
                     } catch (_: Exception) {}
                     try {
                         authRepository.signInWithEmail(email, password)
@@ -65,7 +66,8 @@ class AuthViewModel @Inject constructor(
                 }
 
                 // 1. Primary: Login via production Backend API (eliminates Firebase 500 error)
-                val apiResult = apiRepository.login(email.trim(), password)
+                val deviceFp = context?.let { com.vastavik.computer.utils.DeviceFingerprint.get(it) }
+                val apiResult = apiRepository.login(email.trim(), password, deviceFp)
                 if (apiResult.isSuccess && apiResult.getOrNull()?.success == true) {
                     // Background sync with Firebase if reachable
                     try {
@@ -129,7 +131,7 @@ class AuthViewModel @Inject constructor(
         signIn(AdminSession.ADMIN_EMAIL, AdminSession.ADMIN_PASSWORD, context)
     }
 
-    fun signUp(email: String, password: String, name: String = "", board: String = "ICSE") {
+    fun signUp(email: String, password: String, name: String = "", board: String = "ICSE", context: Context? = null) {
         if (email.trim().equals(AdminSession.ADMIN_EMAIL, ignoreCase = true)) {
             _uiState.value = _uiState.value.copy(error = "This email is reserved. Students must use their own account.")
             return
@@ -141,13 +143,26 @@ class AuthViewModel @Inject constructor(
                     email.substringBefore("@").replaceFirstChar { it.uppercase() }
                 }
 
-                // 1. Primary: Register on production Backend API
+                val pendingPrefs = context?.getSharedPreferences("growth_attribution", Context.MODE_PRIVATE)
+                val pendingRef = pendingPrefs?.getString("pending_referral_code", null)
+                val pendingShare = pendingPrefs?.getString("pending_share_token", null)
+                val deviceFp = context?.let { com.vastavik.computer.utils.DeviceFingerprint.get(it) }
+                val deviceName = context?.let { com.vastavik.computer.utils.DeviceFingerprint.getDeviceName() }
+                val platform = com.vastavik.computer.utils.DeviceFingerprint.getPlatform()
+
                 val apiResult = apiRepository.signup(
                     email = email.trim(),
                     password = password,
                     name = studentName,
-                    board = board
+                    board = board,
+                    referralCode = pendingRef,
+                    shareToken = pendingShare,
+                    deviceFingerprint = deviceFp,
+                    deviceName = deviceName,
+                    platform = platform
                 )
+
+                pendingPrefs?.edit()?.remove("pending_referral_code")?.remove("pending_share_token")?.apply()
 
                 if (apiResult.isSuccess && apiResult.getOrNull()?.success == true) {
                     // Background Firebase Auth registration if available

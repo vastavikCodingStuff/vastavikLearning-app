@@ -11,7 +11,12 @@ data class SignupRequest(
     val password: String,
     val name: String,
     val board: String = "ICSE",
-    val language: String = "Java"
+    val language: String = "Java",
+    @SerializedName("referral_code") val referralCode: String? = null,
+    @SerializedName("share_token") val shareToken: String? = null,
+    @SerializedName("device_fingerprint") val deviceFingerprint: String? = null,
+    @SerializedName("device_name") val deviceName: String? = null,
+    val platform: String? = null
 )
 
 data class LoginRequest(
@@ -364,4 +369,125 @@ data class UpdateProfileRequest(
     val hobbies: String? = null,
     @SerializedName("preferred_language") val preferredLanguage: String? = null,
     val languages: List<String>? = null
+)
+
+data class UserProfileResponseV2(
+    @SerializedName("user_id") val userId: String = "",
+    val name: String = "",
+    val email: String = "",
+    val role: String = "student",
+    @SerializedName("is_premium") val isPremium: Boolean = false,
+    val board: String? = "ICSE",
+    @SerializedName("student_class") val studentClass: String? = "Class 10",
+    @SerializedName("preferred_language") val preferredLanguage: String? = "Java",
+    val languages: List<String> = listOf("Java", "Python", "JavaScript", "SQL"),
+    @SerializedName("subscription_expires_at") val subscriptionExpiresAt: String? = null,
+    @SerializedName("access_type") val accessType: String? = "free",
+    @SerializedName("credit_balance") val creditBalance: Double? = 0.0,
+    @SerializedName("referral_code") val referralCode: String? = null,
+    @SerializedName("completion_rate") val completionRate: Double = 0.0,
+    @SerializedName("payment_details") val paymentDetails: List<Map<String, Any>> = emptyList()
+)
+
+// ==========================================
+// Growth (Referral, Share, Coupon, Pricing)
+// ==========================================
+
+data class PricingQuote(
+    @SerializedName("plan_id") val planId: String = "monthly_pro",
+    @SerializedName("plan_name") val planName: String = "Vastavik Pro Monthly",
+    @SerializedName("base_amount") val baseAmount: Double = 0.0,
+    @SerializedName("discount_amount") val discountAmount: Double = 0.0,
+    @SerializedName("taxable_amount") val taxableAmount: Double = 0.0,
+    @SerializedName("gst_rate") val gstRate: Double = 0.18,
+    @SerializedName("gst_amount") val gstAmount: Double = 0.0,
+    @SerializedName("total_amount") val totalAmount: Double = 0.0,
+    @SerializedName("total_amount_paise") val totalAmountPaise: Int = 0,
+    val currency: String = "INR",
+    @SerializedName("credit_balance_inr") val creditBalanceInr: Double = 0.0
+)
+
+data class CreateOrderRequestV2(
+    @SerializedName("plan_id") val planId: String = "monthly_pro",
+    @SerializedName("coupon_code") val couponCode: String? = null
+)
+
+data class CreateOrderResponseV2(
+    @SerializedName("order_id") val orderId: String = "",
+    @SerializedName("amount_paise") val amountPaise: Int = 0,
+    val currency: String = "INR",
+    @SerializedName("razorpay_order_id") val razorpayOrderId: String? = null,
+    @SerializedName("skip_payment") val skipPayment: Boolean = false,
+    val quote: PricingQuote = PricingQuote()
+)
+
+data class VerifyPaymentRequest(
+    @SerializedName("razorpay_order_id") val razorpayOrderId: String,
+    @SerializedName("razorpay_payment_id") val razorpayPaymentId: String,
+    @SerializedName("razorpay_signature") val razorpaySignature: String
+)
+
+data class ReferralHistoryEntry(
+    @SerializedName("referee_uid") val refereeUid: String? = null,
+    @SerializedName("referee_email") val refereeEmail: String? = null,
+    val status: String = "",
+    @SerializedName("reward_amount") val rewardAmount: Double = 0.0,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("rewarded_at") val rewardedAt: String? = null
+)
+
+data class ReferralStatusResponse(
+    val code: String? = null,
+    val eligible: Boolean = false,
+    @SerializedName("rewards_total") val rewardsTotal: Double = 0.0,
+    val cap: Int = 0,
+    @SerializedName("rewarded_count") val rewardedCount: Int = 0,
+    @SerializedName("pending_count") val pendingCount: Int = 0,
+    @SerializedName("remaining_count") val remainingCount: Int = 0,
+    @SerializedName("credit_balance_inr") val creditBalanceInr: Double = 0.0,
+    val history: List<ReferralHistoryEntry> = emptyList()
+)
+
+data class ShareEntry(
+    val token: String = "",
+    @SerializedName("share_url") val shareUrl: String = "",
+    val status: String = "",
+    val clicks: Int = 0,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("converted_at") val convertedAt: String? = null
+)
+
+data class ShareStatusResponse(
+    val eligible: Boolean = false,
+    val cap: Int = 0,
+    @SerializedName("rewarded_count") val rewardedCount: Int = 0,
+    @SerializedName("remaining_count") val remainingCount: Int = 0,
+    val shares: List<ShareEntry> = emptyList()
+)
+
+data class ShareCreateResponse(
+    val eligible: Boolean = false,
+    val token: String? = null,
+    @SerializedName("share_url") val shareUrl: String? = null,
+    @SerializedName("cap_reached") val capReached: Boolean = false,
+    val message: String? = null
+)
+
+data class CouponRedeemRequest(val code: String)
+data class CouponRedeemResponse(
+    val success: Boolean = false,
+    @SerializedName("already_active") val alreadyActive: Boolean = false,
+    val message: String = ""
+)
+
+data class CreditLedgerEntry(
+    val source: String = "",
+    val amount: Double = 0.0,
+    val ref: String? = null,
+    @SerializedName("created_at") val createdAt: String? = null
+)
+
+data class CreditsBalanceResponse(
+    @SerializedName("credit_balance_inr") val creditBalanceInr: Double = 0.0,
+    val ledger: List<CreditLedgerEntry> = emptyList()
 )

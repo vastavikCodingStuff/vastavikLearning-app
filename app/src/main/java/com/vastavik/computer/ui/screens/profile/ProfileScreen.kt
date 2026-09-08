@@ -570,6 +570,8 @@ fun ProfileScreen(
                             add(Quadruple("OCR Exercise", "Scan & solve", Icons.Filled.DocumentScanner, "ocr_exercise"))
                             add(Quadruple("My Notes", "Your saved notes", Icons.Filled.Note, "my_notes"))
                             add(Quadruple("Payment History", "Invoices & plans", Icons.Filled.Receipt, "payment_history"))
+                            add(Quadruple("Refer & Earn", "Earn Rs.25 per friend", Icons.Filled.CardGiftcard, "refer_and_earn"))
+                            add(Quadruple("Share App", "Earn Rs.10 per install", Icons.Filled.Share, "share_app"))
                             add(Quadruple("Settings", "Theme & prefs", Icons.Filled.Settings, "settings"))
                             add(Quadruple("Bug Reporting", "Report issues & attach media", Icons.Filled.BugReport, "bug_report"))
                             if (isAdmin) {

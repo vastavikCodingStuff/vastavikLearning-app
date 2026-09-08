@@ -54,9 +54,14 @@ class VastavikApiRepository @Inject constructor(
         password: String,
         name: String,
         board: String = "ICSE",
-        language: String = "Java"
+        language: String = "Java",
+        referralCode: String? = null,
+        shareToken: String? = null,
+        deviceFingerprint: String? = null,
+        deviceName: String? = null,
+        platform: String? = null
     ): Result<AuthResponse> = safeApiCall {
-        val res = api.signup(SignupRequest(email, password, name, board, language))
+        val res = api.signup(SignupRequest(email, password, name, board, language, referralCode, shareToken, deviceFingerprint, deviceName, platform))
         if (res.success && res.accessToken != null && res.refreshToken != null) {
             tokenManager.saveTokens(res.accessToken, res.refreshToken)
         }
@@ -250,9 +255,33 @@ class VastavikApiRepository @Inject constructor(
     // Payments
     // ==========================================
 
-    suspend fun createPaymentOrder(planId: String, amount: Double): Result<CreateOrderResponse> = safeApiCall {
-        api.createPaymentOrder(CreateOrderRequest(planId = planId, amount = amount))
+    suspend fun createPaymentOrder(planId: String = "monthly_pro", couponCode: String? = null): Result<CreateOrderResponseV2> = safeApiCall {
+        api.createPaymentOrder(CreateOrderRequestV2(planId, couponCode))
     }
+
+    suspend fun verifyPayment(razorpayOrderId: String, razorpayPaymentId: String, razorpaySignature: String): Result<CommonResponse> = safeApiCall {
+        api.verifyPayment(VerifyPaymentRequest(razorpayOrderId, razorpayPaymentId, razorpaySignature))
+    }
+
+    suspend fun getPricingQuote(): Result<PricingQuote> = safeApiCall { api.getPricingQuote() }
+
+    suspend fun generateReferralCode(): Result<Map<String, Any>> = safeApiCall { api.generateReferralCode() }
+
+    suspend fun getReferralStatus(): Result<ReferralStatusResponse> = safeApiCall { api.getReferralStatus() }
+
+    suspend fun generateShareToken(): Result<ShareCreateResponse> = safeApiCall { api.generateShareToken() }
+
+    suspend fun getShareStatus(): Result<ShareStatusResponse> = safeApiCall { api.getShareStatus() }
+
+    suspend fun trackShareClick(token: String, userAgent: String = ""): Result<Map<String, Any>> = safeApiCall {
+        api.trackShareClick(token, mapOf("user_agent" to userAgent))
+    }
+
+    suspend fun redeemCoupon(code: String): Result<CouponRedeemResponse> = safeApiCall {
+        api.redeemCoupon(CouponRedeemRequest(code))
+    }
+
+    suspend fun getCreditsBalance(): Result<CreditsBalanceResponse> = safeApiCall { api.getCreditsBalance() }
 
     suspend fun getPaymentHistory(): Result<List<Map<String, Any>>> = safeApiCall {
         api.getPaymentHistory()

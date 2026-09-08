@@ -18,8 +18,8 @@ android {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 41
-        versionName = "1.0.41"
+        versionCode = 42
+        versionName = "1.0.42"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
@@ -41,6 +41,7 @@ android {
         buildConfigField("String", "API_KEY_SECRET", "\"${properties.getProperty("API_KEY_SECRET", "dev-secret-android-32bytes-hex-0000")}\"")
         // Judge0 self-hosted instance on http://139.84.172.230:2358 — set JUDGE0_AUTH_TOKEN in local.properties
         buildConfigField("String", "JUDGE0_AUTH_TOKEN", "\"${properties.getProperty("JUDGE0_AUTH_TOKEN", "4187f0c558ee335d9be43697718fa5f7")}\"")
+        buildConfigField("String", "RAZORPAY_KEY_ID", "\"${properties.getProperty("RAZORPAY_KEY_ID", "")}\"")
     }
 
     signingConfigs {
@@ -178,6 +179,9 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+
+    // Razorpay Checkout
+    implementation(libs.razorpay)
 
     // Testing
     testImplementation(libs.junit)

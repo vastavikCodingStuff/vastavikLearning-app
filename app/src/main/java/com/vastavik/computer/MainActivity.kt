@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.vastavik.computer.data.repository.VastavikApiRepository
 import com.vastavik.computer.ui.navigation.AppNavHost
 import com.vastavik.computer.ui.theme.VastavikTheme
 import com.vastavik.computer.utils.AdminSession
@@ -31,17 +32,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.lifecycle.lifecycleScope
+import com.razorpay.PaymentResultListener
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), PaymentResultListener {
 
     @Inject
     lateinit var themePreferences: ThemePreferences
 
+    @Inject
+    lateinit var apiRepository: VastavikApiRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        captureGrowthAttribution(intent)
 
         // Track app-open / app-background so the activity log captures session boundaries.
         com.vastavik.computer.utils.ActivityLog.appOpen(this)
@@ -192,5 +199,31 @@ class MainActivity : ComponentActivity() {
             "class_started" -> if (!intent?.getStringExtra("class_id").isNullOrEmpty()) "meeting_lobby/${intent.getStringExtra("class_id")}" else "home"
             else -> "splash"
         }
+    }
+
+    private fun captureGrowthAttribution(intent: Intent?) {
+        val data = intent?.data ?: return
+        val prefs = getSharedPreferences("growth_attribution", MODE_PRIVATE)
+        val path = data.pathSegments
+        when {
+            path.size >= 2 && path[0] == "r" -> {
+                prefs.edit().putString("pending_referral_code", path[1]).apply()
+            }
+            path.size >= 2 && path[0] == "s" -> {
+                val token = path[1]
+                prefs.edit().putString("pending_share_token", token).apply()
+                lifecycleScope.launch {
+                    try { apiRepository.trackShareClick(token) } catch (_: Exception) {}
+                }
+            }
+        }
+    }
+
+    override fun onPaymentSuccess(razorpayPaymentId: String?) {
+        com.vastavik.computer.utils.RazorpayBridge.onSuccess?.invoke(razorpayPaymentId ?: "")
+    }
+
+    override fun onPaymentError(code: Int, description: String?) {
+        com.vastavik.computer.utils.RazorpayBridge.onError?.invoke(code, description)
     }
 }

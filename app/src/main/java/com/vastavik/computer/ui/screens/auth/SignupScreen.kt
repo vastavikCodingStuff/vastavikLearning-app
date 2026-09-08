@@ -190,7 +190,7 @@ fun SignupScreen(
                 Button(
                     onClick = {
                         if (email.isNotBlank() && password.isNotBlank() && password == confirmPassword) {
-                            viewModel.signUp(email.trim(), password.trim())
+                            viewModel.signUp(email.trim(), password.trim(), context = context)
                         } else {
                             val msg = when {
                                 email.isBlank() || password.isBlank() -> "Please fill in all fields"

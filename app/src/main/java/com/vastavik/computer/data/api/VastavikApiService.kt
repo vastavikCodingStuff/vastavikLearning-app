@@ -168,10 +168,41 @@ interface VastavikApiService {
     // ==========================================
 
     @POST("api/v1/payments/create-order")
-    suspend fun createPaymentOrder(@Body request: CreateOrderRequest): CreateOrderResponse
+    suspend fun createPaymentOrder(@Body request: CreateOrderRequestV2): CreateOrderResponseV2
+
+    @POST("api/v1/payments/verify")
+    suspend fun verifyPayment(@Body request: VerifyPaymentRequest): CommonResponse
 
     @GET("api/v1/payments/history")
     suspend fun getPaymentHistory(): List<Map<String, Any>>
+
+    // ==========================================
+    // Growth (Referral, Share, Coupon, Pricing)
+    // ==========================================
+
+    @POST("api/v1/referral/generate")
+    suspend fun generateReferralCode(): Map<String, Any>
+
+    @GET("api/v1/referral/status")
+    suspend fun getReferralStatus(): ReferralStatusResponse
+
+    @POST("api/v1/share/generate")
+    suspend fun generateShareToken(): ShareCreateResponse
+
+    @GET("api/v1/share/status")
+    suspend fun getShareStatus(): ShareStatusResponse
+
+    @POST("api/v1/share/track/{token}")
+    suspend fun trackShareClick(@Path("token") token: String, @Body body: Map<String, String>): Map<String, Any>
+
+    @POST("api/v1/coupon/redeem")
+    suspend fun redeemCoupon(@Body request: CouponRedeemRequest): CouponRedeemResponse
+
+    @GET("api/v1/pricing/quote")
+    suspend fun getPricingQuote(): PricingQuote
+
+    @GET("api/v1/credits/balance")
+    suspend fun getCreditsBalance(): CreditsBalanceResponse
 
     // ==========================================
     // System & Updates
