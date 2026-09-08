@@ -202,12 +202,6 @@ private fun HomeTab(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        // Mandatory update banner — appears first so it cannot be missed.
-        item {
-            com.vastavik.computer.ui.components.MandatoryUpdateBanner(
-                onClick = { onNavigate("app_update") }
-            )
-        }
         item {
             VastavikTopBar(
                 onProfileClick = { onNavigate("profile") },
@@ -215,115 +209,10 @@ private fun HomeTab(
                 onUpdateClick = { onNavigate("app_update") }
             )
         }
-
-        // Live Frontend Update Banner connected to GitHub/Backend
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-                    .padding(end = 4.dp, bottom = 4.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .offset(x = 3.dp, y = 3.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(bs)
-                )
-                if (updateInfo?.isUpdateAvailable == true) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF2563EB))
-                            .border(BorderStroke(2.dp, bb), RoundedCornerShape(14.dp))
-                            .clickable { onNavigate("app_update") }
-                            .padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.18f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.SystemUpdate,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "App Update Available: v${updateInfo?.latestVersion}",
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White,
-                                fontSize = 13.sp
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                "New build found on GitHub Assets. Tap to install.",
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontSize = 11.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        // Circular green color download button
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF10B981))
-                                .border(BorderStroke(1.5.dp, Color.White), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.Download,
-                                contentDescription = "Download Update",
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                } else {
-                    // Backend Connected / Up-to-date strip
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(MaterialTheme.colorScheme.surface)
-                            .border(BorderStroke(1.5.dp, bb.copy(alpha = 0.6f)), RoundedCornerShape(14.dp))
-                            .clickable { onNavigate("app_update") }
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF10B981))
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Backend Synced • v${com.vastavik.computer.BuildConfig.VERSION_NAME} Latest",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            "Check Updates →",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF2563EB)
-                        )
-                    }
-                }
-            }
+            com.vastavik.computer.ui.components.MandatoryUpdateBanner(
+                onClick = { onNavigate("app_update") }
+            )
         }
 
         // Hero Brutal Card with integrated stats footer

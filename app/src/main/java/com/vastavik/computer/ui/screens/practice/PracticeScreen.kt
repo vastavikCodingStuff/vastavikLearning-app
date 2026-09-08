@@ -141,7 +141,8 @@ fun PracticeScreen(
 
     // Active AI coding item for Vastavik AI solution sheet
     var activeCodingItem by remember { mutableStateOf<CodingItem?>(null) }
-    var selectedLanguage by remember { mutableStateOf("Java") }
+    val initialLang = com.vastavik.computer.utils.BoardLanguage.getPreferred(context)
+    var selectedLanguage by remember(initialLang) { mutableStateOf(initialLang) }
     var aiSolutionMarkdown by remember { mutableStateOf("") }
     var isGeneratingCode by remember { mutableStateOf(false) }
 
@@ -560,7 +561,7 @@ fun PracticeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    listOf("Java", "Python", "C++", "JavaScript").forEach { lang ->
+                    com.vastavik.computer.utils.BoardLanguage.supportedLanguages().forEach { lang ->
                         val isLangSelected = selectedLanguage == lang
                         Box(
                             modifier = Modifier
@@ -570,6 +571,7 @@ fun PracticeScreen(
                                 .clickable {
                                     if (selectedLanguage != lang) {
                                         selectedLanguage = lang
+                                        com.vastavik.computer.utils.BoardLanguage.savePreferred(context, lang)
                                         loadVastavikAiSolution(item, lang)
                                     }
                                 }

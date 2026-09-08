@@ -44,15 +44,18 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
     }
 
     val boards = listOf("ICSE", "CBSE", "West Bengal Board", "Others")
+    val languages = com.vastavik.computer.utils.BoardLanguage.supportedLanguages()
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var school by remember { mutableStateOf("") }
     var studentClass by remember { mutableStateOf("") }
     var board by remember { mutableStateOf("ICSE") }
+    var preferredLanguage by remember { mutableStateOf("Java") }
     var dob by remember { mutableStateOf("") }
     var hobbies by remember { mutableStateOf("") }
     var boardExpanded by remember { mutableStateOf(false) }
+    var languageExpanded by remember { mutableStateOf(false) }
     var isSaving by remember { mutableStateOf(false) }
     val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
 
@@ -79,6 +82,12 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
             if (boards.contains(savedBoard)) {
                 board = savedBoard
             }
+            val savedLang = prefs.getString("language", null)
+            if (!savedLang.isNullOrBlank() && languages.contains(savedLang)) {
+                preferredLanguage = savedLang
+            } else {
+                preferredLanguage = com.vastavik.computer.utils.BoardLanguage.defaultFor(board)
+            }
             dob = prefs.getString("dob", "") ?: ""
             hobbies = prefs.getString("hobbies", "") ?: ""
         }
@@ -95,6 +104,11 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                     if (!profile.school.isNullOrBlank()) school = profile.school
                     if (!profile.studentClass.isNullOrBlank()) studentClass = profile.studentClass
                     if (!profile.board.isNullOrBlank() && boards.contains(profile.board)) board = profile.board
+                    if (!profile.preferredLanguage.isNullOrBlank() && languages.contains(profile.preferredLanguage)) {
+                        preferredLanguage = profile.preferredLanguage
+                    } else if (!profile.board.isNullOrBlank()) {
+                        preferredLanguage = com.vastavik.computer.utils.BoardLanguage.defaultFor(profile.board)
+                    }
                     if (!profile.dob.isNullOrBlank()) dob = profile.dob
                     if (!profile.hobbies.isNullOrBlank()) hobbies = profile.hobbies
                 }
@@ -117,7 +131,8 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                             board = board,
                             school = school.trim(),
                             dob = dob.trim(),
-                            hobbies = hobbies.trim()
+                            hobbies = hobbies.trim(),
+                            preferredLanguage = preferredLanguage
                         )
                     )
                 } catch (_: Exception) {}
@@ -137,7 +152,9 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                                 "school" to school.trim(),
                                 "dob" to dob.trim(),
                                 "dateOfBirth" to dob.trim(),
-                                "hobbies" to hobbies.trim()
+                                "hobbies" to hobbies.trim(),
+                                "preferredLanguage" to preferredLanguage,
+                                "language" to preferredLanguage
                             ),
                             SetOptions.merge()
                         )
@@ -153,6 +170,8 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                     .putString("school", school.trim())
                     .putString("dob", dob.trim())
                     .putString("hobbies", hobbies.trim())
+                    .putString("language", preferredLanguage)
+                    .putString("preferredLanguage", preferredLanguage)
                     .apply()
 
                 isSaving = false
@@ -253,12 +272,53 @@ fun EditProfileScreen(onNavigate: (String) -> Unit, onBack: () -> Unit = {}) {
                             text = { Text(option) },
                             onClick = {
                                 board = option
+                                preferredLanguage = com.vastavik.computer.utils.BoardLanguage.defaultFor(option)
                                 boardExpanded = false
                             }
                         )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Preferred Language — defaults to board language (ICSE→Java, CBSE→Python, WB→C) but user can override
+            Text("Preferred Coding Language", fontWeight = FontWeight.W500, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(modifier = Modifier.height(6.dp))
+            ExposedDropdownMenuBox(
+                expanded = languageExpanded,
+                onExpandedChange = { languageExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = preferredLanguage,
+                    onValueChange = {},
+                    readOnly = true,
+                    leadingIcon = { Icon(Icons.Filled.Code, contentDescription = null) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = languageExpanded,
+                    onDismissRequest = { languageExpanded = false }
+                ) {
+                    languages.forEach { lang ->
+                        DropdownMenuItem(
+                            text = { Text(lang) },
+                            onClick = {
+                                preferredLanguage = lang
+                                languageExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Text(
+                "Default: ${com.vastavik.computer.utils.BoardLanguage.defaultFor(board)} for $board — you can change it anytime.",
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             // School

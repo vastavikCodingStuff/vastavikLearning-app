@@ -49,6 +49,7 @@ fun UserSetupScreen(onNavigate: (String) -> Unit) {
     var dob by remember { mutableStateOf("") }
     var hobbies by remember { mutableStateOf("") }
     var language by remember { mutableStateOf("Java") }
+    var languageExpanded by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
     val boards = listOf("ICSE", "CBSE", "West Bengal Board", "Others")
@@ -68,6 +69,13 @@ fun UserSetupScreen(onNavigate: (String) -> Unit) {
         val savedBoard = prefs.getString("board", "") ?: ""
         if (savedBoard.isNotBlank() && boards.contains(savedBoard)) {
             board = savedBoard
+        }
+
+        val savedLang = prefs.getString("language", null)
+        if (!savedLang.isNullOrBlank() && savedLang in listOf("Java", "Python", "C", "C++", "JavaScript")) {
+            language = savedLang
+        } else {
+            language = com.vastavik.computer.utils.BoardLanguage.defaultFor(board)
         }
 
         val savedSchool = prefs.getString("school", "") ?: ""
@@ -155,12 +163,54 @@ fun UserSetupScreen(onNavigate: (String) -> Unit) {
                             text = { Text(option) },
                             onClick = {
                                 board = option
+                                language = com.vastavik.computer.utils.BoardLanguage.defaultFor(option)
                                 boardExpanded = false
                             }
                         )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Preferred Language — board default (ICSE→Java, CBSE→Python, WB→C)
+            Text("Preferred Coding Language *", fontWeight = FontWeight.W500, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(modifier = Modifier.height(6.dp))
+            val languages = com.vastavik.computer.utils.BoardLanguage.supportedLanguages()
+            ExposedDropdownMenuBox(
+                expanded = languageExpanded,
+                onExpandedChange = { languageExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = language,
+                    onValueChange = {},
+                    readOnly = true,
+                    leadingIcon = { Icon(Icons.Filled.Code, contentDescription = null) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = languageExpanded,
+                    onDismissRequest = { languageExpanded = false }
+                ) {
+                    languages.forEach { lang ->
+                        DropdownMenuItem(
+                            text = { Text(lang) },
+                            onClick = {
+                                language = lang
+                                languageExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Text(
+                "Default: ${com.vastavik.computer.utils.BoardLanguage.defaultFor(board)} for $board",
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             // School
