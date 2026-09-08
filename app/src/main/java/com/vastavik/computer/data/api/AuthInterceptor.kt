@@ -50,6 +50,17 @@ class AuthInterceptor(
         } catch (_: Exception) {
         }
 
-        return chain.proceed(builder.build())
+        val response = chain.proceed(builder.build())
+
+        if (response.code == 403 || response.code == 401) {
+            try {
+                val peekBody = response.peekBody(2048).string()
+                if (peekBody.contains("ACCOUNT_BANNED") || peekBody.contains("ACCOUNT_DELETED")) {
+                    com.vastavik.computer.utils.BanManager.handleUserBanned(null, "Your account has been banned and deleted by the administrator.")
+                }
+            } catch (_: Exception) {}
+        }
+
+        return response
     }
 }

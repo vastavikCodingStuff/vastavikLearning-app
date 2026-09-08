@@ -24,6 +24,7 @@ import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.ui.theme.brutalBorderColor
 import com.vastavik.computer.ui.theme.brutalShadowColor
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.tasks.await
 
 private val PrimaryIndigo = Color(0xFF2563EB)
 
@@ -50,7 +51,23 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
             onNavigate("security_check")
         } else {
             val user = FirebaseAuth.getInstance().currentUser
-            if (user != null || com.vastavik.computer.utils.AdminSession.isAdmin.value) {
+            if (user != null && !com.vastavik.computer.utils.AdminSession.isAdmin.value) {
+                try {
+                    user.reload().await()
+                } catch (e: Exception) {
+                    val msg = e.message ?: ""
+                    if (msg.contains("USER_NOT_FOUND", ignoreCase = true) ||
+                        msg.contains("user-not-found", ignoreCase = true) ||
+                        msg.contains("USER_DISABLED", ignoreCase = true) ||
+                        msg.contains("user-disabled", ignoreCase = true)) {
+                        com.vastavik.computer.utils.BanManager.handleUserBanned(context, "Your account has been banned and deleted by the administrator.")
+                        onNavigate("banned")
+                        return@LaunchedEffect
+                    }
+                }
+            }
+
+            if (FirebaseAuth.getInstance().currentUser != null || com.vastavik.computer.utils.AdminSession.isAdmin.value) {
                 onNavigate("home")
             } else {
                 onNavigate("login")

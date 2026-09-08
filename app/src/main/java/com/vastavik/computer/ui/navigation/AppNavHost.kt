@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vastavik.computer.ui.screens.auth.BannedScreen
 import com.vastavik.computer.ui.screens.auth.ForgotPasswordScreen
 import com.vastavik.computer.ui.screens.auth.LoginScreen
 import com.vastavik.computer.ui.screens.auth.SignupScreen
@@ -257,6 +258,13 @@ fun AppNavHost(
         }
         composable("account_deleted") {
             AccountDeletedScreen(onNavigate = { route ->
+                navController.navigate(route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            })
+        }
+        composable("banned") {
+            BannedScreen(onNavigate = { route ->
                 navController.navigate(route) {
                     popUpTo(0) { inclusive = true }
                 }

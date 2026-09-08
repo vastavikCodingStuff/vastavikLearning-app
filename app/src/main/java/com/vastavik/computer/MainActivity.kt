@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             AdminSession.update(FirebaseAuth.getInstance().currentUser)
             val isAdmin by AdminSession.isAdmin.collectAsState()
             val isEngineLogsEnabled by AdminSession.isEngineLogsEnabled.collectAsState()
+            val isBanned by com.vastavik.computer.utils.BanManager.isBanned.collectAsState()
             VastavikTheme(darkTheme = isDarkMode, neoBrutalish = isNeo, neoBrutalAccentIndex = neoAccentIndex) {
                 Box(
                     modifier = Modifier
@@ -96,6 +97,15 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         .padding(top = 2.dp)
                 ) {
                     val navController = rememberNavController()
+
+                    LaunchedEffect(isBanned) {
+                        if (isBanned) {
+                            navController.navigate("banned") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+
                     AppNavHost(
                         navController = navController,
                         startRoute = getStartRoute(intent)
