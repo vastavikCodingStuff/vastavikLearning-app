@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import com.vastavik.computer.data.api.model.ShareCreateResponse
 import com.vastavik.computer.data.api.model.ShareStatusResponse
 import com.vastavik.computer.data.repository.VastavikApiRepository
@@ -43,11 +44,16 @@ fun ShareAppScreen(onBack: () -> Unit) {
 
     LaunchedEffect(Unit) {
         isLoading = true
+        error = null
         try {
-            val r = repo?.getShareStatus()?.getOrNull()
-            status = r
+            val result = repo?.getShareStatus()
+            when {
+                result == null -> error = "Repository unavailable"
+                result.isSuccess -> status = result.getOrNull()
+                else -> error = result.exceptionOrNull()?.message ?: "Could not load share status"
+            }
         } catch (e: Exception) {
-            error = e.message
+            error = e.message ?: "Could not load share status"
         } finally {
             isLoading = false
         }
@@ -79,7 +85,24 @@ fun ShareAppScreen(onBack: () -> Unit) {
 
             val s = status
             if (s == null) {
-                Text(error ?: "Could not load share status.", color = MaterialTheme.colorScheme.error)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Text(error ?: "Could not load share status.", color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = {
+                        isLoading = true
+                        error = null
+                        scope.launch {
+                            try {
+                                val result = repo?.getShareStatus()
+                                when {
+                                    result == null -> error = "Repository unavailable"
+                                    result.isSuccess -> { status = result.getOrNull(); error = null }
+                                    else -> error = result.exceptionOrNull()?.message ?: "Could not load share status"
+                                }
+                            } catch (e: Exception) { error = e.message } finally { isLoading = false }
+                        }
+                    }) { Text("Retry") }
+                }
                 return@Column
             }
 
