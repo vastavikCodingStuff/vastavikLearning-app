@@ -218,6 +218,22 @@ private fun HomeTab(
     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
     val isBlocked = updateInfo?.isUpdateAvailable == true
     val context = androidx.compose.ui.platform.LocalContext.current
+    var fetchedCourses by remember { mutableStateOf<List<com.vastavik.computer.data.api.model.CourseItem>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val repo = dagger.hilt.android.EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                com.vastavik.computer.di.RepositoryEntryPoint::class.java
+            ).vastavikApiRepository()
+            val result = repo.getHomeCatalog()
+            result.getOrNull()?.let { catalog ->
+                if (catalog.courses.isNotEmpty()) {
+                    fetchedCourses = catalog.courses
+                }
+            }
+        } catch (_: Exception) {}
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         VastavikTopBar(
@@ -561,7 +577,7 @@ private fun HomeTab(
 
         item { Spacer(modifier = Modifier.height(20.dp)) }
 
-        // Popular Topics
+        // Popular Topics — fetched from backend courses (replaces hardcoded list)
         item {
             Row(
                 modifier = Modifier
@@ -578,10 +594,19 @@ private fun HomeTab(
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
-            val topics = listOf("OOP Concepts", "Arrays & Lists", "Sorting Algorithms", "File Handling")
-            topics.forEach { topic ->
-                PopularTopicItem(title = topic, subject = "CS", duration = "15 min")
-                Spacer(modifier = Modifier.height(12.dp))
+            if (fetchedCourses.isEmpty()) {
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), contentAlignment = Alignment.Center) {
+                    Text("Loading courses...", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            } else {
+                fetchedCourses.forEach { course ->
+                    PopularTopicItem(
+                        title = course.title,
+                        subject = course.description.take(60).let { if (it.length < course.description.length) "$it..." else it },
+                        duration = course.iconName
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
         }
 
