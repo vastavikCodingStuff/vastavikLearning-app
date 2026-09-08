@@ -30,6 +30,8 @@ import com.vastavik.computer.ui.screens.onboarding.UserSetupScreen
 import com.vastavik.computer.ui.screens.onboarding.WelcomeScreen
 import com.vastavik.computer.ui.screens.editor.CodeEditorScreen
 import com.vastavik.computer.ui.screens.editor.OcrExerciseScreen
+import com.vastavik.computer.ui.screens.growth.ReferAndEarnScreen
+import com.vastavik.computer.ui.screens.growth.ShareAppScreen
 import com.vastavik.computer.ui.screens.meeting.InClassScreen
 import com.vastavik.computer.ui.screens.meeting.LobbyScreen
 import com.vastavik.computer.ui.screens.meeting.MeetingViewModel
@@ -234,6 +236,12 @@ fun AppNavHost(
         }
         composable("payment_history") {
             PaymentHistoryScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
+        }
+        composable("refer_and_earn") {
+            ReferAndEarnScreen(onBack = { navController.popBackStack() })
+        }
+        composable("share_app") {
+            ShareAppScreen(onBack = { navController.popBackStack() })
         }
         composable("edit_profile") {
             EditProfileScreen(onNavigate = { route -> navController.navigate(route) }, onBack = { navController.popBackStack() })
