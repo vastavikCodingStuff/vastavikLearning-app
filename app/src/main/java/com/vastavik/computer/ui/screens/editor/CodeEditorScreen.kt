@@ -259,7 +259,7 @@ fun CodeEditorScreen(
         if (isRunning) return
         val languageId = Judge0Service.languageIdFor(language)
         if (languageId == null) {
-            output = "Judge0 execution is not supported for $language. Please select Java, Python, or JavaScript."
+            output = "Judge0 execution is not supported for $language. Please select Java, Python, C, C++ or JavaScript."
             isSuccess = false
             executionMeta = "Unsupported language"
             return

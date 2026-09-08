@@ -197,12 +197,16 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     }
 
     suspend fun askVastavikAi(prompt: String): String {
-        val backendResp = callBackendAiChat(prompt, activeConversationId)
+        val lang = com.vastavik.computer.utils.BoardLanguage.getPreferred(context)
+        val enhancedPrompt = if (prompt.contains("code", ignoreCase = true) || prompt.contains("program", ignoreCase = true) || prompt.contains("function", ignoreCase = true)) {
+            "$prompt\n\n[System: User board language preference is $lang — respond with code examples in $lang unless user explicitly requests another language.]"
+        } else prompt
+        val backendResp = callBackendAiChat(enhancedPrompt, activeConversationId)
         if (!backendResp.isNullOrBlank()) {
             return backendResp
         }
         return withContext(Dispatchers.IO) {
-            callVastavikAiChat(selectedAiModel, messages + ChatMessage(prompt, isUser = true))
+            callVastavikAiChat(selectedAiModel, messages + ChatMessage(enhancedPrompt, isUser = true))
         }
     }
 

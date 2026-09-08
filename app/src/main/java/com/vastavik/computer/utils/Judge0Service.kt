@@ -19,6 +19,7 @@ object Judge0Service {
     fun languageIdFor(language: String): Int? = when (language.trim().lowercase()) {
         "java" -> 62
         "python", "py" -> 71
+        "c" -> 50
         "c++", "cpp" -> 54
         "javascript", "js" -> 63
         else -> null
@@ -27,6 +28,7 @@ object Judge0Service {
     private fun languageNameFor(languageId: Int): String = when (languageId) {
         62 -> "java"
         71 -> "python"
+        50 -> "c"
         54 -> "cpp"
         63 -> "javascript"
         else -> "java"

@@ -196,10 +196,11 @@ fun PredictOutputSetScreen(
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
 
-    var selectedLanguage by remember { mutableStateOf("Java") }
+    val initialLang = com.vastavik.computer.utils.BoardLanguage.getPreferred(context)
+    var selectedLanguage by remember(initialLang) { mutableStateOf(initialLang) }
     var langDropdownExpanded by remember { mutableStateOf(false) }
 
-    val languages = listOf("Java", "Python", "C++", "JavaScript")
+    val languages = com.vastavik.computer.utils.BoardLanguage.supportedLanguages()
 
     // 5 multi-question problem set
     val questions = remember(setTitle) {
@@ -742,6 +743,7 @@ fun PredictOutputSetScreen(
                                     text = { Text(lang, fontWeight = FontWeight.Bold) },
                                     onClick = {
                                         selectedLanguage = lang
+                                        com.vastavik.computer.utils.BoardLanguage.savePreferred(context, lang)
                                         langDropdownExpanded = false
                                     }
                                 )
