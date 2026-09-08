@@ -62,6 +62,9 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     var showBanners by remember { mutableStateOf(!bannersShown) }
     var displayName by remember { mutableStateOf(com.vastavik.computer.utils.DisplayName.STUDENT_FALLBACK) }
     val isAdmin by com.vastavik.computer.utils.AdminSession.isAdmin.collectAsState()
+    val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+    val isBlocked = updateInfo?.isUpdateAvailable == true
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         com.vastavik.computer.utils.AppUpdater.checkGitHubReleaseAndNotify(context)
@@ -73,6 +76,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             rawName = rawName ?: emailPart,
             isAdmin = isAdmin
         )
+    }
+
+    LaunchedEffect(isBlocked) {
+        if (isBlocked) {
+            try {
+                pagerState.animateScrollToPage(1, animationSpec = tween(durationMillis = 220, easing = FastOutSlowInEasing))
+            } catch (_: Exception) {}
+        }
     }
     val bannerPages = remember {
         listOf(
@@ -128,10 +139,17 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BottomNavBar(
                 selectedIndex = currentTab,
                 onItemSelected = { tabIdx ->
+                    if (isBlocked) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("You can't use the app without updating it. For complete access, please update now.")
+                        }
+                        return@BottomNavBar
+                    }
                     val page = tabIdx + 1
                     if (page != pagerState.currentPage) {
                         coroutineScope.launch {
@@ -161,6 +179,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         androidx.compose.foundation.pager.HorizontalPager(
             state = pagerState,
             beyondViewportPageCount = 1,
+            userScrollEnabled = !isBlocked,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -197,23 +216,35 @@ private fun HomeTab(
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
+    val isBlocked = updateInfo?.isUpdateAvailable == true
+    val context = androidx.compose.ui.platform.LocalContext.current
 
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-        item {
-            VastavikTopBar(
-                onProfileClick = { onNavigate("profile") },
-                onNotificationClick = { onNavigate("notifications") },
-                onUpdateClick = { onNavigate("app_update") }
-            )
-        }
-        item {
-            com.vastavik.computer.ui.components.MandatoryUpdateBanner(
-                onClick = { onNavigate("app_update") }
-            )
-        }
+    Column(modifier = modifier.fillMaxSize()) {
+        VastavikTopBar(
+            onProfileClick = {
+                if (isBlocked) {
+                    android.widget.Toast.makeText(context, "You can't use the app without updating it. For complete access, please update now.", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    onNavigate("profile")
+                }
+            },
+            onNotificationClick = {
+                if (isBlocked) {
+                    android.widget.Toast.makeText(context, "You can't use the app without updating it. For complete access, please update now.", android.widget.Toast.LENGTH_SHORT).show()
+                } else {
+                    onNavigate("notifications")
+                }
+            },
+            onUpdateClick = { onNavigate("app_update") }
+        )
+        com.vastavik.computer.ui.components.MandatoryUpdateBanner(
+            onClick = { onNavigate("app_update") }
+        )
+        Box(modifier = Modifier.weight(1f)) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
 
         // Hero Brutal Card with integrated stats footer
         item {
@@ -555,6 +586,27 @@ private fun HomeTab(
         }
 
         item { Spacer(modifier = Modifier.height(24.dp)) }
+            }
+            if (isBlocked) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.38f))
+                        .clickable {
+                            android.widget.Toast.makeText(context, "You can't use the app without updating it. For complete access, please update now.", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                ) {
+                    Box(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.Center)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(androidx.compose.ui.graphics.Color.White)
+                            .border(BorderStroke(2.dp, androidx.compose.ui.graphics.Color(0xFFDC2626)), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                    ) {
+                        androidx.compose.material3.Text("Update Required — Tap the red banner above to update", fontWeight = FontWeight.Bold, color = androidx.compose.ui.graphics.Color(0xFF7F1D1D), fontSize = 13.sp)
+                    }
+                }
+            }
+        }
     }
 }
 
