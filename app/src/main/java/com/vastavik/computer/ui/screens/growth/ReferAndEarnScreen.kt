@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vastavik.computer.data.api.model.ReferralStatusResponse
@@ -50,11 +51,16 @@ fun ReferAndEarnScreen(onBack: () -> Unit) {
 
     LaunchedEffect(Unit) {
         isLoading = true
+        error = null
         try {
-            val r = repo?.getReferralStatus()?.getOrNull()
-            status = r
+            val result = repo?.getReferralStatus()
+            when {
+                result == null -> error = "Repository unavailable — please restart the app"
+                result.isSuccess -> status = result.getOrNull()
+                else -> error = result.exceptionOrNull()?.message ?: "Could not load referral status"
+            }
         } catch (e: Exception) {
-            error = e.message
+            error = e.message ?: "Could not load referral status"
         } finally {
             isLoading = false
         }
@@ -86,7 +92,28 @@ fun ReferAndEarnScreen(onBack: () -> Unit) {
 
             val s = status
             if (s == null) {
-                Text(error ?: "Could not load referral status.", color = MaterialTheme.colorScheme.error)
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Text(error ?: "Could not load referral status.", color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(12.dp))
+                    Button(onClick = {
+                        isLoading = true
+                        error = null
+                        scope.launch {
+                            try {
+                                val result = repo?.getReferralStatus()
+                                when {
+                                    result == null -> error = "Repository unavailable"
+                                    result.isSuccess -> { status = result.getOrNull(); error = null }
+                                    else -> error = result.exceptionOrNull()?.message ?: "Could not load referral status"
+                                }
+                            } catch (e: Exception) {
+                                error = e.message
+                            } finally { isLoading = false }
+                        }
+                    }) { Text("Retry") }
+                    Spacer(Modifier.height(8.dp))
+                    Text("Check internet and login. Backend: ${com.vastavik.computer.BuildConfig.BACKEND_BASE_URL}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                }
                 return@Column
             }
 
