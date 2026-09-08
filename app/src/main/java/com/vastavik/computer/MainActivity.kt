@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     lateinit var apiRepository: VastavikApiRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Enforce FLAG_SECURE immediately on window creation to block all screenshots, recordings, and background caching
+        com.vastavik.computer.utils.SecurityProtectionManager.enforceWindowSecurity(window)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -85,15 +87,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             AdminSession.update(FirebaseAuth.getInstance().currentUser)
             val isAdmin by AdminSession.isAdmin.collectAsState()
             val isEngineLogsEnabled by AdminSession.isEngineLogsEnabled.collectAsState()
-            DisposableEffect(isAdmin) {
-                if (isAdmin) {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                } else {
-                    window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
-                }
-                onDispose { }
-            }
-
             VastavikTheme(darkTheme = isDarkMode, neoBrutalish = isNeo, neoBrutalAccentIndex = neoAccentIndex) {
                 Box(
                     modifier = Modifier
@@ -108,6 +101,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         startRoute = getStartRoute(intent)
                     )
 
+                    // Forensic anti-leak watermark overlay across all screens
+                    com.vastavik.computer.ui.components.PrivacyWatermarkOverlay()
+
                     // Telegram-style floating heads-up in-app notification banner
                     com.vastavik.computer.ui.components.TelegramNotificationHost(
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter),
@@ -116,6 +112,11 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
                     // NeoBrutalistic No-Internet notification banner
                     com.vastavik.computer.ui.components.NoInternetBannerHost(
+                        modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
+                    )
+
+                    // Emulator security detection banner (when running inside BlueStacks / VM)
+                    com.vastavik.computer.ui.components.EmulatorWarningBannerHost(
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
                     )
 
