@@ -77,14 +77,21 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideColdStartRetryInterceptor(): com.vastavik.computer.data.api.ColdStartRetryInterceptor =
+        com.vastavik.computer.data.api.ColdStartRetryInterceptor()
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
         tokenAuthenticator: com.vastavik.computer.data.api.TokenAuthenticator,
-        loadBalancerInterceptor: com.vastavik.computer.data.api.LoadBalancerInterceptor
+        loadBalancerInterceptor: com.vastavik.computer.data.api.LoadBalancerInterceptor,
+        coldStartRetryInterceptor: com.vastavik.computer.data.api.ColdStartRetryInterceptor
     ): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
         return OkHttpClient.Builder()
             .addInterceptor(loadBalancerInterceptor)   // rewrite host first
+            .addInterceptor(coldStartRetryInterceptor) // transparent cold start retry/backoff
             .addInterceptor(authInterceptor)
             .authenticator(tokenAuthenticator)
             .addInterceptor(logging)

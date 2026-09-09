@@ -3,18 +3,21 @@ package com.vastavik.computer.data.api
 import com.vastavik.computer.BuildConfig
 
 object ApiConfig {
-    const val CONNECT_TIMEOUT_SEC = 30L
-    const val READ_TIMEOUT_SEC = 30L
-    const val WRITE_TIMEOUT_SEC = 30L
+    const val CONNECT_TIMEOUT_SEC = 60L
+    const val READ_TIMEOUT_SEC = 60L
+    const val WRITE_TIMEOUT_SEC = 60L
+
+    // Cold-start retry settings
+    const val COLD_START_MAX_RETRIES = 2
+    const val COLD_START_RETRY_DELAY_MS = 2500L
 
     // Environment Presets
     const val URL_LOCAL_EMULATOR = "http://10.0.2.2:8000/"
     const val URL_RENDER_CLOUD = "https://vastaviklearning-backend-app.onrender.com/"
-    const val URL_RAILWAY_CLOUD = "https://vastaviklearning-backend-app.up.railway.app/"
     const val URL_PRODUCTION = "https://api.vastaviklearning.com/"
 
-    // Load-balanced candidates (Render + Railway). Order = default preference.
-    val LOAD_BALANCED_URLS = listOf(URL_RENDER_CLOUD, URL_RAILWAY_CLOUD)
+    // Load-balanced candidates. Render is the live production backend.
+    val LOAD_BALANCED_URLS = listOf(URL_RENDER_CLOUD)
 
     val BASE_URL: String
         get() {
