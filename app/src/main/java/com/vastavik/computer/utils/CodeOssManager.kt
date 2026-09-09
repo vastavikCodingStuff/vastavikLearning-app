@@ -40,7 +40,7 @@ object CodeOssManager {
 
     // Default GitHub Release asset download URL for the companion extension
     const val DEFAULT_DOWNLOAD_URL =
-        "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.52/vastavik-codeoss-extension.apk"
+        "https://github.com/vastavikCodingStuff/vastavikLearning-app/releases/download/v1.0.54/vastavik-codeoss-extension.apk"
 
     sealed class DownloadState {
         object Idle : DownloadState()

@@ -65,17 +65,21 @@ object UbuntuTerminalEngine {
         if (!readme.exists()) {
             readme.writeText(
                 """
-                # 🐧 Vastavik CodeOSS & Sandboxed Ubuntu
+                # projects
 
-                Welcome to your offline Linux developer environment on Android.
-                - **Terminal:** Minimal headless Ubuntu 22.04 LTS with `apt` package manager.
-                - **Editor:** CodeOSS / Monaco IDE with auto-rotate and multi-window views.
-                - **AI Copilot:** Mistral AI embedded directly into your coding environment.
+                Welcome to your full-featured VS Code & Ubuntu development environment on Android.
 
-                ### Quick Commands
-                - `apt update && apt install python3 nodejs git`
-                - `npm run dev`
-                - `python3 solution.py`
+                ### Stack
+                - **Node.js**: v24.18.0 (arm64)
+                - **npm**: 11.6.1
+                - **Python**: 3.12.11
+                - **OS**: Ubuntu Linux 22.04 LTS with apt
+
+                ### Getting Started
+                ```bash
+                npm run dev
+                curl -s :3000
+                ```
                 """.trimIndent()
             )
         }
@@ -84,7 +88,7 @@ object UbuntuTerminalEngine {
         if (!serverJs.exists()) {
             serverJs.writeText(
                 """
-                // Sample Node.js Server in Sandboxed Ubuntu
+                // Node.js HTTP Server
                 const http = require('http');
                 const port = 3000;
 
@@ -93,8 +97,7 @@ object UbuntuTerminalEngine {
                     res.end(JSON.stringify({
                         node: process.version,
                         platform: process.platform,
-                        arch: process.arch,
-                        status: 'Ubuntu Sandbox Active'
+                        arch: process.arch
                     }));
                 });
 
@@ -113,11 +116,12 @@ object UbuntuTerminalEngine {
                   "name": "api",
                   "version": "1.0.0",
                   "description": "Vastavik CodeOSS Project",
+                  "main": "server.js",
                   "scripts": {
                     "dev": "node server.js",
                     "start": "node server.js"
                   },
-                  "keywords": ["ubuntu", "codeoss", "vastavik"]
+                  "dependencies": {}
                 }
                 """.trimIndent()
             )
@@ -239,7 +243,9 @@ object UbuntuTerminalEngine {
                 return@withContext 0
             }
             command.startsWith("curl") && (command.contains(":3000") || command.contains("localhost:3000")) -> {
-                onOutputLine(TerminalOutput("{\"node\":\"v24.18.0\",\"platform\":\"android\",\"arch\":\"arm64\",\"sandbox\":\"active\"}"))
+                onOutputLine(TerminalOutput("{\"node\":\"v24.18.0\","))
+                onOutputLine(TerminalOutput("\"platform\":\"android\","))
+                onOutputLine(TerminalOutput("\"arch\":\"arm64\"}"))
                 return@withContext 0
             }
             command == "uname -a" -> {
