@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CodeOSS — VS Code with Sandboxed Ubuntu</title>
+    <title>projects — Code Server</title>
     <!-- Official Monaco Editor Styling -->
     <link rel="stylesheet" data-name="vs/editor/editor.main" href="vs/editor/editor.main.css">
     <style>
@@ -15,19 +15,22 @@
         }
 
         :root {
-            --bg-activity: #333333;
-            --bg-sidebar: #252526;
+            --bg-titlebar: #181818;
+            --bg-activity: #181818;
+            --bg-sidebar: #181818;
             --bg-editor: #1e1e1e;
             --bg-terminal: #181818;
-            --bg-header: #2d2d2d;
-            --border-color: #3e3e42;
-            --accent-blue: #007acc;
-            --accent-green: #4ec9b0;
-            --accent-orange: #ce9178;
-            --accent-amber: #e5a93b;
+            --bg-statusbar: #181818;
+            --border-color: #2b2b2b;
+            --accent-blue: #0078d4;
+            --accent-focus: #005fb8;
             --text-primary: #cccccc;
             --text-active: #ffffff;
             --text-muted: #858585;
+            --term-green: #34d399;
+            --term-yellow: #facc15;
+            --term-cyan: #38bdf8;
+            --term-white: #f1f5f9;
             --font-mono: 'Menlo', 'Monaco', 'Courier New', Consolas, monospace;
             --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
@@ -49,66 +52,130 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            background-color: var(--bg-titlebar);
         }
 
-        /* Top Code-Server Connection Bar */
-        #codeserver-bar {
-            height: 28px;
-            background-color: #1a1a1a;
+        /* 1. TOP APPLICATION BAR (MATCHING SCREENSHOT) */
+        #top-bar {
+            height: 38px;
+            background-color: var(--bg-titlebar);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 10px;
-            font-size: 11px;
-            z-index: 10;
+            padding: 0 8px;
+            flex-shrink: 0;
+            z-index: 20;
         }
 
-        .cs-status {
+        .top-left {
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+
+        .vscode-logo-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-arrows {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-muted);
+        }
+
+        .nav-arrow-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .nav-arrow-btn:hover {
+            color: var(--text-active);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .top-center {
+            flex: 1;
+            max-width: 280px;
+            margin: 0 8px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 24px;
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .search-pill:hover {
+            border-color: #555555;
+        }
+
+        .pill-title {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-weight: 500;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--accent-amber);
-            box-shadow: 0 0 6px var(--accent-amber);
-        }
-
-        .status-dot.online {
-            background-color: #4ec9b0;
-            box-shadow: 0 0 6px #4ec9b0;
-        }
-
-        .cs-actions {
+        .pill-icons {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
+            color: var(--text-muted);
         }
 
-        .btn-pill {
-            background-color: #2a2d2e;
-            color: #d7ba7d;
-            border: 1px solid #45494a;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .layout-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.15s;
+            border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
         }
 
-        .btn-pill:hover, .btn-pill:active {
-            background-color: var(--accent-blue);
-            color: #ffffff;
-            border-color: var(--accent-blue);
+        .layout-btn:hover, .layout-btn.active {
+            color: var(--text-active);
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
-        /* Main Workspace Body */
+        /* 2. MAIN WORKSPACE CONTAINER */
         #workspace-body {
             display: flex;
             flex: 1;
@@ -116,46 +183,55 @@
             position: relative;
         }
 
-        /* Left Activity Bar */
+        /* 3. LEFT ACTIVITY BAR (MATCHING SCREENSHOT) */
         #activity-bar {
             width: 48px;
             background-color: var(--bg-activity);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px 0;
-            border-right: 1px solid rgba(0,0,0,0.2);
-            z-index: 5;
+            padding: 4px 0;
+            border-right: 1px solid var(--border-color);
+            z-index: 10;
             flex-shrink: 0;
         }
 
-        .activity-icon {
-            width: 42px;
-            height: 42px;
+        .activity-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 6px;
+        }
+
+        .act-icon {
+            width: 48px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
             cursor: pointer;
             position: relative;
-            margin-bottom: 4px;
-            border-radius: 6px;
-            font-size: 18px;
             transition: color 0.15s;
         }
 
-        .activity-icon:hover, .activity-icon.active {
+        .act-icon:hover {
             color: var(--text-active);
         }
 
-        .activity-icon.active::before {
+        .act-icon.active {
+            color: var(--text-active);
+        }
+
+        .act-icon.active::before {
             content: '';
             position: absolute;
             left: 0;
             top: 6px;
             bottom: 6px;
-            width: 3px;
-            background-color: var(--text-active);
+            width: 2px;
+            background-color: #ffffff;
             border-radius: 0 2px 2px 0;
         }
 
@@ -163,311 +239,350 @@
             flex: 1;
         }
 
-        /* Collapsible Sidebar (Explorer) */
+        .activity-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        /* 4. PRIMARY SIDEBAR (EXPLORER) */
         #sidebar {
-            width: 220px;
+            width: 210px;
             background-color: var(--bg-sidebar);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: width 0.2s ease;
             flex-shrink: 0;
+            transition: width 0.2s ease, opacity 0.2s ease;
         }
 
         #sidebar.collapsed {
             width: 0;
             border-right: none;
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .sidebar-header {
+        .sidebar-title-row {
             height: 35px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 12px;
+            padding: 0 14px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-muted);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .sidebar-actions {
+        .explorer-section {
+            flex: 1;
             display: flex;
-            gap: 6px;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
-        .icon-btn {
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .section-header-title {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .section-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+        }
+
+        .sec-act-btn {
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 2px;
-            font-size: 12px;
             border-radius: 3px;
         }
 
-        .icon-btn:hover {
+        .sec-act-btn:hover {
             color: var(--text-active);
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .file-tree {
-            flex: 1;
-            overflow-y: auto;
-            padding: 6px 0;
+        .file-list {
+            display: flex;
+            flex-direction: column;
         }
 
-        .tree-section-title {
-            padding: 4px 12px;
+        .file-entry {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px 5px 22px;
+            font-size: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .file-entry:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        .file-entry.active {
+            background-color: #04395e;
+            color: #ffffff;
+        }
+
+        .icon-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .icon-md {
+            color: #4daafc;
+            font-size: 11px;
+        }
+
+        .icon-js {
+            color: #f7df1e;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .icon-json {
+            color: #56b6c2;
+            font-size: 11px;
+        }
+
+        .icon-py {
+            color: #3572a5;
+            font-size: 11px;
+        }
+
+        .accordion-item {
+            border-top: 1px solid var(--border-color);
+            padding: 6px 12px;
             font-size: 11px;
             font-weight: 700;
-            color: #888888;
+            text-transform: uppercase;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 4px;
-        }
-
-        .tree-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            font-size: 12px;
+            gap: 6px;
             cursor: pointer;
-            color: var(--text-primary);
-            transition: background 0.1s;
         }
 
-        .tree-item:hover {
-            background-color: #2a2d2e;
-        }
-
-        .tree-item.active {
-            background-color: #37373d;
-            color: var(--text-active);
-        }
-
-        .file-icon {
-            font-size: 14px;
-        }
-
-        /* Editor Area */
-        #editor-area {
+        /* 5. MAIN CONTENT AREA (EDITOR & TERMINAL SPLIT) */
+        #main-stage {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background-color: var(--bg-editor);
+            background-color: var(--bg-terminal);
             position: relative;
         }
 
-        /* Editor Tab Bar */
-        #tabs-bar {
-            height: 36px;
-            background-color: var(--bg-header);
+        /* Optional Editor Container (when toggled via layout) */
+        #editor-pane {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            background-color: var(--bg-editor);
+            overflow: hidden;
+        }
+
+        #editor-pane.visible {
+            display: flex;
+        }
+
+        .editor-tabs {
+            height: 35px;
+            background-color: #181818;
             display: flex;
             align-items: center;
-            overflow-x: auto;
             border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
             flex-shrink: 0;
         }
 
-        .tab-item {
+        .ed-tab {
             height: 100%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 14px;
+            gap: 6px;
+            padding: 0 12px;
             font-size: 12px;
-            background-color: #2d2d2d;
             color: var(--text-muted);
             border-right: 1px solid var(--border-color);
+            background-color: #181818;
             cursor: pointer;
-            white-space: nowrap;
-            position: relative;
         }
 
-        .tab-item.active {
+        .ed-tab.active {
             background-color: var(--bg-editor);
             color: var(--text-active);
+            border-top: 2px solid var(--accent-blue);
         }
 
-        .tab-item.active::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: var(--accent-blue);
-        }
-
-        .tab-close {
-            font-size: 12px;
-            opacity: 0.6;
-            margin-left: 4px;
-        }
-
-        .tab-close:hover {
-            opacity: 1;
-        }
-
-        .tabs-actions {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-right: 8px;
-        }
-
-        .action-btn {
-            background-color: var(--accent-blue);
-            color: #ffffff;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .action-btn.secondary {
-            background-color: #3a3d41;
-            color: var(--text-primary);
-        }
-
-        .action-btn:hover {
-            opacity: 0.9;
-        }
-
-        /* Monaco Editor Container */
-        #monaco-container {
+        #monaco-mount {
             flex: 1;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Split Terminal Panel */
-        #terminal-panel {
-            height: 230px;
-            background-color: var(--bg-terminal);
-            border-top: 1px solid var(--border-color);
+        /* 6. TERMINAL PANE (MATCHING SCREENSHOT) */
+        #terminal-pane {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
-            transition: height 0.2s ease;
-            position: relative;
-            z-index: 8;
+            background-color: var(--bg-terminal);
+            overflow: hidden;
         }
 
-        #terminal-panel.minimized {
-            height: 32px;
-        }
-
-        #terminal-panel.hidden {
-            display: none;
-        }
-
-        .terminal-header {
-            height: 32px;
-            background-color: #222222;
+        .term-header {
+            height: 34px;
+            background-color: var(--bg-terminal);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 10px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
             flex-shrink: 0;
         }
 
-        .terminal-tabs {
+        .term-header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
+            gap: 8px;
         }
 
-        .term-tab {
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .term-tab.active {
-            color: var(--text-active);
-            border-bottom: 2px solid var(--accent-blue);
-            padding-bottom: 2px;
-        }
-
-        .terminal-controls {
+        .term-tab-pill {
             display: flex;
             align-items: center;
             gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-active);
         }
 
-        .terminal-body {
+        .term-header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+        }
+
+        .term-ctrl-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .term-ctrl-btn:hover {
+            color: var(--text-active);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .term-body {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 6px 10px;
-            overflow: hidden;
+            padding: 8px 12px;
+            overflow-y: auto;
             font-family: var(--font-mono);
             font-size: 12px;
+            line-height: 1.5;
+            color: var(--term-white);
         }
 
-        .terminal-output {
-            flex: 1;
-            overflow-y: auto;
-            line-height: 1.45;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-
-        .log-line {
-            color: #d4d4d4;
-        }
-        .log-cmd {
-            color: #4ec9b0;
-            font-weight: 600;
-        }
-        .log-err {
-            color: #f48771;
-        }
-        .log-sys {
-            color: #9cdcfe;
-        }
-        .log-apt {
-            color: #dcdcaa;
-        }
-
-        .terminal-input-row {
+        .term-history {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-top: 4px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .term-prompt {
-            color: #4ec9b0;
-            font-weight: bold;
+        .line-cmd-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .prompt-txt {
+            color: var(--term-green);
+            font-weight: 600;
             white-space: nowrap;
         }
 
-        #term-input {
+        .cmd-txt {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .out-cyan {
+            color: var(--term-cyan);
+        }
+
+        .out-yellow {
+            color: var(--term-yellow);
+        }
+
+        .out-green {
+            color: var(--term-green);
+        }
+
+        .out-dim {
+            color: #a0a0a0;
+        }
+
+        .out-err {
+            color: #f87171;
+        }
+
+        .term-input-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        #term-cmd-input {
             flex: 1;
             background: none;
             border: none;
@@ -475,12 +590,13 @@
             color: #ffffff;
             font-family: var(--font-mono);
             font-size: 12px;
+            caret-color: #ffffff;
         }
 
-        /* Mobile Terminal Accessory Toolbar */
-        #mobile-acc-bar {
-            height: 36px;
-            background-color: #1e1e1e;
+        /* 7. TOUCH ACCESSORY BAR */
+        #touch-bar {
+            height: 32px;
+            background-color: #1a1a1a;
             border-top: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -490,758 +606,830 @@
             flex-shrink: 0;
         }
 
-        .acc-key {
-            background-color: #2d2d2d;
-            border: 1px solid #444;
-            color: #d4d4d4;
+        .touch-key {
+            background-color: #262626;
+            border: 1px solid #3a3a3a;
+            color: #cccccc;
             font-family: var(--font-mono);
             font-size: 11px;
-            font-weight: bold;
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 4px;
             cursor: pointer;
             white-space: nowrap;
-            user-select: none;
         }
 
-        .acc-key:active {
+        .touch-key:active {
             background-color: var(--accent-blue);
             color: #ffffff;
         }
 
-        .acc-key.highlight {
+        .touch-key.highlight {
             background-color: #0e639c;
             color: #ffffff;
             border-color: #1177bb;
         }
 
-        /* Quick Command Chips */
-        .quick-chips {
-            display: flex;
-            gap: 6px;
-            padding: 4px 8px;
-            background-color: #1a1a1a;
-            overflow-x: auto;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            flex-shrink: 0;
-        }
-
-        .chip {
-            background-color: #2b2b2b;
-            color: #9cdcfe;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            cursor: pointer;
-            white-space: nowrap;
-            border: 1px solid #3c3c3c;
-        }
-
-        .chip:hover {
-            background-color: #383838;
-            color: #ffffff;
-        }
-
-        /* Mistral AI Drawer (Right) */
-        #copilot-drawer {
-            width: 280px;
-            background-color: #202020;
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 15;
-            box-shadow: -4px 0 16px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease;
-            transform: translateX(100%);
-        }
-
-        #copilot-drawer.open {
-            transform: translateX(0);
-        }
-
-        .copilot-header {
-            height: 38px;
-            background-color: #282828;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 12px;
-            font-weight: 700;
-            color: #d7ba7d;
-        }
-
-        .copilot-body {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 12px;
-        }
-
-        .copilot-msg {
-            padding: 8px 10px;
-            border-radius: 6px;
-            line-height: 1.4;
-        }
-
-        .copilot-msg.ai {
-            background-color: #2d2d30;
-            border: 1px solid #3e3e42;
-            color: #e0e0e0;
-        }
-
-        .copilot-msg.user {
-            background-color: #0e639c;
-            color: #ffffff;
-            align-self: flex-end;
-            max-width: 85%;
-        }
-
-        .copilot-input-row {
-            padding: 8px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 6px;
-            background-color: #252526;
-        }
-
-        .copilot-input {
-            flex: 1;
-            background-color: #1e1e1e;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 6px 8px;
-            color: #ffffff;
-            font-size: 12px;
-            outline: none;
-        }
-
-        /* Status Bar (Bottom) */
-        #statusbar {
+        /* 8. BOTTOM STATUS BAR (MATCHING SCREENSHOT) */
+        #status-bar {
             height: 22px;
-            background-color: #007acc;
-            color: #ffffff;
+            background-color: var(--bg-statusbar);
+            border-top: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 8px;
             font-size: 11px;
-            z-index: 10;
+            color: var(--text-primary);
             flex-shrink: 0;
+            z-index: 20;
         }
 
-        .statusbar-left, .statusbar-right {
+        .sb-left, .sb-right {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
-        .status-item {
+        .sb-item {
             display: flex;
             align-items: center;
             gap: 4px;
             cursor: pointer;
         }
+
+        .sb-remote-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .badge-amber {
+            background-color: #d97706;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
     </style>
 </head>
 <body>
     <div id="app-root">
-        <!-- Top Code-Server Detection & Control Bar -->
-        <div id="codeserver-bar">
-            <div class="cs-status">
-                <span class="status-dot" id="cs-dot"></span>
-                <span id="cs-status-label">Checking Code-Server (127.0.0.1:8080)...</span>
+
+        <!-- 1. TOP APPLICATION BAR (MATCHING SCREENSHOT) -->
+        <div id="top-bar">
+            <!-- Left: VS Code Logo & History Arrows -->
+            <div class="top-left">
+                <div class="vscode-logo-btn" title="VS Code">
+                    <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                        <rect width="100" height="100" rx="20" fill="#0066b8"/>
+                        <path d="M72.2 12.8a6.3 6.3 0 0 0-6.1 1.6L36.8 39.5 22.5 28.3a4.2 4.2 0 0 0-5.8.8l-4.5 5.8a4.2 4.2 0 0 0 .7 5.8l17.7 13.8L12.9 68.3a4.2 4.2 0 0 0-.7 5.8l4.5 5.8a4.2 4.2 0 0 0 5.8.8L36.8 69.5l29.3 25.1a6.3 6.3 0 0 0 6.1 1.6 6.3 6.3 0 0 0 4.4-6V18.8a6.3 6.3 0 0 0-4.4-6zm-4.4 61.4L44.6 54.5l23.2-19.7v49.4z" fill="#0098ff"/>
+                        <path d="M12.9 68.3a4.2 4.2 0 0 0-.7 5.8l4.5 5.8a4.2 4.2 0 0 0 5.8.8L36.8 69.5 30.6 64l-17.7 4.3z" fill="#005a9e"/>
+                        <path d="M67.8 74.2L44.6 54.5l23.2-19.7v39.4z" fill="#29b6f6"/>
+                    </svg>
+                </div>
+                <div class="nav-arrows">
+                    <button class="nav-arrow-btn" onclick="historyBack()" title="Back">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </button>
+                    <button class="nav-arrow-btn" onclick="historyForward()" title="Forward">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="cs-actions">
-                <button class="btn-pill" id="btn-connect-cs" onclick="connectToCodeServer()">⚡ Open Code-Server</button>
-                <button class="btn-pill" onclick="toggleTerminal(true)">💻 Terminal</button>
+
+            <!-- Center: Projects Command / Breadcrumb Pill -->
+            <div class="top-center">
+                <div class="search-pill" onclick="openCommandPalette()">
+                    <div class="pill-title">
+                        <span>projects</span>
+                    </div>
+                    <div class="pill-icons">
+                        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm.5 0a3.5 3.5 0 0 0-3-3.465V1.5a.5.5 0 0 0-1 0v3.035A3.5 3.5 0 0 0 4 8a3.5 3.5 0 0 0 3 3.465V14.5a.5.5 0 0 0 1 0v-3.035A3.5 3.5 0 0 0 11 8z"/>
+                        </svg>
+                        <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
+                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Window Layout Controls -->
+            <div class="top-right">
+                <!-- Split Editor -->
+                <button class="layout-btn" onclick="toggleSplitMode()" title="Split Editor">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-6 11H2V3h6v10zm7 0H9V3h6v10z"/>
+                    </svg>
+                </button>
+                <!-- Toggle Primary Sidebar -->
+                <button class="layout-btn active" id="btn-toggle-sidebar" onclick="toggleSidebar()" title="Toggle Primary Side Bar">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-9 11H2V3h3v10zm10 0H6V3h9v10z"/>
+                    </svg>
+                </button>
+                <!-- Toggle Panel / Terminal -->
+                <button class="layout-btn active" id="btn-toggle-terminal" onclick="toggleTerminalView()" title="Toggle Panel">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm0 7H2V3h12v6zm0 4H2v-3h12v3z"/>
+                    </svg>
+                </button>
+                <!-- Toggle Secondary Side Bar -->
+                <button class="layout-btn" onclick="toggleEditorView()" title="Toggle Secondary Side Bar">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-4 11H2V3h8v10zm5 0h-4V3h4v10z"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <!-- Main Workspace -->
+        <!-- 2. MAIN WORKSPACE BODY -->
         <div id="workspace-body">
-            <!-- Left Activity Bar -->
+
+            <!-- 3. LEFT ACTIVITY BAR (MATCHING SCREENSHOT) -->
             <div id="activity-bar">
-                <div class="activity-icon active" id="act-explorer" onclick="toggleSidebar()" title="Explorer">📁</div>
-                <div class="activity-icon" onclick="openTerminalTab('bash')" title="Ubuntu Bash">💻</div>
-                <div class="activity-icon" onclick="openTerminalTab('apt')" title="APT Package Manager">📦</div>
-                <div class="activity-icon" onclick="toggleCopilot()" title="Mistral AI Copilot">✨</div>
+                <div class="activity-top">
+                    <!-- Hamburger Menu -->
+                    <div class="act-icon" onclick="toggleSidebar()" title="Menu">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </div>
+                    <!-- Explorer (Selected) -->
+                    <div class="act-icon active" id="act-explorer" onclick="showExplorer()" title="Explorer">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M13 1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm1 12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v10zM3 4a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h7a1 1 0 0 0 0-1H4a1 1 0 0 1-1-1V5a1 1 0 0 0-1-1z"/>
+                        </svg>
+                    </div>
+                    <!-- Search -->
+                    <div class="act-icon" onclick="openSearchPrompt()" title="Search">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </div>
+                    <!-- Source Control -->
+                    <div class="act-icon" onclick="openGitStatus()" title="Source Control">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10 2a2 2 0 0 0-2 2c0 .4.1.8.3 1.1L5.9 7.5A2 2 0 0 0 5 7a2 2 0 0 0-2 2c0 .4.1.8.3 1.1L1.6 11.8A2 2 0 1 0 2.5 13l2-1.9c.2.1.3.1.5.1a2 2 0 0 0 1.8-1.1l2.4-2.4c.4.3.8.4 1.3.4a2 2 0 1 0 0-4zm-7 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm7-7a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                        </svg>
+                    </div>
+                    <!-- Run & Debug -->
+                    <div class="act-icon" onclick="runDevCommand()" title="Run and Debug">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4.5 2.5a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .76.43l8-5a.5.5 0 0 0 0-.86l-8-5a.5.5 0 0 0-.26-.07zM5 4.02L11.37 8 5 11.98V4.02z"/>
+                        </svg>
+                    </div>
+                    <!-- Extensions -->
+                    <div class="act-icon" onclick="openAptManager()" title="Extensions & APT">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+                        </svg>
+                    </div>
+                    <!-- Testing -->
+                    <div class="act-icon" onclick="runTests()" title="Testing">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M9.5 2V1h-3v1h.5v4.293l-4.854 7.28A1 1 0 0 0 3 15h10a1 1 0 0 0 .854-1.427L9 6.293V2h.5zM7.5 2h1v4.5l.354.354 4.146 6.219a.25.25 0 0 1-.208.427H3.208a.25.25 0 0 1-.208-.427l4.146-6.22.354-.353V2z"/>
+                        </svg>
+                    </div>
+                </div>
+
                 <div class="activity-spacer"></div>
-                <div class="activity-icon" onclick="connectToCodeServer()" title="Connect Live Code-Server">⚡</div>
-                <div class="activity-icon" onclick="showSettingsInfo()" title="Settings">⚙️</div>
+
+                <div class="activity-bottom">
+                    <!-- Accounts -->
+                    <div class="act-icon" title="Accounts">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                        </svg>
+                    </div>
+                    <!-- Settings -->
+                    <div class="act-icon" onclick="showSettingsModal()" title="Settings">
+                        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                        </svg>
+                    </div>
+                </div>
             </div>
 
-            <!-- Collapsible File Explorer -->
+            <!-- 4. PRIMARY SIDEBAR (EXPLORER) -->
             <div id="sidebar">
-                <div class="sidebar-header">
-                    <span>Explorer: Workspace</span>
-                    <div class="sidebar-actions">
-                        <button class="icon-btn" onclick="promptNewFile()" title="New File">➕</button>
-                        <button class="icon-btn" onclick="refreshWorkspaceFiles()" title="Refresh">🔄</button>
-                    </div>
+                <div class="sidebar-title-row">
+                    <span>Explorer</span>
+                    <button class="sec-act-btn" title="More Actions">···</button>
                 </div>
-                <div class="file-tree" id="file-tree-container">
-                    <div class="tree-section-title">📁 /root/workspace</div>
-                    <div class="tree-item active" onclick="switchFile('solution.py')">
-                        <span class="file-icon">🐍</span>
-                        <span>solution.py</span>
+
+                <div class="explorer-section">
+                    <!-- Workspace Section: PROJECTS -->
+                    <div class="section-header" onclick="toggleProjectFolder()">
+                        <div class="section-header-title">
+                            <span id="folder-chevron">⌄</span>
+                            <span>PRO...</span>
+                        </div>
+                        <div class="section-actions" onclick="event.stopPropagation()">
+                            <button class="sec-act-btn" onclick="createNewFilePrompt()" title="New File">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg>
+                            </button>
+                            <button class="sec-act-btn" onclick="refreshFiles()" title="Refresh">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                </svg>
+                            </button>
+                            <button class="sec-act-btn" title="Collapse Folders">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="tree-item" onclick="switchFile('server.js')">
-                        <span class="file-icon">🟨</span>
-                        <span>server.js</span>
+
+                    <!-- File Items Matching Screenshot -->
+                    <div class="file-list" id="file-list-container">
+                        <div class="file-entry active" id="file-README.md" onclick="selectFile('README.md')">
+                            <span class="icon-badge icon-md">M↓</span>
+                            <span>README.md</span>
+                        </div>
+                        <div class="file-entry" id="file-server.js" onclick="selectFile('server.js')">
+                            <span class="icon-badge icon-js">JS</span>
+                            <span>server.js</span>
+                        </div>
+                        <div class="file-entry" id="file-package.json" onclick="selectFile('package.json')">
+                            <span class="icon-badge icon-json">{ }</span>
+                            <span>package.json</span>
+                        </div>
                     </div>
-                    <div class="tree-item" onclick="switchFile('package.json')">
-                        <span class="file-icon">📦</span>
-                        <span>package.json</span>
-                    </div>
-                    <div class="tree-item" onclick="switchFile('README.md')">
-                        <span class="file-icon">📝</span>
-                        <span>README.md</span>
+
+                    <!-- Accordions matching screenshot -->
+                    <div style="margin-top: auto;">
+                        <div class="accordion-item" onclick="toggleOutline()">
+                            <span>&gt;</span>
+                            <span>OUTLINE</span>
+                        </div>
+                        <div class="accordion-item" onclick="toggleTimeline()">
+                            <span>&gt;</span>
+                            <span>TIMELINE</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Editor & Terminal Area -->
-            <div id="editor-area">
-                <!-- Top Tabs Bar -->
-                <div id="tabs-bar">
-                    <div class="tab-item active" id="tab-solution.py" onclick="switchFile('solution.py')">
-                        <span>🐍 solution.py</span>
+            <!-- 5. MAIN STAGE (TERMINAL & MONACO EDITOR) -->
+            <div id="main-stage">
+
+                <!-- Optional Editor View (Monaco) -->
+                <div id="editor-pane">
+                    <div class="editor-tabs" id="editor-tabs-bar">
+                        <div class="ed-tab active" id="tab-README.md" onclick="selectFile('README.md')">
+                            <span class="icon-badge icon-md">M↓</span>
+                            <span>README.md</span>
+                        </div>
+                        <div class="ed-tab" id="tab-server.js" onclick="selectFile('server.js')">
+                            <span class="icon-badge icon-js">JS</span>
+                            <span>server.js</span>
+                        </div>
+                        <div class="ed-tab" id="tab-package.json" onclick="selectFile('package.json')">
+                            <span class="icon-badge icon-json">{ }</span>
+                            <span>package.json</span>
+                        </div>
                     </div>
-                    <div class="tab-item" id="tab-server.js" onclick="switchFile('server.js')">
-                        <span>🟨 server.js</span>
+                    <div id="monaco-mount"></div>
+                </div>
+
+                <!-- 6. TERMINAL PANE (MATCHING SCREENSHOT) -->
+                <div id="terminal-pane">
+                    <!-- Terminal Tab Header -->
+                    <div class="term-header">
+                        <div class="term-header-left">
+                            <button class="term-ctrl-btn" title="Menu">···</button>
+                            <div class="term-tab-pill">
+                                <span>bash</span>
+                                <button class="term-ctrl-btn" onclick="clearTerminal()" title="New Terminal" style="width: 18px; height: 18px;">+</button>
+                                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="term-header-right">
+                            <button class="term-ctrl-btn" onclick="toggleSplitMode()" title="Split Terminal">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-6 11H2V3h6v10zm7 0H9V3h6v10z"/>
+                                </svg>
+                            </button>
+                            <button class="term-ctrl-btn" onclick="clearTerminal()" title="Kill Terminal">
+                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                            </button>
+                            <button class="term-ctrl-btn" onclick="toggleTerminalView()" title="Close Terminal">···</button>
+                        </div>
                     </div>
-                    <div class="tab-item" id="tab-package.json" onclick="switchFile('package.json')">
-                        <span>📦 package.json</span>
+
+                    <!-- Interactive Terminal Session (Initialized matching screenshot) -->
+                    <div class="term-body" id="terminal-scroll">
+                        <div class="term-history" id="term-log-container">
+                            <!-- Line 1: npm run dev -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">npm run dev</span>
+                            </div>
+                            <div class="out-dim">&gt; api@1.0.0 dev</div>
+                            <div class="out-dim">&gt; node server.js</div>
+                            <div class="out-green">Up on 3000</div>
+
+                            <!-- Line 2: curl -s :3000 -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">curl -s :3000</span>
+                            </div>
+                            <div class="out-yellow">{"node":"v24.18.0",</div>
+                            <div class="out-yellow">"platform":"android",</div>
+                            <div class="out-yellow">"arch":"arm64"}</div>
+
+                            <!-- Line 3: python3 -V -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">python3 -V</span>
+                            </div>
+                            <div>Python 3.12.11</div>
+
+                            <!-- Line 4: git --version -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">git --version</span>
+                            </div>
+                            <div>git version 2.55.0</div>
+
+                            <!-- Line 5: npm -v -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">npm -v</span>
+                            </div>
+                            <div>11.6.1</div>
+
+                            <!-- Line 6: rg --version -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">rg --version</span>
+                            </div>
+                            <div>ripgrep 14.1.1</div>
+
+                            <!-- Line 7: tmux ls -->
+                            <div class="line-cmd-row">
+                                <span class="prompt-txt">projects $</span>
+                                <span class="cmd-txt">tmux ls</span>
+                            </div>
+                            <div class="out-green">dev: 2 windows (attached)</div>
+                        </div>
+
+                        <!-- Active Input Row -->
+                        <div class="term-input-row">
+                            <span class="prompt-txt">projects $</span>
+                            <input type="text" id="term-cmd-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="" autofocus />
+                        </div>
                     </div>
-                    <div class="tab-item" id="tab-README.md" onclick="switchFile('README.md')">
-                        <span>📝 README.md</span>
-                    </div>
-                    <div class="tabs-actions">
-                        <button class="action-btn" onclick="runSolution()">▶ Run</button>
-                        <button class="action-btn secondary" onclick="toggleCopilot()">✨ Copilot</button>
-                        <button class="action-btn secondary" onclick="toggleTerminal()">💻 Terminal</button>
+
+                    <!-- 7. TOUCH ACCESSORY BAR -->
+                    <div id="touch-bar">
+                        <button class="touch-key" onclick="sendAccKey('ESC')">ESC</button>
+                        <button class="touch-key" onclick="sendAccKey('TAB')">TAB</button>
+                        <button class="touch-key" onclick="sendAccKey('CTRL_C')">CTRL+C</button>
+                        <button class="touch-key" onclick="insertAccChar('|')">|</button>
+                        <button class="touch-key" onclick="insertAccChar('~')">~</button>
+                        <button class="touch-key" onclick="insertAccChar('/')">/</button>
+                        <button class="touch-key" onclick="insertAccChar('-')">-</button>
+                        <button class="touch-key" onclick="historyMove(-1)">UP</button>
+                        <button class="touch-key" onclick="historyMove(1)">DOWN</button>
+                        <button class="touch-key highlight" onclick="quickRun('npm run dev')">NPM</button>
+                        <button class="touch-key highlight" onclick="quickRun('curl -s :3000')">CURL</button>
+                        <button class="touch-key highlight" onclick="quickRun('apt update && apt list --installed')">APT</button>
                     </div>
                 </div>
 
-                <!-- Genuine Monaco Editor Container -->
-                <div id="monaco-container"></div>
+            </div>
 
-                <!-- Integrated Sandboxed Ubuntu Terminal Panel -->
-                <div id="terminal-panel">
-                    <div class="terminal-header">
-                        <div class="terminal-tabs">
-                            <span class="term-tab active" id="ttab-bash" onclick="openTerminalTab('bash')">1: bash (Ubuntu 24.04 LTS)</span>
-                            <span class="term-tab" id="ttab-apt" onclick="openTerminalTab('apt')">2: apt (Packages)</span>
-                            <span class="term-tab" id="ttab-cs" onclick="openTerminalTab('cs')">3: code-server</span>
-                        </div>
-                        <div class="terminal-controls">
-                            <button class="icon-btn" onclick="toggleTerminalSize()" title="Maximize / Restore">▲</button>
-                            <button class="icon-btn" onclick="toggleTerminal(false)" title="Close Terminal">✕</button>
-                        </div>
-                    </div>
+        </div>
 
-                    <!-- Quick Command Chips -->
-                    <div class="quick-chips">
-                        <span class="chip" onclick="quickExec('python3 solution.py')">▶ python3 solution.py</span>
-                        <span class="chip" onclick="quickExec('apt update')">🔄 apt update</span>
-                        <span class="chip" onclick="quickExec('apt install python3')">📦 apt install python3</span>
-                        <span class="chip" onclick="quickExec('code-server --status')">⚡ code-server --status</span>
-                        <span class="chip" onclick="quickExec('ls -la')">ls -la</span>
-                        <span class="chip" onclick="quickExec('clear')">clear</span>
-                    </div>
-
-                    <!-- Terminal Output -->
-                    <div class="terminal-body">
-                        <div class="terminal-output" id="terminal-output">
-                            <div class="log-sys">🐧 Welcome to Sandboxed Ubuntu Linux with APT & CodeOSS</div>
-                            <div class="log-sys">Type 'apt update && apt install python3' or 'code-server' to launch VS Code server.</div>
-                        </div>
-                        <div class="terminal-input-row">
-                            <span class="term-prompt">root@ubuntu:/workspace# </span>
-                            <input type="text" id="term-input" placeholder="Type command..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-                        </div>
-                    </div>
-
-                    <!-- Touchscreen Mobile Accessory Bar -->
-                    <div id="mobile-acc-bar">
-                        <button class="acc-key" onclick="sendAccKey('ESC')">ESC</button>
-                        <button class="acc-key" onclick="sendAccKey('TAB')">TAB</button>
-                        <button class="acc-key" onclick="sendAccKey('CTRL_C')">CTRL+C</button>
-                        <button class="acc-key" onclick="insertAccText('|')">|</button>
-                        <button class="acc-key" onclick="insertAccText('~')">~</button>
-                        <button class="acc-key" onclick="insertAccText('/')">/</button>
-                        <button class="acc-key" onclick="insertAccText('-')">-</button>
-                        <button class="acc-key" onclick="historyNav(-1)">UP</button>
-                        <button class="acc-key" onclick="historyNav(1)">DOWN</button>
-                        <button class="acc-key highlight" onclick="quickExec('python3 solution.py')">RUN</button>
-                        <button class="acc-key highlight" onclick="quickExec('apt update && apt list --installed')">APT</button>
-                        <button class="acc-key highlight" onclick="quickExec('code-server')">CODE-SERVER</button>
-                    </div>
+        <!-- 8. BOTTOM STATUS BAR (MATCHING SCREENSHOT) -->
+        <div id="status-bar">
+            <div class="sb-left">
+                <!-- Remote >< -->
+                <div class="sb-remote-btn" onclick="toggleTerminalView()" title="Terminal / Code-Server Session">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <!-- Problems Count -->
+                <div class="sb-item" title="0 Errors, 0 Warnings">
+                    <span>⊗ 0</span>
+                    <span>▲ 0</span>
                 </div>
             </div>
 
-            <!-- Mistral AI Copilot Panel (Right Drawer) -->
-            <div id="copilot-drawer">
-                <div class="copilot-header">
-                    <span>✨ Mistral AI Copilot</span>
-                    <button class="icon-btn" onclick="toggleCopilot(false)">✕</button>
+            <div class="sb-right">
+                <div class="sb-item">
+                    <span>Layout: us</span>
                 </div>
-                <div class="copilot-body" id="copilot-msgs">
-                    <div class="copilot-msg ai">
-                        <strong>Mistral AI:</strong> Hi! I'm your embedded assistant in CodeOSS. Ask me to explain code, fix errors, or generate Ubuntu commands.
-                    </div>
+                <div class="sb-item" title="Prettier Formatter Active">
+                    <span>✓ Prettier</span>
                 </div>
-                <div class="copilot-input-row">
-                    <input type="text" class="copilot-input" id="copilot-input" placeholder="Ask Mistral AI..." />
-                    <button class="action-btn" onclick="sendCopilotMsg()">Send</button>
+                <div class="badge-amber" title="5 Notifications / Background Tasks">
+                    <span>⚡ 5</span>
+                </div>
+                <div class="sb-item" title="Notifications">
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                    </svg>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom VS Code Status Bar -->
-        <div id="statusbar">
-            <div class="statusbar-left">
-                <span class="status-item" onclick="toggleSidebar()">📁 /root/workspace</span>
-                <span class="status-item" id="sb-git">🌿 main*</span>
-                <span class="status-item" id="sb-errors">⊗ 0  ▲ 0</span>
-            </div>
-            <div class="statusbar-right">
-                <span class="status-item" id="sb-lang">Python</span>
-                <span class="status-item">UTF-8</span>
-                <span class="status-item" onclick="toggleTerminal()">Ubuntu 24.04</span>
-                <span class="status-item" id="sb-cs-indicator">⚡ Code-Server</span>
-            </div>
-        </div>
     </div>
 
     <!-- Official Monaco Editor AMD Loader -->
     <script src="vs/loader.js"></script>
     <script>
-        // Configure Monaco Loader paths relative to this file
+        // Configure Monaco Loader paths relative to assets
         require.config({
             paths: {
                 'vs': 'vs'
             }
         });
 
-        // Global workspace state
-        let currentFile = 'solution.py';
-        let currentLanguage = 'python';
+        let activeFile = 'README.md';
         let editorInstance = null;
         let fileModels = {};
-        const cmdHistory = [];
-        let historyIndex = -1;
-        let isCodeServerOnline = false;
+        const cmdHistory = ['npm run dev', 'curl -s :3000', 'python3 -V', 'git --version', 'npm -v', 'rg --version', 'tmux ls'];
+        let historyIdx = cmdHistory.length;
 
-        const defaultFiles = {
-            'solution.py': {
-                lang: 'python',
-                content: `# Python 3 in Sandboxed Ubuntu Linux\nimport sys\nimport platform\n\ndef main():\n    print("Hello from Vastavik CodeOSS & Ubuntu Sandbox!")\n    print(f"Python: {platform.python_version()} on {platform.system()} ({platform.machine()})")\n\nif __name__ == "__main__":\n    main()\n`
+        const defaultContents = {
+            'README.md': {
+                lang: 'markdown',
+                content: `# projects\n\nWelcome to your full-featured VS Code & Ubuntu development environment on Android.\n\n### Stack\n- **Node.js**: v24.18.0 (arm64)\n- **npm**: 11.6.1\n- **Python**: 3.12.11\n- **OS**: Ubuntu Linux 22.04 LTS with apt\n\n### Getting Started\n\`\`\`bash\nnpm run dev\ncurl -s :3000\n\`\`\`\n`
             },
             'server.js': {
                 lang: 'javascript',
-                content: `// Node.js Server in Sandboxed Ubuntu\nconst http = require('http');\nconst port = 3000;\n\nconst server = http.createServer((req, res) => {\n    res.writeHead(200, { 'Content-Type': 'application/json' });\n    res.end(JSON.stringify({\n        status: 'Ubuntu Sandbox Active',\n        node: process.version\n    }));\n});\n\nserver.listen(port, () => console.log('Up on port ' + port));\n`
+                content: `// Node.js HTTP Server\nconst http = require('http');\nconst port = 3000;\n\nconst server = http.createServer((req, res) => {\n    res.writeHead(200, { 'Content-Type': 'application/json' });\n    res.end(JSON.stringify({\n        node: process.version,\n        platform: process.platform,\n        arch: process.arch\n    }));\n});\n\nserver.listen(port, () => {\n    console.log('Up on ' + port);\n});\n`
             },
             'package.json': {
                 lang: 'json',
-                content: `{\n  "name": "vastavik-project",\n  "version": "1.0.0",\n  "description": "Vastavik CodeOSS Project",\n  "main": "server.js",\n  "scripts": {\n    "start": "node server.js"\n  }\n}\n`
-            },
-            'README.md': {
-                lang: 'markdown',
-                content: `# 🐧 Vastavik CodeOSS & Sandboxed Ubuntu\n\nWelcome to your complete offline development suite on Android.\n- **VS Code Engine:** Powered by Monaco Editor and coder/code-server architecture.\n- **Ubuntu Terminal:** Full bash terminal with \`apt\` package manager.\n- **Mistral AI:** Embedded Copilot for real-time code assistance.\n\n### Commands\n- \`apt update && apt install python3\`\n- \`code-server --status\`\n`
+                content: `{\n  "name": "api",\n  "version": "1.0.0",\n  "description": "Vastavik CodeOSS Project",\n  "main": "server.js",\n  "scripts": {\n    "dev": "node server.js",\n    "start": "node server.js"\n  },\n  "dependencies": {}\n}\n`
             }
         };
 
-        // Initialize Monaco Editor
+        // Initialize Monaco in background for editing
         require(['vs/editor/editor.main'], function() {
-            // Create Monaco models for default files
-            for (const [fname, fobj] of Object.entries(defaultFiles)) {
-                // If native bridge provides saved content, use it
-                let content = fobj.content;
+            for (const [fname, fobj] of Object.entries(defaultContents)) {
+                let text = fobj.content;
                 if (window.AndroidBridge && window.AndroidBridge.readFile) {
                     const saved = window.AndroidBridge.readFile(fname);
-                    if (saved && saved.length > 0) content = saved;
+                    if (saved && saved.length > 0) text = saved;
                 }
-                fileModels[fname] = monaco.editor.createModel(content, fobj.lang);
+                fileModels[fname] = monaco.editor.createModel(text, fobj.lang);
             }
 
-            editorInstance = monaco.editor.create(document.getElementById('monaco-container'), {
-                model: fileModels[currentFile],
+            editorInstance = monaco.editor.create(document.getElementById('monaco-mount'), {
+                model: fileModels[activeFile],
                 theme: 'vs-dark',
                 automaticLayout: true,
-                fontSize: 14,
+                fontSize: 13,
                 fontFamily: 'Menlo, Monaco, "Courier New", Consolas, monospace',
-                minimap: { enabled: true },
+                minimap: { enabled: false },
                 lineNumbers: 'on',
                 scrollBeyondLastLine: false,
-                folding: true,
-                cursorBlinking: 'smooth',
-                cursorSmoothCaretAnimation: 'on',
                 bracketPairColorization: { enabled: true },
                 renderWhitespace: 'selection',
-                tabSize: 4
+                tabSize: 2
             });
 
-            // Listen for changes and auto-save to sandboxed storage
             editorInstance.onDidChangeModelContent(() => {
                 const updated = editorInstance.getValue();
                 if (window.AndroidBridge && window.AndroidBridge.saveFile) {
-                    window.AndroidBridge.saveFile(currentFile, updated);
+                    window.AndroidBridge.saveFile(activeFile, updated);
                 }
             });
 
-            // Signal Android host
             if (window.AndroidBridge && window.AndroidBridge.onReady) {
                 window.AndroidBridge.onReady();
             }
-
-            // Start Code-Server status polling
-            checkCodeServer();
-            setInterval(checkCodeServer, 3000);
         });
 
-        // Switch active file
-        function switchFile(filename) {
-            currentFile = filename;
+        // File Selection & Tab Switch
+        function selectFile(filename) {
+            activeFile = filename;
+
+            // Update explorer selection
+            document.querySelectorAll('.file-entry').forEach(el => el.classList.remove('active'));
+            const fItem = document.getElementById('file-' + filename);
+            if (fItem) fItem.classList.add('active');
+
+            // Ensure model exists
             if (!fileModels[filename]) {
                 const ext = filename.split('.').pop();
-                const langMap = { 'py': 'python', 'js': 'javascript', 'json': 'json', 'md': 'markdown', 'sh': 'shell', 'java': 'java', 'cpp': 'cpp', 'c': 'c' };
-                const lang = langMap[ext] || 'plaintext';
-                let content = '';
+                const langMap = { 'py': 'python', 'js': 'javascript', 'json': 'json', 'md': 'markdown', 'sh': 'shell' };
+                let text = '';
                 if (window.AndroidBridge && window.AndroidBridge.readFile) {
-                    content = window.AndroidBridge.readFile(filename);
+                    text = window.AndroidBridge.readFile(filename);
                 }
-                fileModels[filename] = monaco.editor.createModel(content, lang);
+                fileModels[filename] = monaco.editor.createModel(text, langMap[ext] || 'plaintext');
             }
 
             if (editorInstance) {
                 editorInstance.setModel(fileModels[filename]);
             }
 
-            // Update UI tabs
-            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-            const activeTab = document.getElementById('tab-' + filename);
-            if (activeTab) activeTab.classList.add('active');
+            // Update editor tabs
+            document.querySelectorAll('.ed-tab').forEach(el => el.classList.remove('active'));
+            const tItem = document.getElementById('tab-' + filename);
+            if (tItem) tItem.classList.add('active');
 
-            // Update sidebar selection
-            document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
-
-            // Update Status Bar
-            const langName = fileModels[filename].getLanguageId();
-            document.getElementById('sb-lang').textContent = langName.charAt(0).toUpperCase() + langName.slice(1);
-        }
-
-        // Payload loader from Android Intent
-        window.loadPayload = function(code, lang, question) {
-            if (!code || code.trim().length === 0) return;
-
-            let targetFile = 'solution.py';
-            let monacoLang = 'python';
-            const lowerLang = (lang || '').toLowerCase();
-
-            if (lowerLang.includes('java')) {
-                targetFile = 'Solution.java';
-                monacoLang = 'java';
-            } else if (lowerLang.includes('c++') || lowerLang.includes('cpp')) {
-                targetFile = 'solution.cpp';
-                monacoLang = 'cpp';
-            } else if (lowerLang.includes('script') || lowerLang.includes('node')) {
-                targetFile = 'server.js';
-                monacoLang = 'javascript';
-            }
-
-            if (fileModels[targetFile]) {
-                fileModels[targetFile].setValue(code);
-            } else {
-                fileModels[targetFile] = monaco.editor.createModel(code, monacoLang);
-            }
-
-            switchFile(targetFile);
-
-            if (question && question.length > 0) {
-                appendTerminalLine('Question: ' + question, false);
-            }
-        };
-
-        // Code-Server Detection & Connection
-        function checkCodeServer() {
-            let online = false;
-            if (window.AndroidBridge && window.AndroidBridge.isCodeServerOnline) {
-                online = window.AndroidBridge.isCodeServerOnline();
-            }
-
-            isCodeServerOnline = online;
-            const dot = document.getElementById('cs-dot');
-            const label = document.getElementById('cs-status-label');
-            const btn = document.getElementById('btn-connect-cs');
-            const sbCs = document.getElementById('sb-cs-indicator');
-
-            if (online) {
-                dot.classList.add('online');
-                label.textContent = 'Code-Server Live on 127.0.0.1:8080';
-                btn.textContent = '🟢 Connect Code-Server';
-                btn.style.borderColor = '#4ec9b0';
-                sbCs.textContent = '🟢 Code-Server Live';
-            } else {
-                dot.classList.remove('online');
-                label.textContent = 'Standalone CodeOSS (Ubuntu Sandbox Active)';
-                btn.textContent = '⚡ Launch Code-Server';
-                btn.style.borderColor = '#45494a';
-                sbCs.textContent = '⚡ Code-Server Offline';
+            // If editor was hidden, show it in split or editor view
+            const edPane = document.getElementById('editor-pane');
+            if (!edPane.classList.contains('visible')) {
+                toggleEditorView();
             }
         }
 
-        function connectToCodeServer() {
-            if (isCodeServerOnline) {
-                if (window.AndroidBridge && window.AndroidBridge.connectCodeServer) {
-                    window.AndroidBridge.connectCodeServer('http://127.0.0.1:8080/');
-                } else {
-                    window.location.href = 'http://127.0.0.1:8080/';
+        // Window Layout Toggles
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const btn = document.getElementById('btn-toggle-sidebar');
+            sb.classList.toggle('collapsed');
+            btn.classList.toggle('active', !sb.classList.contains('collapsed'));
+            if (editorInstance) editorInstance.layout();
+        }
+
+        function showExplorer() {
+            const sb = document.getElementById('sidebar');
+            const btn = document.getElementById('btn-toggle-sidebar');
+            sb.classList.remove('collapsed');
+            btn.classList.add('active');
+            if (editorInstance) editorInstance.layout();
+        }
+
+        function toggleTerminalView() {
+            const term = document.getElementById('terminal-pane');
+            const btn = document.getElementById('btn-toggle-terminal');
+            const isHidden = term.style.display === 'none';
+            term.style.display = isHidden ? 'flex' : 'none';
+            btn.classList.toggle('active', isHidden);
+            if (editorInstance) editorInstance.layout();
+        }
+
+        function toggleEditorView() {
+            const edPane = document.getElementById('editor-pane');
+            const isVisible = edPane.classList.contains('visible');
+            if (isVisible) {
+                edPane.classList.remove('visible');
+            } else {
+                edPane.classList.add('visible');
+            }
+            if (editorInstance) editorInstance.layout();
+        }
+
+        function toggleSplitMode() {
+            const edPane = document.getElementById('editor-pane');
+            const termPane = document.getElementById('terminal-pane');
+            if (edPane.classList.contains('visible') && termPane.style.display !== 'none') {
+                // Currently split: switch to full terminal
+                edPane.classList.remove('visible');
+                termPane.style.display = 'flex';
+            } else {
+                // Split both
+                edPane.classList.add('visible');
+                termPane.style.display = 'flex';
+            }
+            if (editorInstance) editorInstance.layout();
+        }
+
+        function toggleProjectFolder() {
+            const list = document.getElementById('file-list-container');
+            const chev = document.getElementById('folder-chevron');
+            if (list.style.display === 'none') {
+                list.style.display = 'flex';
+                chev.textContent = '⌄';
+            } else {
+                list.style.display = 'none';
+                chev.textContent = '›';
+            }
+        }
+
+        function toggleOutline() {
+            quickRun('python3 -V');
+        }
+
+        function toggleTimeline() {
+            quickRun('git log -n 3 --oneline');
+        }
+
+        function createNewFilePrompt() {
+            const name = prompt('Enter filename (e.g. solution.py, app.js):');
+            if (name && name.trim()) {
+                const cleaned = name.trim();
+                if (window.AndroidBridge && window.AndroidBridge.createFile) {
+                    window.AndroidBridge.createFile(cleaned);
                 }
-            } else {
-                // Not online yet: run launch command in Ubuntu terminal
-                toggleTerminal(true);
-                executeTerminalCmd('code-server');
+                refreshFiles();
+                selectFile(cleaned);
             }
         }
 
-        // Run Solution Action
-        function runSolution() {
-            toggleTerminal(true);
-            const ext = currentFile.split('.').pop();
-            if (ext === 'py') {
-                executeTerminalCmd('python3 ' + currentFile);
-            } else if (ext === 'js') {
-                executeTerminalCmd('node ' + currentFile);
-            } else if (ext === 'sh') {
-                executeTerminalCmd('bash ' + currentFile);
-            } else {
-                executeTerminalCmd('cat ' + currentFile);
+        function refreshFiles() {
+            if (window.AndroidBridge && window.AndroidBridge.listFiles) {
+                try {
+                    const files = JSON.parse(window.AndroidBridge.listFiles());
+                    const container = document.getElementById('file-list-container');
+                    container.innerHTML = '';
+                    files.forEach(f => {
+                        const iconClass = f.name.endsWith('.md') ? 'icon-md' : (f.name.endsWith('.js') ? 'icon-js' : (f.name.endsWith('.json') ? 'icon-json' : 'icon-py'));
+                        const badgeText = f.name.endsWith('.md') ? 'M↓' : (f.name.endsWith('.js') ? 'JS' : (f.name.endsWith('.json') ? '{ }' : 'PY'));
+                        const div = document.createElement('div');
+                        div.className = 'file-entry' + (f.name === activeFile ? ' active' : '');
+                        div.id = 'file-' + f.name;
+                        div.onclick = () => selectFile(f.name);
+                        div.innerHTML = `<span class="icon-badge ${iconClass}">${badgeText}</span><span>${f.name}</span>`;
+                        container.appendChild(div);
+                    });
+                } catch (e) {}
             }
         }
 
-        // Terminal Operations
-        function toggleTerminal(forceOpen) {
-            const panel = document.getElementById('terminal-panel');
-            if (forceOpen !== undefined) {
-                if (forceOpen) panel.classList.remove('hidden');
-                else panel.classList.add('hidden');
-            } else {
-                panel.classList.toggle('hidden');
+        // Terminal Interactive Operations
+        const termInput = document.getElementById('term-cmd-input');
+        const termContainer = document.getElementById('term-log-container');
+        const termScroll = document.getElementById('terminal-scroll');
+
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = termInput.value.trim();
+                termInput.value = '';
+                if (cmd) {
+                    executeTerminalCommand(cmd);
+                }
+            } else if (e.key === 'ArrowUp') {
+                historyMove(-1);
+            } else if (e.key === 'ArrowDown') {
+                historyMove(1);
             }
-            if (editorInstance) editorInstance.layout();
-        }
+        });
 
-        function toggleTerminalSize() {
-            const panel = document.getElementById('terminal-panel');
-            if (panel.style.height === '80%') {
-                panel.style.height = '230px';
-            } else {
-                panel.style.height = '80%';
-            }
-            if (editorInstance) editorInstance.layout();
-        }
-
-        function openTerminalTab(tab) {
-            toggleTerminal(true);
-            document.querySelectorAll('.term-tab').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById('ttab-' + tab);
-            if (target) target.classList.add('active');
-
-            if (tab === 'apt') {
-                appendTerminalLine('--- APT Package Manager (Ubuntu 24.04) ---', false);
-                executeTerminalCmd('apt list --installed');
-            } else if (tab === 'cs') {
-                executeTerminalCmd('code-server --status');
-            }
-        }
-
-        function appendTerminalLine(text, isError) {
-            const output = document.getElementById('terminal-output');
-            const line = document.createElement('div');
-            line.className = isError ? 'log-line log-err' : 'log-line';
-            if (text.startsWith('root@ubuntu') || text.startsWith('projects $')) {
-                line.className = 'log-line log-cmd';
-            } else if (text.startsWith('Hit:') || text.startsWith('Get:') || text.startsWith('Reading')) {
-                line.className = 'log-line log-apt';
-            }
-            line.textContent = text;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
-
-        window.appendTerminalLine = appendTerminalLine;
-
-        function executeTerminalCmd(cmd) {
-            if (!cmd || cmd.trim().length === 0) return;
-            appendTerminalLine('root@ubuntu:/workspace# ' + cmd, false);
+        function executeTerminalCommand(cmd) {
             cmdHistory.push(cmd);
-            historyIndex = cmdHistory.length;
+            historyIdx = cmdHistory.length;
 
             if (cmd === 'clear') {
-                document.getElementById('terminal-output').innerHTML = '';
+                clearTerminal();
                 return;
             }
+
+            // Append Prompt & Command
+            const cmdRow = document.createElement('div');
+            cmdRow.className = 'line-cmd-row';
+            cmdRow.innerHTML = `<span class="prompt-txt">projects $</span><span class="cmd-txt">${escapeHtml(cmd)}</span>`;
+            termContainer.appendChild(cmdRow);
+            termScroll.scrollTop = termScroll.scrollHeight;
 
             if (window.AndroidBridge && window.AndroidBridge.executeCommand) {
                 window.AndroidBridge.executeCommand(cmd);
             } else {
+                // Fallback simulation
                 setTimeout(() => {
-                    appendTerminalLine('[simulation] Executed: ' + cmd, false);
-                }, 100);
+                    appendTerminalLine('[simulation] ' + cmd, false);
+                }, 80);
             }
         }
 
-        function quickExec(cmd) {
-            toggleTerminal(true);
-            executeTerminalCmd(cmd);
+        function appendTerminalLine(text, isError) {
+            const div = document.createElement('div');
+            if (isError) {
+                div.className = 'out-err';
+            } else if (text.startsWith('Up on') || text.startsWith('dev:')) {
+                div.className = 'out-green';
+            } else if (text.startsWith('{') || text.startsWith('"') || text.endsWith('}')) {
+                div.className = 'out-yellow';
+            } else if (text.startsWith('>')) {
+                div.className = 'out-dim';
+            }
+            div.textContent = text;
+            termContainer.appendChild(div);
+            termScroll.scrollTop = termScroll.scrollHeight;
         }
 
-        // Terminal input handler
-        const termInput = document.getElementById('term-input');
-        termInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = termInput.value;
-                termInput.value = '';
-                executeTerminalCmd(cmd);
-            } else if (e.key === 'ArrowUp') {
-                historyNav(-1);
-            } else if (e.key === 'ArrowDown') {
-                historyNav(1);
-            }
-        });
+        window.appendTerminalLine = appendTerminalLine;
 
-        function historyNav(dir) {
-            if (cmdHistory.length === 0) return;
-            historyIndex += dir;
-            if (historyIndex < 0) historyIndex = 0;
-            if (historyIndex >= cmdHistory.length) {
-                historyIndex = cmdHistory.length;
-                termInput.value = '';
-                return;
-            }
-            termInput.value = cmdHistory[historyIndex];
+        function clearTerminal() {
+            termContainer.innerHTML = '';
         }
 
-        function sendAccKey(key) {
-            if (key === 'ESC') {
-                termInput.value = '';
-            } else if (key === 'TAB') {
-                termInput.value += '    ';
-            } else if (key === 'CTRL_C') {
+        function quickRun(cmd) {
+            executeTerminalCommand(cmd);
+        }
+
+        function sendAccKey(k) {
+            if (k === 'ESC') termInput.value = '';
+            else if (k === 'TAB') termInput.value += '    ';
+            else if (k === 'CTRL_C') {
                 appendTerminalLine('^C', true);
                 termInput.value = '';
             }
             termInput.focus();
         }
 
-        function insertAccText(txt) {
-            termInput.value += txt;
+        function insertAccChar(c) {
+            termInput.value += c;
             termInput.focus();
         }
 
-        // File Explorer Sidebar toggle
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('collapsed');
-            if (editorInstance) editorInstance.layout();
+        function historyMove(dir) {
+            if (cmdHistory.length === 0) return;
+            historyIdx += dir;
+            if (historyIdx < 0) historyIdx = 0;
+            if (historyIdx >= cmdHistory.length) {
+                historyIdx = cmdHistory.length;
+                termInput.value = '';
+                return;
+            }
+            termInput.value = cmdHistory[historyIdx];
         }
 
-        function promptNewFile() {
-            const fname = prompt('Enter new filename (e.g. script.py, index.js):');
-            if (fname && fname.trim().length > 0) {
-                const cleaned = fname.trim();
-                if (window.AndroidBridge && window.AndroidBridge.createFile) {
-                    window.AndroidBridge.createFile(cleaned);
-                }
-                switchFile(cleaned);
-                refreshWorkspaceFiles();
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Navigation and Utility
+        function historyBack() {
+            window.history.back();
+        }
+
+        function historyForward() {
+            window.history.forward();
+        }
+
+        function openCommandPalette() {
+            const cmd = prompt('VS Code Command Palette (e.g. npm run dev, apt update, clear):');
+            if (cmd && cmd.trim()) {
+                executeTerminalCommand(cmd.trim());
             }
         }
 
-        function refreshWorkspaceFiles() {
-            if (window.AndroidBridge && window.AndroidBridge.listFiles) {
-                try {
-                    const json = window.AndroidBridge.listFiles();
-                    const files = JSON.parse(json);
-                    const container = document.getElementById('file-tree-container');
-                    container.innerHTML = '<div class="tree-section-title">📁 /root/workspace</div>';
-                    files.forEach(f => {
-                        const icon = f.name.endsWith('.py') ? '🐍' : (f.name.endsWith('.js') ? '🟨' : (f.name.endsWith('.json') ? '📦' : '📄'));
-                        const item = document.createElement('div');
-                        item.className = 'tree-item' + (f.name === currentFile ? ' active' : '');
-                        item.onclick = () => switchFile(f.name);
-                        item.innerHTML = `<span class="file-icon">${icon}</span><span>${f.name}</span>`;
-                        container.appendChild(item);
-                    });
-                } catch (e) {
-                    console.error('List files error', e);
-                }
+        function openSearchPrompt() {
+            const query = prompt('Search in Workspace:');
+            if (query && query.trim()) {
+                executeTerminalCommand('rg ' + query.trim());
             }
         }
 
-        // Mistral AI Copilot
-        function toggleCopilot(forceOpen) {
-            const drawer = document.getElementById('copilot-drawer');
-            if (forceOpen !== undefined) {
-                if (forceOpen) drawer.classList.add('open');
-                else drawer.classList.remove('open');
+        function openGitStatus() {
+            executeTerminalCommand('git status');
+        }
+
+        function runDevCommand() {
+            executeTerminalCommand('npm run dev');
+        }
+
+        function openAptManager() {
+            executeTerminalCommand('apt list --installed');
+        }
+
+        function runTests() {
+            executeTerminalCommand('npm test');
+        }
+
+        function showSettingsModal() {
+            alert('Code Server: v4.90.1 (VS Code v1.90.0)\nEnvironment: Sandboxed Ubuntu 22.04 LTS\nArchitecture: arm64\nAuthentication: None (Direct Access)');
+        }
+
+        // Intent Payload Loader
+        window.loadPayload = function(code, lang, question) {
+            if (!code || !code.trim()) return;
+            let fname = 'solution.py';
+            let lId = 'python';
+            const lower = (lang || '').toLowerCase();
+            if (lower.includes('js') || lower.includes('script') || lower.includes('node')) {
+                fname = 'server.js';
+                lId = 'javascript';
+            }
+
+            if (fileModels[fname]) {
+                fileModels[fname].setValue(code);
             } else {
-                drawer.classList.toggle('open');
+                fileModels[fname] = monaco.editor.createModel(code, lId);
             }
-        }
-
-        function sendCopilotMsg() {
-            const input = document.getElementById('copilot-input');
-            const prompt = input.value.trim();
-            if (!prompt) return;
-            input.value = '';
-
-            const msgs = document.getElementById('copilot-msgs');
-            const userMsg = document.createElement('div');
-            userMsg.className = 'copilot-msg user';
-            userMsg.textContent = prompt;
-            msgs.appendChild(userMsg);
-
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'copilot-msg ai';
-            aiMsg.textContent = 'Thinking with Mistral AI...';
-            msgs.appendChild(aiMsg);
-            msgs.scrollTop = msgs.scrollHeight;
-
-            const codeContext = editorInstance ? editorInstance.getValue() : '';
-
-            if (window.AndroidBridge && window.AndroidBridge.askMistral) {
-                window.AndroidBridge.askMistral(prompt, codeContext, currentLanguage);
-            } else {
-                setTimeout(() => {
-                    aiMsg.textContent = 'Here is how to solve that in Ubuntu: Run python3 solution.py in the terminal.';
-                }, 800);
-            }
-        }
-
-        window.onMistralResponse = function(reply) {
-            const msgs = document.getElementById('copilot-msgs');
-            const lastMsg = msgs.querySelector('.copilot-msg.ai:last-child');
-            if (lastMsg) {
-                lastMsg.innerHTML = '<strong>Mistral AI:</strong> ' + reply.replace(/\n/g, '<br>');
-            }
-            msgs.scrollTop = msgs.scrollHeight;
+            selectFile(fname);
         };
-
-        function showSettingsInfo() {
-            alert('CodeOSS Version: 1.0.52\nArchitecture: Coder Code-Server + Monaco Web IDE\nEnvironment: Headless Ubuntu 24.04 LTS Sandbox with APT');
-        }
     </script>
 </body>
 </html>
