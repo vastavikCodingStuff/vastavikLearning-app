@@ -23,6 +23,8 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <!-- Signature Permission to interact with Vastavik CodeOSS Extension -->
+    <uses-permission android:name="com.vastavik.codeoss.permission.OPEN_EDITOR" />
 
     <!-- Hardware features -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -40,7 +42,7 @@
 
     <application
         android:name=".VastavikApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -49,7 +51,7 @@
         android:theme="@style/Theme.VastavikComputers"
         android:hardwareAccelerated="true"
         android:largeHeap="true"
-        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
 
         <!-- Firebase Messaging -->
