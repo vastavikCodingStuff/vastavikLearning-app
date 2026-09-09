@@ -287,7 +287,7 @@ fun EmulatorSecurityCurtain(
                                 enteredPin = it
                                 pinError = false
                             },
-                            placeholder = { Text("Enter PIN (vastavik2026)") },
+                            placeholder = { Text("Enter PIN") },
                             singleLine = true,
                             visualTransformation = PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -306,7 +306,7 @@ fun EmulatorSecurityCurtain(
                         if (pinError) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Invalid Passcode. Use vastavik2026",
+                                text = "Invalid Passcode. Please try again.",
                                 color = Color(0xFFDC2626),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold

@@ -22,9 +22,29 @@ object HmacUtil {
         return hash.joinToString("") { "%02x".format(it) }
     }
 
-    fun extractVideoId(url: String): String? {
-        if (url.length == 11 && !url.contains("/") && !url.contains("?")) return url
-        val regex = Regex("""(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([A-Za-z0-9_-]{11})""")
-        return regex.find(url)?.groupValues?.get(1)
+    fun extractVideoId(url: String?): String? {
+        if (url.isNullOrBlank()) return null
+        val trimmed = url.trim()
+        // 1. Direct 11-char ID
+        if (trimmed.length == 11 && !trimmed.contains("/") && !trimmed.contains("?") && !trimmed.contains("&")) {
+            return trimmed
+        }
+        // 2. Standard watch URL (matches v= parameter regardless of order)
+        val watchRegex = Regex("""[?&]v=([A-Za-z0-9_-]{11})""")
+        watchRegex.find(trimmed)?.groupValues?.get(1)?.let { return it }
+
+        // 3. youtu.be short URL
+        val youtuBeRegex = Regex("""youtu\.be/([A-Za-z0-9_-]{11})""")
+        youtuBeRegex.find(trimmed)?.groupValues?.get(1)?.let { return it }
+
+        // 4. Shorts URL
+        val shortsRegex = Regex("""youtube\.com/shorts/([A-Za-z0-9_-]{11})""")
+        shortsRegex.find(trimmed)?.groupValues?.get(1)?.let { return it }
+
+        // 5. Embed, live, and v URLs
+        val pathRegex = Regex("""youtube\.com/(?:embed|live|v)/([A-Za-z0-9_-]{11})""")
+        pathRegex.find(trimmed)?.groupValues?.get(1)?.let { return it }
+
+        return null
     }
 }

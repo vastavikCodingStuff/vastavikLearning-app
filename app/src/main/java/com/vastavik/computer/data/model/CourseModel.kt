@@ -2,6 +2,7 @@ package com.vastavik.computer.data.model
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
+import com.vastavik.computer.data.api.HmacUtil
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -167,26 +168,46 @@ data class LessonModel(
     companion object {
         fun fromSnapshot(doc: DocumentSnapshot): LessonModel {
             val data = doc.data ?: return LessonModel(id = doc.id)
-            val ytUrl = data["youtubeUrl"] as? String ?: ""
-            val vid = (data["youtubeVideoId"] as? String)
-                ?: Regex("""(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([A-Za-z0-9_-]{11})""").find(ytUrl)?.groupValues?.get(1) ?: ""
+            val ytUrl = (data["youtubeUrl"] as? String)
+                ?: (data["youtube_url"] as? String)
+                ?: ""
+            val rawVid = (data["youtubeVideoId"] as? String)
+                ?: (data["youtube_video_id"] as? String)
+            val vid = rawVid?.takeIf { it.isNotBlank() }
+                ?: HmacUtil.extractVideoId(ytUrl)
+                ?: ""
             return LessonModel(
                 id = doc.id,
-                title = data["title"] as? String ?: "",
-                description = data["description"] as? String ?: "",
+                title = (data["title"] as? String) ?: "",
+                description = (data["description"] as? String) ?: "",
                 youtubeUrl = ytUrl,
-                duration = data["duration"] as? String ?: "",
-                youtubePositionSec = (data["youtubePositionSec"] as? Number)?.toInt() ?: 0,
-                whiteboardImageUrl = data["whiteboardImageUrl"] as? String ?: "",
-                codeSample = data["codeSample"] as? String ?: "",
-                notes = data["notes"] as? String ?: "",
+                duration = (data["duration"] as? String) ?: "",
+                youtubePositionSec = (data["youtubePositionSec"] as? Number)?.toInt()
+                    ?: (data["youtube_position_sec"] as? Number)?.toInt()
+                    ?: 0,
+                whiteboardImageUrl = (data["whiteboardImageUrl"] as? String)
+                    ?: (data["whiteboard_image_url"] as? String)
+                    ?: "",
+                codeSample = (data["codeSample"] as? String)
+                    ?: (data["code_sample"] as? String)
+                    ?: "",
+                notes = (data["notes"] as? String) ?: "",
                 order = (data["order"] as? Number)?.toInt() ?: 0,
-                createdAt = data["createdAt"]?.toString() ?: "",
+                createdAt = data["createdAt"]?.toString() ?: data["created_at"]?.toString() ?: "",
                 youtubeVideoId = vid,
-                durationSec = (data["durationSec"] as? Number)?.toInt() ?: 0,
-                isPremium = data["isPremium"] as? Boolean ?: false,
-                isPublished = data["isPublished"] as? Boolean ?: true,
-                videoFormat = data["videoFormat"] as? String ?: "vscode"
+                durationSec = (data["durationSec"] as? Number)?.toInt()
+                    ?: (data["duration_sec"] as? Number)?.toInt()
+                    ?: 0,
+                isPremium = (data["isPremium"] as? Boolean)
+                    ?: (data["is_premium"] as? Boolean)
+                    ?: false,
+                isPublished = (data["isPublished"] as? Boolean)
+                    ?: (data["is_published"] as? Boolean)
+                    ?: true,
+                videoFormat = (data["videoFormat"] as? String)
+                    ?: (data["video_format"] as? String)
+                    ?: (data["video_type"] as? String)
+                    ?: "vscode"
             )
         }
     }

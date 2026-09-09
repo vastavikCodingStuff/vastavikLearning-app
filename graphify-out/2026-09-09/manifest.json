@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788931434.3941667,
-    "seen": 1788931869.6153245,
-    "ast_hash": "c8cb2a355509270a71f32fd5d2c65abc",
+    "mtime": 1788933839.0769708,
+    "seen": 1788935354.2181318,
+    "ast_hash": "3ff8aa32e5fa690ef3f5a2549c329d4c",
     "semantic_hash": ""
   },
   "app/google-services.json": {
@@ -18,8 +18,8 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/VastavikApplication.kt": {
-    "mtime": 1788931425.0887017,
-    "seen": 1788931869.6153374,
+    "mtime": 1788931929.2625499,
+    "seen": 1788933761.3241262,
     "ast_hash": "091eb645ca484b62b1d0667452bc4270",
     "semantic_hash": ""
   },
@@ -66,8 +66,8 @@
     "semantic_hash": "64b34688fff4026464e8c9dac46940e8"
   },
   "app/src/main/java/com/vastavik/computer/di/AppModule.kt": {
-    "mtime": 1788931419.0726407,
-    "seen": 1788931869.6153886,
+    "mtime": 1788931929.26469,
+    "seen": 1788933761.3241684,
     "ast_hash": "5420296b027810b8d61dc4d6ece4d7ea",
     "semantic_hash": ""
   },
@@ -468,8 +468,8 @@
     "semantic_hash": "8bf98568a0262cb39f3a991729becc4f"
   },
   "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt": {
-    "mtime": 1788931390.0419707,
-    "seen": 1788931869.6153393,
+    "mtime": 1788931929.263083,
+    "seen": 1788933761.3241282,
     "ast_hash": "6c0bea1b36195e24f67b6d89c239bfc4",
     "semantic_hash": ""
   },
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/TokenManager.kt": {
-    "mtime": 1788822421.9958434,
-    "seen": 1788893023.7629702,
-    "ast_hash": "ecf9afbfe91605d28d4cbdcd7c0f46c0",
+    "mtime": 1788933839.079068,
+    "seen": 1788935354.2181697,
+    "ast_hash": "1404255d32d715e14a9e0b98bb3894b5",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/model/BackendModels.kt": {
@@ -798,15 +798,15 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
-    "mtime": 1788931456.0221026,
-    "seen": 1788931869.615485,
-    "ast_hash": "604c5ab931754416602e7496fc150e7a",
+    "mtime": 1788933839.0796292,
+    "seen": 1788935354.2183442,
+    "ast_hash": "59a74cc101c5ab3341f82ffd4e09c077",
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
-    "mtime": 1788931440.3185792,
-    "seen": 1788931869.6155107,
-    "ast_hash": "87c71a4953d7845934e791b91075bbc7",
+    "mtime": 1788933839.0807405,
+    "seen": 1788935354.2183802,
+    "ast_hash": "5a9661656aac947a8c07d53f8ecdb196",
     "semantic_hash": ""
   },
   "companion-codeoss/scripts/start-ubuntu.sh": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
-    "mtime": 1788822422.1012254,
-    "seen": 1788893023.7632108,
-    "ast_hash": "eee8f5dc96cd5f6b95c94aecddc76c91",
+    "mtime": 1788933839.0846522,
+    "seen": 1788935354.2185397,
+    "ast_hash": "1518b6aa8c8e487ef1328c9cc4e43fa8",
     "semantic_hash": ""
   },
   "companion-codeoss/README.md": {
@@ -828,8 +828,8 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/BackendLoadBalancer.kt": {
-    "mtime": 1788931412.183931,
-    "seen": 1788931869.6153433,
+    "mtime": 1788931929.263612,
+    "seen": 1788933761.3241315,
     "ast_hash": "de74c7c6ed87f7dc029d8a560ba93a76",
     "semantic_hash": ""
   },
@@ -840,9 +840,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/UbuntuTerminalEngine.kt": {
-    "mtime": 1788822422.1022253,
-    "seen": 1788893023.7632124,
-    "ast_hash": "9c3fd011c686b0625e32aac37a4d2df9",
+    "mtime": 1788933839.0857098,
+    "seen": 1788935354.218543,
+    "ast_hash": "57ccbca38fe829ccce06b3b71c0d81a3",
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MistralAiClient.kt": {
@@ -852,9 +852,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/index.html": {
-    "mtime": 1788931475.1418786,
-    "seen": 1788931869.6156464,
-    "ast_hash": "1ad208764fa2ead1411d668559af346b",
+    "mtime": 1788933839.0840719,
+    "seen": 1788935354.2185712,
+    "ast_hash": "8ccf256f11ea06654ab2b4dc28dc5718",
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/vs/base/worker/workerMain.js": {
@@ -1614,9 +1614,9 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/components/EmulatorSecurityCurtain.kt": {
-    "mtime": 1788929539.431506,
-    "seen": 1788929624.0690212,
-    "ast_hash": "93e95b779bbd424629d02fdd475eb45a",
+    "mtime": 1788973901.4519718,
+    "seen": 1788974148.290766,
+    "ast_hash": "ed28f3da96436d57eb0e6aef9886e309",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/ui/screens/auth/BannedScreen.kt": {
@@ -1638,21 +1638,21 @@
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/BackendWarmupManager.kt": {
-    "mtime": 1788931404.003954,
-    "seen": 1788931869.6153455,
-    "ast_hash": "97e254a45c10761f69ede35297d251ee",
+    "mtime": 1788931929.2641497,
+    "seen": 1788933761.3241334,
+    "ast_hash": "e836852f12bc056501cd76598ba3c990",
     "semantic_hash": ""
   },
   "app/src/main/java/com/vastavik/computer/data/api/ColdStartRetryInterceptor.kt": {
-    "mtime": 1788931397.2442975,
-    "seen": 1788931869.6153488,
-    "ast_hash": "473ca1b4e2c9118a2d8adb3e8c83ec87",
+    "mtime": 1788931929.2641497,
+    "seen": 1788933761.3241372,
+    "ast_hash": "354d0be6f6f45b1dd32d280aa3b603ba",
     "semantic_hash": ""
   },
   ".github/workflows/keep_alive.yml": {
-    "mtime": 1788931427.9038548,
-    "seen": 1788931869.6156316,
-    "ast_hash": "0b47e01a57d5c269127c436db4a203f6",
+    "mtime": 1788931929.2614863,
+    "seen": 1788933761.3244169,
+    "ast_hash": "c093e649c4c410a2bd01fe59203d4bbb",
     "semantic_hash": ""
   }
 }
