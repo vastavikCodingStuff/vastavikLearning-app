@@ -1,0 +1,1658 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1788978514.935957,
+    "seen": 1788978580.4407964,
+    "ast_hash": "d6c5495e21a0d75eda5da4617e47e6f1",
+    "semantic_hash": ""
+  },
+  "app/google-services.json": {
+    "mtime": 1788822421.991843,
+    "seen": 1788893023.762951,
+    "ast_hash": "a684bab956cc13dedf16e5176eb18be0",
+    "semantic_hash": "a684bab956cc13dedf16e5176eb18be0"
+  },
+  "app/src/main/java/com/vastavik/computer/MainActivity.kt": {
+    "mtime": 1788930818.6422243,
+    "seen": 1788931869.6153357,
+    "ast_hash": "7aa2b8043cb830e8bea0e3ad792ea0bf",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/VastavikApplication.kt": {
+    "mtime": 1788931929.2625499,
+    "seen": 1788933761.3241262,
+    "ast_hash": "091eb645ca484b62b1d0667452bc4270",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/BannerModel.kt": {
+    "mtime": 1788822421.9979436,
+    "seen": 1788893023.7629783,
+    "ast_hash": "075c8609d9f22e0c39247206c10adc28",
+    "semantic_hash": "075c8609d9f22e0c39247206c10adc28"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/ChatModel.kt": {
+    "mtime": 1788822421.9979436,
+    "seen": 1788893023.7629795,
+    "ast_hash": "27d51a200036bba5a9a0a058bbdae5d4",
+    "semantic_hash": "27d51a200036bba5a9a0a058bbdae5d4"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/CourseModel.kt": {
+    "mtime": 1788977264.215209,
+    "seen": 1788978580.440842,
+    "ast_hash": "3bb6c7c3a6f3efaa74a7ca2808b2e794",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/MeetingModels.kt": {
+    "mtime": 1788822421.9988453,
+    "seen": 1788893023.762982,
+    "ast_hash": "72883876dd6d9bb89edb72b939b660c7",
+    "semantic_hash": "72883876dd6d9bb89edb72b939b660c7"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/QuizModel.kt": {
+    "mtime": 1788822421.9988453,
+    "seen": 1788893023.7629828,
+    "ast_hash": "0ec3328635c88307d6ce555a41e27278",
+    "semantic_hash": "0ec3328635c88307d6ce555a41e27278"
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/SubscriptionModel.kt": {
+    "mtime": 1788822421.9988453,
+    "seen": 1788893023.762984,
+    "ast_hash": "8cbabb2c3009ae63d75b475898c7068b",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/UserModel.kt": {
+    "mtime": 1788822421.9988453,
+    "seen": 1788893023.762985,
+    "ast_hash": "64b34688fff4026464e8c9dac46940e8",
+    "semantic_hash": "64b34688fff4026464e8c9dac46940e8"
+  },
+  "app/src/main/java/com/vastavik/computer/di/AppModule.kt": {
+    "mtime": 1788931929.26469,
+    "seen": 1788933761.3241684,
+    "ast_hash": "5420296b027810b8d61dc4d6ece4d7ea",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/CommonComponents.kt": {
+    "mtime": 1788822422.002841,
+    "seen": 1788893023.7629979,
+    "ast_hash": "42a1190fe2b246edb787001e45e35b9f",
+    "semantic_hash": "42a1190fe2b246edb787001e45e35b9f"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/MeetingComponents.kt": {
+    "mtime": 1788822422.0038412,
+    "seen": 1788893023.7630033,
+    "ast_hash": "1999a15ac64eb3e0f124f650e4ad3cfb",
+    "semantic_hash": "1999a15ac64eb3e0f124f650e4ad3cfb"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/PromoPopup.kt": {
+    "mtime": 1788822422.0048416,
+    "seen": 1788893023.7630088,
+    "ast_hash": "874646975c1b357f45a6b4e0595fc8b2",
+    "semantic_hash": "874646975c1b357f45a6b4e0595fc8b2"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/VastavikTopBar.kt": {
+    "mtime": 1788822422.005841,
+    "seen": 1788893023.7630122,
+    "ast_hash": "9ce7608139510efacd5baf70696a566b",
+    "semantic_hash": "9ce7608139510efacd5baf70696a566b"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/VastavikYouTubePlayer.kt": {
+    "mtime": 1788977264.215726,
+    "seen": 1788978580.440882,
+    "ast_hash": "8a5a9ee0afe84702657386b2c4f66e20",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/Whiteboard.kt": {
+    "mtime": 1788822422.0068412,
+    "seen": 1788893023.7630153,
+    "ast_hash": "a0f4ea34abf70adf7260cc4ca70f4a5f",
+    "semantic_hash": "a0f4ea34abf70adf7260cc4ca70f4a5f"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/navigation/AppNavHost.kt": {
+    "mtime": 1788893686.9021008,
+    "seen": 1788929624.0690842,
+    "ast_hash": "45638b8b050da2613eef4069926dc0ca",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/navigation/SystemBars.kt": {
+    "mtime": 1788822422.0068412,
+    "seen": 1788893023.7630172,
+    "ast_hash": "89b6095013894a4a9346dd115da37fda",
+    "semantic_hash": "89b6095013894a4a9346dd115da37fda"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/AuthViewModel.kt": {
+    "mtime": 1788854690.5995848,
+    "seen": 1788893023.763018,
+    "ast_hash": "0ad8dd2fef2820c8aa236fb11e772703",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/ForgotPasswordScreen.kt": {
+    "mtime": 1788822422.0088596,
+    "seen": 1788893023.763019,
+    "ast_hash": "9640b2b21701b1f681c57db0388d626c",
+    "semantic_hash": "9640b2b21701b1f681c57db0388d626c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/LoginScreen.kt": {
+    "mtime": 1788822422.0088596,
+    "seen": 1788893023.76302,
+    "ast_hash": "3e791ce5978e028e629c40cb570a0e60",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SecurityCheckScreen.kt": {
+    "mtime": 1788822422.0088596,
+    "seen": 1788893023.763021,
+    "ast_hash": "ed4dd38659ea60cefa8ad5fcccf59c41",
+    "semantic_hash": "ed4dd38659ea60cefa8ad5fcccf59c41"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SignupScreen.kt": {
+    "mtime": 1788854690.5995848,
+    "seen": 1788893023.7630222,
+    "ast_hash": "387e93f634ed04ff1019ac8c70d67bbd",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/SplashScreen.kt": {
+    "mtime": 1788893711.947466,
+    "seen": 1788929624.0691166,
+    "ast_hash": "bf9f21b7c291a1a6feb457f5cc32ae30",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatScreen.kt": {
+    "mtime": 1788857657.6765487,
+    "seen": 1788893023.7630248,
+    "ast_hash": "083bd8faaea8c84538d2e6a5e0021517",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/ChatViewModel.kt": {
+    "mtime": 1788822422.010841,
+    "seen": 1788893023.7630258,
+    "ast_hash": "0966bdacd6a9fbedd2aa229d63f87e89",
+    "semantic_hash": "0966bdacd6a9fbedd2aa229d63f87e89"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/editor/CodeEditorScreen.kt": {
+    "mtime": 1788857657.6775515,
+    "seen": 1788893023.763029,
+    "ast_hash": "6823195be84357dd60f3a175f288dd03",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/editor/OcrExerciseScreen.kt": {
+    "mtime": 1788822422.0118413,
+    "seen": 1788893023.76303,
+    "ast_hash": "29020f4f37520078b8b8e44baa283d4d",
+    "semantic_hash": "29020f4f37520078b8b8e44baa283d4d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/ComingSoonScreen.kt": {
+    "mtime": 1788822422.012845,
+    "seen": 1788893023.7630334,
+    "ast_hash": "fba3d47813a10256c25ba950557d079d",
+    "semantic_hash": "fba3d47813a10256c25ba950557d079d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/HomeScreen.kt": {
+    "mtime": 1788929539.4325058,
+    "seen": 1788929624.0691621,
+    "ast_hash": "95a3f4a5de3a2a3ef8170a6385617d1a",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/home/HomeViewModel.kt": {
+    "mtime": 1788822422.0138574,
+    "seen": 1788893023.763035,
+    "ast_hash": "5ca8eb97f121eeddbe63f33339da7d58",
+    "semantic_hash": "5ca8eb97f121eeddbe63f33339da7d58"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/learning/LearningPathScreen.kt": {
+    "mtime": 1788822422.0138574,
+    "seen": 1788893023.7630365,
+    "ast_hash": "cb32f6c2152ea2f7ceac0ba997292344",
+    "semantic_hash": "cb32f6c2152ea2f7ceac0ba997292344"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/learning/LearningViewModel.kt": {
+    "mtime": 1788822422.0138574,
+    "seen": 1788893023.7630372,
+    "ast_hash": "421da7617ce1b00a249516a079f50662",
+    "semantic_hash": "421da7617ce1b00a249516a079f50662"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingScreens.kt": {
+    "mtime": 1788822422.0151525,
+    "seen": 1788893023.7630382,
+    "ast_hash": "67aa052fdba2a22350ae7a45ea4a53af",
+    "semantic_hash": "67aa052fdba2a22350ae7a45ea4a53af"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/meeting/MeetingViewModel.kt": {
+    "mtime": 1788822422.0151525,
+    "seen": 1788893023.7630394,
+    "ast_hash": "82b8cdacb1a49014b4d152daeb4eeb08",
+    "semantic_hash": "82b8cdacb1a49014b4d152daeb4eeb08"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/notifications/AppUpdateScreen.kt": {
+    "mtime": 1788822422.0161572,
+    "seen": 1788893023.7630403,
+    "ast_hash": "7799089d570b79ecfb15b8b26a929628",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/notifications/NotificationsScreen.kt": {
+    "mtime": 1788822422.0161572,
+    "seen": 1788893023.7630413,
+    "ast_hash": "6c3be6464f442996fa258daf517b6a8a",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/AccountDeletedScreen.kt": {
+    "mtime": 1788822422.0171573,
+    "seen": 1788893023.7630422,
+    "ast_hash": "6ecb6c5229d38b83da8d651c27266c93",
+    "semantic_hash": "6ecb6c5229d38b83da8d651c27266c93"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/AdminDashboardScreen.kt": {
+    "mtime": 1788822422.0171573,
+    "seen": 1788893023.7630432,
+    "ast_hash": "c1bce3ed89e7ff01eae0b0477df37158",
+    "semantic_hash": "c1bce3ed89e7ff01eae0b0477df37158"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/EditProfileScreen.kt": {
+    "mtime": 1788857657.6785514,
+    "seen": 1788893023.7630444,
+    "ast_hash": "4ef04d3e76212cc658f330fe664926cb",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/MyNotesScreen.kt": {
+    "mtime": 1788822422.0181584,
+    "seen": 1788893023.7630453,
+    "ast_hash": "7970f586651b8ae5557840207a158950",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/OnboardingViewModel.kt": {
+    "mtime": 1788822422.0181584,
+    "seen": 1788893023.7630477,
+    "ast_hash": "5869adb1bca64b05bd951d22c455266c",
+    "semantic_hash": "5869adb1bca64b05bd951d22c455266c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PYQScreen.kt": {
+    "mtime": 1788822422.0191572,
+    "seen": 1788893023.7630491,
+    "ast_hash": "4d0bd46fb9cb0c573f0906bc0ed35b70",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentHistoryScreen.kt": {
+    "mtime": 1788822422.0201588,
+    "seen": 1788893023.7630506,
+    "ast_hash": "55f804c1b2a67da3c5804500eb8c7592",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/PaymentScreen.kt": {
+    "mtime": 1788854690.6018827,
+    "seen": 1788893023.7630515,
+    "ast_hash": "f0b2aca1cf58e9652ee9e5c97edd838e",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SearchResultsScreen.kt": {
+    "mtime": 1788822422.0211575,
+    "seen": 1788893023.7630525,
+    "ast_hash": "d86cde39fec2b1fef3af84ee3946405d",
+    "semantic_hash": "d86cde39fec2b1fef3af84ee3946405d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsScreen.kt": {
+    "mtime": 1788893088.154693,
+    "seen": 1788929624.0692406,
+    "ast_hash": "82f19f8b4d3b6a9df22324a64f5ac715",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/SettingsViewModel.kt": {
+    "mtime": 1788822422.0221574,
+    "seen": 1788893023.7630546,
+    "ast_hash": "cf31996658f7a262bc8f5cbd0835dc99",
+    "semantic_hash": "cf31996658f7a262bc8f5cbd0835dc99"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/UserSetupScreen.kt": {
+    "mtime": 1788857657.6795504,
+    "seen": 1788893023.7630556,
+    "ast_hash": "bdde969c61bf564d567e4111f36d4f66",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/WelcomeScreen.kt": {
+    "mtime": 1788822422.0221574,
+    "seen": 1788893023.7630568,
+    "ast_hash": "97a5a8c434aeec5dd92a960ea4a9bd0d",
+    "semantic_hash": "97a5a8c434aeec5dd92a960ea4a9bd0d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeScreen.kt": {
+    "mtime": 1788857657.6825852,
+    "seen": 1788893023.7630577,
+    "ast_hash": "cd8dfbc86285c56d0ebf79622a4e048f",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/practice/PracticeViewModel.kt": {
+    "mtime": 1788822422.0231576,
+    "seen": 1788893023.7630587,
+    "ast_hash": "faaf7568e2e3ee2937cbe30fd244af23",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileScreen.kt": {
+    "mtime": 1788854690.6018827,
+    "seen": 1788893023.7630615,
+    "ast_hash": "a252deee0d39510581c2d05304793fa9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/ProfileViewModel.kt": {
+    "mtime": 1788822422.0261576,
+    "seen": 1788893023.7630627,
+    "ast_hash": "95cbff6e3a4b746bd29fd58aca6c1a05",
+    "semantic_hash": "95cbff6e3a4b746bd29fd58aca6c1a05"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizManager.kt": {
+    "mtime": 1788822422.0261576,
+    "seen": 1788893023.7630637,
+    "ast_hash": "c4d0fac191e8a86d4f9551f426916ed6",
+    "semantic_hash": "c4d0fac191e8a86d4f9551f426916ed6"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizSetupScreen.kt": {
+    "mtime": 1788822422.0261576,
+    "seen": 1788893023.7630646,
+    "ast_hash": "bc4fc67344cb1212b603ade8c3375a62",
+    "semantic_hash": "bc4fc67344cb1212b603ade8c3375a62"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizTakingScreen.kt": {
+    "mtime": 1788822422.027157,
+    "seen": 1788893023.7630656,
+    "ast_hash": "5f3f40895123ad5844e4dcb39c7a45f2",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/quiz/QuizViewModel.kt": {
+    "mtime": 1788822422.027157,
+    "seen": 1788893023.7630668,
+    "ast_hash": "d7969455b21f9e2c1546a00962571703",
+    "semantic_hash": "d7969455b21f9e2c1546a00962571703"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/video/VideoLessonScreen.kt": {
+    "mtime": 1788822422.027157,
+    "seen": 1788893023.7630677,
+    "ast_hash": "8da3cf3704442c557cc1e5a2d3341753",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/video/VideoLessonViewModel.kt": {
+    "mtime": 1788822422.0281572,
+    "seen": 1788893023.7630687,
+    "ast_hash": "ad6d188545ad9179561dc47751001642",
+    "semantic_hash": "ad6d188545ad9179561dc47751001642"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Brutalism.kt": {
+    "mtime": 1788822422.0281572,
+    "seen": 1788893023.7630696,
+    "ast_hash": "dcbf150ac281244f71e027249314aa90",
+    "semantic_hash": "dcbf150ac281244f71e027249314aa90"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Color.kt": {
+    "mtime": 1788822422.0291572,
+    "seen": 1788893023.7630708,
+    "ast_hash": "58ec69284b2056105fc71ce75fb565d8",
+    "semantic_hash": "58ec69284b2056105fc71ce75fb565d8"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/NeoBrutalistColors.kt": {
+    "mtime": 1788822422.0291572,
+    "seen": 1788893023.7630718,
+    "ast_hash": "be305e0946f48bd91a5866fab7d0e4a4",
+    "semantic_hash": "be305e0946f48bd91a5866fab7d0e4a4"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/NeoShapes.kt": {
+    "mtime": 1788822422.0291572,
+    "seen": 1788893023.7630727,
+    "ast_hash": "5dfacc4dcd468d6e7225fd719c2c6c15",
+    "semantic_hash": "5dfacc4dcd468d6e7225fd719c2c6c15"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Theme.kt": {
+    "mtime": 1788822422.0301588,
+    "seen": 1788893023.7630737,
+    "ast_hash": "032a10d241ea176acd311dbc8584bd4b",
+    "semantic_hash": "032a10d241ea176acd311dbc8584bd4b"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/theme/Type.kt": {
+    "mtime": 1788822422.0301588,
+    "seen": 1788893023.7630746,
+    "ast_hash": "1fe3b1827011a48974db1c9f5b6e8a9c",
+    "semantic_hash": "1fe3b1827011a48974db1c9f5b6e8a9c"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Constants.kt": {
+    "mtime": 1788822422.032157,
+    "seen": 1788893023.7630816,
+    "ast_hash": "16947ce8550409d681922475ea3e2cda",
+    "semantic_hash": "16947ce8550409d681922475ea3e2cda"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DeviceSecurityChecker.kt": {
+    "mtime": 1788822422.0331573,
+    "seen": 1788893023.7630842,
+    "ast_hash": "1017911a375827301eaeff8aff24be29",
+    "semantic_hash": "1017911a375827301eaeff8aff24be29"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/FirebaseMessagingService.kt": {
+    "mtime": 1788822422.0341578,
+    "seen": 1788893023.763087,
+    "ast_hash": "4e51a8c46b114768c180089f14ed01c0",
+    "semantic_hash": "4e51a8c46b114768c180089f14ed01c0"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/MeetingForegroundService.kt": {
+    "mtime": 1788822422.035157,
+    "seen": 1788893023.7630892,
+    "ast_hash": "315c8464def7fbf02e457384d04a9dac",
+    "semantic_hash": "315c8464def7fbf02e457384d04a9dac"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/NotificationDismissReceiver.kt": {
+    "mtime": 1788822422.035157,
+    "seen": 1788893023.7630908,
+    "ast_hash": "fbb5f3091a762b6178213af7a0999274",
+    "semantic_hash": "fbb5f3091a762b6178213af7a0999274"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Resource.kt": {
+    "mtime": 1788822422.0361567,
+    "seen": 1788893023.763095,
+    "ast_hash": "6f5ba6f454691bd66ae5f19bc9e0bc72",
+    "semantic_hash": "6f5ba6f454691bd66ae5f19bc9e0bc72"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/ThemePreferences.kt": {
+    "mtime": 1788822422.0371573,
+    "seen": 1788893023.7630975,
+    "ast_hash": "0e51b430d164f544f9e592c7b9369163",
+    "semantic_hash": "0e51b430d164f544f9e592c7b9369163"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1788822422.3114855,
+    "seen": 1788893023.7632136,
+    "ast_hash": "f5f411b341511281022c648c598fba3a",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1788822421.990844,
+    "seen": 1788893023.7632186,
+    "ast_hash": "cbcc2c2e2c4af03dc96c6c6c253a2585",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/UnderDevelopmentBanner.kt": {
+    "mtime": 1788822422.005841,
+    "seen": 1788893023.7630112,
+    "ast_hash": "8bf98568a0262cb39f3a991729becc4f",
+    "semantic_hash": "8bf98568a0262cb39f3a991729becc4f"
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/ApiConfig.kt": {
+    "mtime": 1788931929.263083,
+    "seen": 1788933761.3241282,
+    "ast_hash": "6c0bea1b36195e24f67b6d89c239bfc4",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/AuthInterceptor.kt": {
+    "mtime": 1788893691.940809,
+    "seen": 1788929624.0688798,
+    "ast_hash": "31b6559809abad4b70360203cfa20360",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/HmacUtil.kt": {
+    "mtime": 1788977264.21421,
+    "seen": 1788978580.4408247,
+    "ast_hash": "050ce196d63871718a79ce26f43d7669",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/VastavikApiService.kt": {
+    "mtime": 1788854690.5975842,
+    "seen": 1788893023.7629714,
+    "ast_hash": "cc34b3f30e3bfdde26227af957be2962",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/model/AppUpdateInfo.kt": {
+    "mtime": 1788822421.9968433,
+    "seen": 1788893023.7629771,
+    "ast_hash": "79bdb9410deb50829c7bb46226c25c62",
+    "semantic_hash": "79bdb9410deb50829c7bb46226c25c62"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/LocalMeetingClient.kt": {
+    "mtime": 1788822421.9998424,
+    "seen": 1788893023.762986,
+    "ast_hash": "adf3a5a106f5488a8db8e40e1723c9f0",
+    "semantic_hash": "adf3a5a106f5488a8db8e40e1723c9f0"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/MeetingClient.kt": {
+    "mtime": 1788822421.9998424,
+    "seen": 1788893023.762987,
+    "ast_hash": "4be3e761f8831a569d92fde2040fdfea",
+    "semantic_hash": "4be3e761f8831a569d92fde2040fdfea"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/RealtimeProtocol.kt": {
+    "mtime": 1788822421.9998424,
+    "seen": 1788893023.7629883,
+    "ast_hash": "6bdb0eef5d8ab130f25b7eb86c43f30c",
+    "semantic_hash": "6bdb0eef5d8ab130f25b7eb86c43f30c"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/StudentConversationManager.kt": {
+    "mtime": 1788822422.000841,
+    "seen": 1788893023.7629893,
+    "ast_hash": "a1b70ee1f8a23e3729db8e16a6436cbd",
+    "semantic_hash": "a1b70ee1f8a23e3729db8e16a6436cbd"
+  },
+  "app/src/main/java/com/vastavik/computer/data/realtime/WebRtcMeetingClient.kt": {
+    "mtime": 1788822422.000841,
+    "seen": 1788893023.7629905,
+    "ast_hash": "6ba2ea73da2c5d6064bb0baf31f0efeb",
+    "semantic_hash": "6ba2ea73da2c5d6064bb0baf31f0efeb"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/AuthRepository.kt": {
+    "mtime": 1788822422.000841,
+    "seen": 1788893023.762992,
+    "ast_hash": "7ce66fc924cb6ea768e26dceb25fbbc5",
+    "semantic_hash": "7ce66fc924cb6ea768e26dceb25fbbc5"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/FirestoreRepository.kt": {
+    "mtime": 1788822422.0018408,
+    "seen": 1788893023.762993,
+    "ast_hash": "8bc70ae71187829430017118b0297c9f",
+    "semantic_hash": "8bc70ae71187829430017118b0297c9f"
+  },
+  "app/src/main/java/com/vastavik/computer/data/repository/VastavikApiRepository.kt": {
+    "mtime": 1788854690.5985875,
+    "seen": 1788893023.7629943,
+    "ast_hash": "09db88c76a54030f4a6b07e60ccc3700",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/BannersPagerOverlay.kt": {
+    "mtime": 1788822422.0018408,
+    "seen": 1788893023.7629964,
+    "ast_hash": "cf871d4c0e2a021cffd3bdd32d1d518c",
+    "semantic_hash": "cf871d4c0e2a021cffd3bdd32d1d518c"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/DebugLogBoxOverlay.kt": {
+    "mtime": 1788822422.002841,
+    "seen": 1788893023.7629986,
+    "ast_hash": "8e9e8e5a82c2d845045f0c2b8f1f296d",
+    "semantic_hash": "8e9e8e5a82c2d845045f0c2b8f1f296d"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/MarkdownContent.kt": {
+    "mtime": 1788822422.0038412,
+    "seen": 1788893023.7630026,
+    "ast_hash": "68a1edfabc2b36efca7b811d8cb9b354",
+    "semantic_hash": "68a1edfabc2b36efca7b811d8cb9b354"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/TelegramNotificationBanner.kt": {
+    "mtime": 1788822422.0048416,
+    "seen": 1788893023.7630103,
+    "ast_hash": "fe5999cdfe80bb0631a0b01468666fb2",
+    "semantic_hash": "fe5999cdfe80bb0631a0b01468666fb2"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/AiConversationManager.kt": {
+    "mtime": 1788822422.009845,
+    "seen": 1788893023.7630239,
+    "ast_hash": "e05fec6021b145c63aa1210646d90893",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/chat/PeerChatScreen.kt": {
+    "mtime": 1788822422.010841,
+    "seen": 1788893023.7630267,
+    "ast_hash": "beec6c9cb74dbc8e98539fdcab39e9d3",
+    "semantic_hash": "beec6c9cb74dbc8e98539fdcab39e9d3"
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/doubts/DoubtSolvingScreen.kt": {
+    "mtime": 1788822422.010841,
+    "seen": 1788893023.763028,
+    "ast_hash": "51340d798cbfde38383e1665209ef530",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/profile/BugReportScreen.kt": {
+    "mtime": 1788822422.0251584,
+    "seen": 1788893023.7630606,
+    "ast_hash": "46ed5a3b585186499a3463ef849ba6df",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/AdminSession.kt": {
+    "mtime": 1788822422.0311573,
+    "seen": 1788893023.763077,
+    "ast_hash": "8908e7ae994c01b3a650245394819506",
+    "semantic_hash": "8908e7ae994c01b3a650245394819506"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/AppUpdater.kt": {
+    "mtime": 1788822422.0311573,
+    "seen": 1788893023.7630782,
+    "ast_hash": "aa75369daa10aa53a964e1448b940045",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DebugLogBox.kt": {
+    "mtime": 1788822422.032157,
+    "seen": 1788893023.7630823,
+    "ast_hash": "7bba145c1cc1e55acfef6a92f37c95af",
+    "semantic_hash": "7bba145c1cc1e55acfef6a92f37c95af"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DownloadProgressReceiver.kt": {
+    "mtime": 1788822422.0341578,
+    "seen": 1788893023.763086,
+    "ast_hash": "ddeba8275a759d80c60a6278d2ea1a5b",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/Judge0Service.kt": {
+    "mtime": 1788857657.6845489,
+    "seen": 1788893023.7630882,
+    "ast_hash": "706f2acc24844fc07bb959671418d4b0",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/TelegramNotificationManager.kt": {
+    "mtime": 1788822422.0371573,
+    "seen": 1788893023.7630966,
+    "ast_hash": "7e696da81ff604f7afe684be775d2c2d",
+    "semantic_hash": "7e696da81ff604f7afe684be775d2c2d"
+  },
+  "app/src/main/java/com/vastavik/computer/utils/VastavikAi.kt": {
+    "mtime": 1788822422.0371573,
+    "seen": 1788893023.7630987,
+    "ast_hash": "5eaf4a439012859e2936344711961666",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/VastavikAiDiskCache.kt": {
+    "mtime": 1788822422.0381572,
+    "seen": 1788893023.7630994,
+    "ast_hash": "061b58f19c6de8e2ce4c888a5b3f3d2d",
+    "semantic_hash": "061b58f19c6de8e2ce4c888a5b3f3d2d"
+  },
+  "build.gradle.kts": {
+    "mtime": 1788822422.0451577,
+    "seen": 1788893023.7631013,
+    "ast_hash": "4d06c7c0d67c4f8e5f1b9a5018223897",
+    "semantic_hash": "4d06c7c0d67c4f8e5f1b9a5018223897"
+  },
+  "tools/publish_release.ps1": {
+    "mtime": 1788822422.3124857,
+    "seen": 1788893023.7632146,
+    "ast_hash": "5b498f9fc7e02edec5bb4c18068d96f3",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1788822421.9888432,
+    "seen": 1788893023.7632155,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": "a0e4d192b9e2e17256124dbfc8e24e6a"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.22.md": {
+    "mtime": 1788822421.9928436,
+    "seen": 1788893023.76322,
+    "ast_hash": "aa79a652ecc530069150bc404967ad72",
+    "semantic_hash": "aa79a652ecc530069150bc404967ad72"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.24.md": {
+    "mtime": 1788822421.9928436,
+    "seen": 1788893023.7632222,
+    "ast_hash": "ded944e303e3d503a8428d350525952f",
+    "semantic_hash": "ded944e303e3d503a8428d350525952f"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.25.md": {
+    "mtime": 1788822421.9928436,
+    "seen": 1788893023.763223,
+    "ast_hash": "3cdabd072c86a9e53f72a6a15bd2a8ff",
+    "semantic_hash": "3cdabd072c86a9e53f72a6a15bd2a8ff"
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.26.md": {
+    "mtime": 1788822421.9938438,
+    "seen": 1788893023.7632241,
+    "ast_hash": "54db3b99a9344f1292c2582b1f11c386",
+    "semantic_hash": "54db3b99a9344f1292c2582b1f11c386"
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1788822421.989845,
+    "seen": 1788893023.7632165,
+    "ast_hash": "a831cf3669f1e6ab85d8a80ebe655f99",
+    "semantic_hash": ""
+  },
+  "BACKEND_SPECIFICATION.md": {
+    "mtime": 1788822421.990844,
+    "seen": 1788893023.7632174,
+    "ast_hash": "14d4c7f9dfc17717b78d1cdc652636b7",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.23.md": {
+    "mtime": 1788822421.9928436,
+    "seen": 1788893023.7632213,
+    "ast_hash": "2a542fc2ea95a37d6e4516cf91ec4130",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/CircuitBreaker.kt": {
+    "mtime": 1788822421.994844,
+    "seen": 1788893023.7629652,
+    "ast_hash": "df1717361799c2f491e4676833a98463",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/TokenAuthenticator.kt": {
+    "mtime": 1788822421.9958434,
+    "seen": 1788893023.762969,
+    "ast_hash": "6c35cba05977b29e66b9b16c004cb137",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/TokenManager.kt": {
+    "mtime": 1788933839.079068,
+    "seen": 1788935354.2181697,
+    "ast_hash": "1404255d32d715e14a9e0b98bb3894b5",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/model/BackendModels.kt": {
+    "mtime": 1788854690.5975842,
+    "seen": 1788893023.7629724,
+    "ast_hash": "958ec043e459b9d762eb8d1814c8e0f2",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/PeerChatClient.kt": {
+    "mtime": 1788822421.9968433,
+    "seen": 1788893023.7629735,
+    "ast_hash": "f1785d712e69f796aea27021ae50b96d",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/VastavikAiStreamer.kt": {
+    "mtime": 1788822421.9968433,
+    "seen": 1788893023.762975,
+    "ast_hash": "019b51f9705a6fa5a5aa547ee4d69b48",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/realtime/WebRtcSignalingClient.kt": {
+    "mtime": 1788822421.9968433,
+    "seen": 1788893023.762976,
+    "ast_hash": "2debe638ad15ed9f190ffdbaf064a0fe",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.27.md": {
+    "mtime": 1788639137.9152224,
+    "seen": 1788642668.620159,
+    "ast_hash": "74262ea501c775826c1ed7e9ef5e5642",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/VastavikEngagementWorker.kt": {
+    "mtime": 1788822422.0381572,
+    "seen": 1788893023.7631004,
+    "ast_hash": "7240f05e9bbe34e09e46261b51af336f",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.29.md": {
+    "mtime": 1788642740.1134338,
+    "seen": 1788643632.8039427,
+    "ast_hash": "926d8624c9836abd1a7b6a59b0db8c06",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/NinjaCelebrationOverlay.kt": {
+    "mtime": 1788822422.0048416,
+    "seen": 1788893023.7630048,
+    "ast_hash": "5f6e4daf4ed00f1415327714bea0fe72",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/PaymentReceiptPdf.kt": {
+    "mtime": 1788822422.0361567,
+    "seen": 1788893023.763092,
+    "ast_hash": "692330cea06f0a44dc4c049f37a91547",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.30.md": {
+    "mtime": 1788643688.2754233,
+    "seen": 1788644564.762519,
+    "ast_hash": "fd08cf1347fbe0b0a64e8cc84d8bd407",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/practice/PredictOutputSetScreen.kt": {
+    "mtime": 1788857657.68355,
+    "seen": 1788893023.7630594,
+    "ast_hash": "5bd1e7314b277f1d13f50b567e6e0ba3",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/PredictOutputPdf.kt": {
+    "mtime": 1788822422.0361567,
+    "seen": 1788893023.763093,
+    "ast_hash": "c3053115faf6c212e59b0dd9840a0c7c",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/RELEASE_NOTES_v1.0.31.md": {
+    "mtime": 1788647440.0788786,
+    "seen": 1788647778.4949768,
+    "ast_hash": "732e694aff0cb59416b2790cb1c21ef7",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/CodeOssManager.kt": {
+    "mtime": 1788978514.9449244,
+    "seen": 1788978580.4409702,
+    "ast_hash": "28ec9f53d617b4ba93a6d3012c63dbef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/build.gradle.kts": {
+    "mtime": 1788978514.946178,
+    "seen": 1788978580.441001,
+    "ast_hash": "548d10168e189d417a2eb083dfd1a4e5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/scripts/start-ubuntu.sh": {
+    "mtime": 1788822422.047157,
+    "seen": 1788893023.7631035,
+    "ast_hash": "99b9000da86fa029863ec906d77ef36b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
+    "mtime": 1788933839.0846522,
+    "seen": 1788935354.2185397,
+    "ast_hash": "1518b6aa8c8e487ef1328c9cc4e43fa8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/README.md": {
+    "mtime": 1788822422.046157,
+    "seen": 1788893023.7632296,
+    "ast_hash": "21a1e1170e0c1780ac464f13134ebfd9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/BackendLoadBalancer.kt": {
+    "mtime": 1788931929.263612,
+    "seen": 1788933761.3241315,
+    "ast_hash": "de74c7c6ed87f7dc029d8a560ba93a76",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/LoadBalancerInterceptor.kt": {
+    "mtime": 1788822421.994844,
+    "seen": 1788893023.7629678,
+    "ast_hash": "d68360beac974efab692e7e9cf35052e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/java/com/vastavik/codeoss/UbuntuTerminalEngine.kt": {
+    "mtime": 1788978514.954103,
+    "seen": 1788978580.441137,
+    "ast_hash": "554ab5c358a841aca07ec7dd06ecf566",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/java/com/vastavik/codeoss/MistralAiClient.kt": {
+    "mtime": 1788822422.1012254,
+    "seen": 1788893023.7632117,
+    "ast_hash": "65cea41bc7bde02d2ac19e92150da421",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/index.html": {
+    "mtime": 1788978514.9501777,
+    "seen": 1788978580.4411612,
+    "ast_hash": "7feae3307af7ed3c85db6074e20a6add",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/base/worker/workerMain.js": {
+    "mtime": 1788822422.0511568,
+    "seen": 1788893023.7631044,
+    "ast_hash": "e56441dea3727f40df97586141d1eede",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/abap/abap.js": {
+    "mtime": 1788822422.0511568,
+    "seen": 1788893023.7631056,
+    "ast_hash": "f2923a7502971611f3c02dcbc29ba98b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/apex/apex.js": {
+    "mtime": 1788822422.052157,
+    "seen": 1788893023.7631066,
+    "ast_hash": "884e6422bc249e925a666d35f42433f7",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/azcli/azcli.js": {
+    "mtime": 1788822422.052157,
+    "seen": 1788893023.7631075,
+    "ast_hash": "293a6224ef33293fe0e4d0020d122321",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/bat/bat.js": {
+    "mtime": 1788822422.052157,
+    "seen": 1788893023.7631085,
+    "ast_hash": "e91ebc378373b6242cc136340bc4c36c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/bicep/bicep.js": {
+    "mtime": 1788822422.0531573,
+    "seen": 1788893023.7631094,
+    "ast_hash": "69debb303cd2adb46ef78ca0528c6bbc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cameligo/cameligo.js": {
+    "mtime": 1788822422.0531573,
+    "seen": 1788893023.7631104,
+    "ast_hash": "91963f145ab3bb05868f53e6880b9655",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/clojure/clojure.js": {
+    "mtime": 1788822422.0531573,
+    "seen": 1788893023.7631114,
+    "ast_hash": "d30372d288d0db9579390174fac97a55",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/coffee/coffee.js": {
+    "mtime": 1788822422.0541651,
+    "seen": 1788893023.7631123,
+    "ast_hash": "eb1a67db0bb7eaab0521d0519aae8969",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cpp/cpp.js": {
+    "mtime": 1788822422.0541651,
+    "seen": 1788893023.7631133,
+    "ast_hash": "64551d72c8784e567bd5f52115321320",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/csharp/csharp.js": {
+    "mtime": 1788822422.0541651,
+    "seen": 1788893023.763114,
+    "ast_hash": "489ac43c477464b5dbbd43a46f54745e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/csp/csp.js": {
+    "mtime": 1788822422.0541651,
+    "seen": 1788893023.763115,
+    "ast_hash": "b25ba24579e708f3f7dec5cf00e6e184",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/css/css.js": {
+    "mtime": 1788822422.055164,
+    "seen": 1788893023.7631164,
+    "ast_hash": "b58ed016fd8205102687d3986151b839",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/cypher/cypher.js": {
+    "mtime": 1788822422.055164,
+    "seen": 1788893023.7631173,
+    "ast_hash": "d3b60489aec38fdd49ee08c1021439c5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/dart/dart.js": {
+    "mtime": 1788822422.055164,
+    "seen": 1788893023.7631183,
+    "ast_hash": "5f4b97baab82b4d496172095da409f61",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/dockerfile/dockerfile.js": {
+    "mtime": 1788822422.0561614,
+    "seen": 1788893023.7631195,
+    "ast_hash": "22590eeb5d1481281c504d699bc9922b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ecl/ecl.js": {
+    "mtime": 1788822422.0561614,
+    "seen": 1788893023.7631204,
+    "ast_hash": "c4de5dc28d3ef6a456a739cfb9c4fbcc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/elixir/elixir.js": {
+    "mtime": 1788822422.0561614,
+    "seen": 1788893023.7631211,
+    "ast_hash": "3a5867d12f8d7affff09cfad363f829c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/flow9/flow9.js": {
+    "mtime": 1788822422.0561614,
+    "seen": 1788893023.763122,
+    "ast_hash": "87cb378cf47728993319c5681afccdac",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/freemarker2/freemarker2.js": {
+    "mtime": 1788822422.0571601,
+    "seen": 1788893023.7631238,
+    "ast_hash": "cdc01646ff3a73c71c480cc143db64a6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/fsharp/fsharp.js": {
+    "mtime": 1788822422.0571601,
+    "seen": 1788893023.7631247,
+    "ast_hash": "6cdc2077996ddf5385ec724461ffbbbd",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/go/go.js": {
+    "mtime": 1788822422.0571601,
+    "seen": 1788893023.7631254,
+    "ast_hash": "da56abe3f11797a37bc4c6765778a46d",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/graphql/graphql.js": {
+    "mtime": 1788822422.0581598,
+    "seen": 1788893023.7631266,
+    "ast_hash": "764a23e61ebf40ec51f2045293df39d6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/handlebars/handlebars.js": {
+    "mtime": 1788822422.0581598,
+    "seen": 1788893023.7631276,
+    "ast_hash": "f6af0ae55a3befd0e98bd93e86c0af00",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/hcl/hcl.js": {
+    "mtime": 1788822422.0581598,
+    "seen": 1788893023.7631285,
+    "ast_hash": "7eb5bfb23959a934277b975b0649742a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/html/html.js": {
+    "mtime": 1788822422.0581598,
+    "seen": 1788893023.7631297,
+    "ast_hash": "ad97e18377b44a25c6048574a3134632",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ini/ini.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631307,
+    "ast_hash": "82cb89283ea5598ce86a2b6d459ea230",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/java/java.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631316,
+    "ast_hash": "8361d1730952a9020ae5ed1c0ee71ac9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/javascript/javascript.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631326,
+    "ast_hash": "92f3cf8b52b3733bf3091bc7d2d0abef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/julia/julia.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631338,
+    "ast_hash": "f080787c9e0348d9b7be8a35d9b338fc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/kotlin/kotlin.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631347,
+    "ast_hash": "7d9e018e55afe2868acf4b72532ae1fe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/less/less.js": {
+    "mtime": 1788822422.0591607,
+    "seen": 1788893023.7631354,
+    "ast_hash": "9dbb2a6c6b1d56e6ba91dfbf4999a73e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/lexon/lexon.js": {
+    "mtime": 1788822422.060652,
+    "seen": 1788893023.7631366,
+    "ast_hash": "c8e78491bd1b9963512e5b997a4f287f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/liquid/liquid.js": {
+    "mtime": 1788822422.060652,
+    "seen": 1788893023.7631376,
+    "ast_hash": "bf9e8c37d34d8ec3f4a92fc89d49b87a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/lua/lua.js": {
+    "mtime": 1788822422.0616615,
+    "seen": 1788893023.7631388,
+    "ast_hash": "7a2a8c294b8e5a9d1f968d4e20b2900a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/m3/m3.js": {
+    "mtime": 1788822422.0616615,
+    "seen": 1788893023.7631395,
+    "ast_hash": "b53f8c711b25cd65d3e5a446fd0104c5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/markdown/markdown.js": {
+    "mtime": 1788822422.0616615,
+    "seen": 1788893023.7631407,
+    "ast_hash": "4f10e38af16f045c30f07f9e3e10d2a4",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mdx/mdx.js": {
+    "mtime": 1788822422.062659,
+    "seen": 1788893023.7631416,
+    "ast_hash": "6a413a3219ab271992e3c90061bf2f3e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mips/mips.js": {
+    "mtime": 1788822422.062659,
+    "seen": 1788893023.7631423,
+    "ast_hash": "3f072330e7ebacbc3a019baf0bbab5e5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/msdax/msdax.js": {
+    "mtime": 1788822422.062659,
+    "seen": 1788893023.7631438,
+    "ast_hash": "e77987531c93d25146fcaecb54995196",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/mysql/mysql.js": {
+    "mtime": 1788822422.0636613,
+    "seen": 1788893023.7631445,
+    "ast_hash": "cc9a8d968c6250eef9424197fd4edac0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/objective-c/objective-c.js": {
+    "mtime": 1788822422.0636613,
+    "seen": 1788893023.7631454,
+    "ast_hash": "1f9df59fd0c4a7eef25dcf60108327d5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pascal/pascal.js": {
+    "mtime": 1788822422.0636613,
+    "seen": 1788893023.7631464,
+    "ast_hash": "2ce65828df9dc5a63c5058e296bb7cf1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pascaligo/pascaligo.js": {
+    "mtime": 1788822422.0636613,
+    "seen": 1788893023.7631476,
+    "ast_hash": "d7e79cfa18e75098b48d7fe99d2a67fe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/perl/perl.js": {
+    "mtime": 1788822422.0646586,
+    "seen": 1788893023.7631483,
+    "ast_hash": "ca1ee6f5e35bbc556b95f519bad8e79e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pgsql/pgsql.js": {
+    "mtime": 1788822422.0646586,
+    "seen": 1788893023.7631493,
+    "ast_hash": "1ba4a229caf9ad5757e20c6e76ad8a42",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/php/php.js": {
+    "mtime": 1788822422.0646586,
+    "seen": 1788893023.7631505,
+    "ast_hash": "795d7edceb0f099c5ab5b97669edd52d",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pla/pla.js": {
+    "mtime": 1788822422.0646586,
+    "seen": 1788893023.7631512,
+    "ast_hash": "d8c6577c8166055b9fff92d4e57297e1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/postiats/postiats.js": {
+    "mtime": 1788822422.0656588,
+    "seen": 1788893023.7631524,
+    "ast_hash": "a63730565c5f64a9ce9966d6badb4b38",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/powerquery/powerquery.js": {
+    "mtime": 1788822422.0656588,
+    "seen": 1788893023.7631533,
+    "ast_hash": "0e39037e64b32f67a8a12cefed949cd8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/powershell/powershell.js": {
+    "mtime": 1788822422.0656588,
+    "seen": 1788893023.7631543,
+    "ast_hash": "c505073d4c3e1c18cd8d30445bfffbae",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/protobuf/protobuf.js": {
+    "mtime": 1788822422.0666585,
+    "seen": 1788893023.7631552,
+    "ast_hash": "7b949b17d63a5ace7a07c53519f7252c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/pug/pug.js": {
+    "mtime": 1788822422.0666585,
+    "seen": 1788893023.7631562,
+    "ast_hash": "61a4c0b78ecd30cf8a454854cc554ae9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/python/python.js": {
+    "mtime": 1788822422.0666585,
+    "seen": 1788893023.7631571,
+    "ast_hash": "fb7a7d8db1657c443c810a133633dc16",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/qsharp/qsharp.js": {
+    "mtime": 1788822422.0666585,
+    "seen": 1788893023.763158,
+    "ast_hash": "7b4139cdf999217c218a95f5f4c8fad5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/r/r.js": {
+    "mtime": 1788822422.067659,
+    "seen": 1788893023.763159,
+    "ast_hash": "056c68ff69d071a44828226c899ca3a8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/razor/razor.js": {
+    "mtime": 1788822422.067659,
+    "seen": 1788893023.76316,
+    "ast_hash": "89d796466817522dfded8872e0e323ef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/redis/redis.js": {
+    "mtime": 1788822422.067659,
+    "seen": 1788893023.7631614,
+    "ast_hash": "02941a199fe19ee132328607ce5facf2",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/redshift/redshift.js": {
+    "mtime": 1788822422.0686586,
+    "seen": 1788893023.7631626,
+    "ast_hash": "24c9404b6573954cc9953ba04cfd761e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/restructuredtext/restructuredtext.js": {
+    "mtime": 1788822422.0686586,
+    "seen": 1788893023.7631636,
+    "ast_hash": "91eb42f9945c3fc65ac12f5886d0af5f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/ruby/ruby.js": {
+    "mtime": 1788822422.0686586,
+    "seen": 1788893023.7631648,
+    "ast_hash": "15f95159b0dc80601ac224d8ca896cbe",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/rust/rust.js": {
+    "mtime": 1788822422.0686586,
+    "seen": 1788893023.7631657,
+    "ast_hash": "cd8b5c9d956d87ba9d640c0e09a1b612",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sb/sb.js": {
+    "mtime": 1788822422.0686586,
+    "seen": 1788893023.7631667,
+    "ast_hash": "45328c542313f4ead079270f6fdb8bcc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scala/scala.js": {
+    "mtime": 1788822422.0701518,
+    "seen": 1788893023.7631674,
+    "ast_hash": "04f8ed197f2877f16f13e51a0438b7d4",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scheme/scheme.js": {
+    "mtime": 1788822422.0701518,
+    "seen": 1788893023.7631686,
+    "ast_hash": "257c3767dff4282eb3f89d9d3d8cc06c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/scss/scss.js": {
+    "mtime": 1788822422.0701518,
+    "seen": 1788893023.7631695,
+    "ast_hash": "7f5467096892d10f79c5fa265d109596",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/shell/shell.js": {
+    "mtime": 1788822422.071164,
+    "seen": 1788893023.7631705,
+    "ast_hash": "a2badcd3ba6839dbd4c1a2f5c3068b84",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/solidity/solidity.js": {
+    "mtime": 1788822422.071164,
+    "seen": 1788893023.7631717,
+    "ast_hash": "b11c569025b5d824cefa390f14c64fd7",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sophia/sophia.js": {
+    "mtime": 1788822422.071164,
+    "seen": 1788893023.7631726,
+    "ast_hash": "1c3b2c6677867f9243518f98802aca55",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sparql/sparql.js": {
+    "mtime": 1788822422.0721593,
+    "seen": 1788893023.7631738,
+    "ast_hash": "6ada2ac618e14ed2cc6688731df3fc23",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/sql/sql.js": {
+    "mtime": 1788822422.0721593,
+    "seen": 1788893023.763175,
+    "ast_hash": "2206de3e5b203ee0fc27bba0934cbd5c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/st/st.js": {
+    "mtime": 1788822422.0721593,
+    "seen": 1788893023.7631757,
+    "ast_hash": "fa0d0feee3e4a31cc59d7817a286d1e8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/swift/swift.js": {
+    "mtime": 1788822422.0731587,
+    "seen": 1788893023.7631767,
+    "ast_hash": "656c3f77f296cac831727a36ff08ec43",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/systemverilog/systemverilog.js": {
+    "mtime": 1788822422.0731587,
+    "seen": 1788893023.7631779,
+    "ast_hash": "0f315e003420f8044e789b615e368c6e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/tcl/tcl.js": {
+    "mtime": 1788822422.074159,
+    "seen": 1788893023.7631795,
+    "ast_hash": "510e0fd711765e3a86c926a44d92531f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/twig/twig.js": {
+    "mtime": 1788822422.074159,
+    "seen": 1788893023.7631805,
+    "ast_hash": "0932ec606ff67e7879269382ae46d368",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/typescript/typescript.js": {
+    "mtime": 1788822422.074159,
+    "seen": 1788893023.7631817,
+    "ast_hash": "b713a721e12ef255edbf3a8fe5d78ba1",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/typespec/typespec.js": {
+    "mtime": 1788822422.075159,
+    "seen": 1788893023.7631824,
+    "ast_hash": "e32576e1be9948c6fb873443f6da8abd",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/vb/vb.js": {
+    "mtime": 1788822422.075159,
+    "seen": 1788893023.7631836,
+    "ast_hash": "8b98e98c603a6b1a1e6ea7e8020f5ee0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/wgsl/wgsl.js": {
+    "mtime": 1788822422.075159,
+    "seen": 1788893023.7631845,
+    "ast_hash": "4826365c74a1752dafd0a22563f1224f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/xml/xml.js": {
+    "mtime": 1788822422.0762248,
+    "seen": 1788893023.7631857,
+    "ast_hash": "023ce87c415d3fd4294dc71a7eb2332a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/basic-languages/yaml/yaml.js": {
+    "mtime": 1788822422.0762248,
+    "seen": 1788893023.7631865,
+    "ast_hash": "8f87bce0e14d051349910bd04e3ed50f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/editor/editor.main.js": {
+    "mtime": 1788699875.964228,
+    "seen": 1788700198.7873728,
+    "ast_hash": "5ee8ed8319e8d41cf78346b4d921fcae",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/css/cssMode.js": {
+    "mtime": 1788822422.079225,
+    "seen": 1788893023.7631912,
+    "ast_hash": "e4c4e048c8ee821e3f26cc95f766d7ef",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/css/cssWorker.js": {
+    "mtime": 1788822422.084241,
+    "seen": 1788893023.7631927,
+    "ast_hash": "ebbdf38a041456934e8bde5be6a0b583",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/html/htmlMode.js": {
+    "mtime": 1788822422.0852268,
+    "seen": 1788893023.7631934,
+    "ast_hash": "ef48c76309b34415cf1754a0e61e4e6e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/html/htmlWorker.js": {
+    "mtime": 1788822422.0882235,
+    "seen": 1788893023.7631943,
+    "ast_hash": "a51ebcdbc4f70411e2cf8ae2d88083ff",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/json/jsonMode.js": {
+    "mtime": 1788822422.089223,
+    "seen": 1788893023.7631958,
+    "ast_hash": "26ed0d64b4d8f8d74425a8b58763b9d2",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/json/jsonWorker.js": {
+    "mtime": 1788822422.0902233,
+    "seen": 1788893023.7631967,
+    "ast_hash": "cdb275a92f3659e1b24b1094caeeddfa",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/typescript/tsMode.js": {
+    "mtime": 1788822422.091223,
+    "seen": 1788893023.7631977,
+    "ast_hash": "bafaf3858a53a6839737eb4fd09c5956",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/language/typescript/tsWorker.js": {
+    "mtime": 1788699876.0115125,
+    "seen": 1788700198.7873797,
+    "ast_hash": "2b3269f54a87145bad81bc0fa9c56183",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/loader.js": {
+    "mtime": 1788822422.091223,
+    "seen": 1788893023.7632005,
+    "ast_hash": "e3328225c8b5ecbe398d5d0c651791e9",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.de.js": {
+    "mtime": 1788822422.0922234,
+    "seen": 1788893023.7632017,
+    "ast_hash": "33a7714084496814b301da409f2e2377",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.es.js": {
+    "mtime": 1788822422.0932236,
+    "seen": 1788893023.7632027,
+    "ast_hash": "5ccd6a23ebba8424018008fd66c7dce0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.fr.js": {
+    "mtime": 1788822422.0942233,
+    "seen": 1788893023.7632036,
+    "ast_hash": "f51ae3e2162d9813a9e736748420a2f6",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.it.js": {
+    "mtime": 1788822422.0952232,
+    "seen": 1788893023.7632048,
+    "ast_hash": "ce88e1fa9811e9b4121d40b521b06b90",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ja.js": {
+    "mtime": 1788822422.096223,
+    "seen": 1788893023.7632055,
+    "ast_hash": "3bab8f72adcefad87db829d9b25e48f0",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ko.js": {
+    "mtime": 1788822422.0972228,
+    "seen": 1788893023.7632067,
+    "ast_hash": "4eca380b014d4e90e1d98a3a64dc255a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.ru.js": {
+    "mtime": 1788822422.0982227,
+    "seen": 1788893023.7632077,
+    "ast_hash": "becdd5b0be1fc962867c3a3d585e1615",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.zh-cn.js": {
+    "mtime": 1788822422.0992236,
+    "seen": 1788893023.7632086,
+    "ast_hash": "27eb9f2be7c08fa74741bf4f775001c8",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/assets/vscode/vs/nls.messages.zh-tw.js": {
+    "mtime": 1788822422.100291,
+    "seen": 1788893023.7632098,
+    "ast_hash": "62f065fde9e2464d7e552250f9530b23",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/NoInternetBanner.kt": {
+    "mtime": 1788822422.0048416,
+    "seen": 1788893023.7630062,
+    "ast_hash": "ca51cafefa0cee4242e0de1c01560786",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/NetworkStatusObserver.kt": {
+    "mtime": 1788822422.035157,
+    "seen": 1788893023.76309,
+    "ast_hash": "92207d8bd873dedcc29f45f417760eb5",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1788822422.1022253,
+    "seen": 1788893023.7632341,
+    "ast_hash": "d6041d9f5682a800a88b3d0c9c00cc6a",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-hdpi/ic_launcher_round.png": {
+    "mtime": 1788822422.1032434,
+    "seen": 1788893023.763235,
+    "ast_hash": "1d5af0d5cebc278e7d6380d520a99b4b",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1788822422.1032434,
+    "seen": 1788893023.763236,
+    "ast_hash": "8793f575d1d2fc3c0dcec3a0ae70099c",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-mdpi/ic_launcher_round.png": {
+    "mtime": 1788822422.1032434,
+    "seen": 1788893023.7632372,
+    "ast_hash": "75b91c6b74caab0b468d824866a40bb3",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1788822422.1047428,
+    "seen": 1788893023.7632382,
+    "ast_hash": "8b0f827d1c519204e8287f22812da73e",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xhdpi/ic_launcher_round.png": {
+    "mtime": 1788822422.1047428,
+    "seen": 1788893023.7632391,
+    "ast_hash": "e8b6ae45a61eb036766315f2a106066f",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1788822422.1047428,
+    "seen": 1788893023.76324,
+    "ast_hash": "ac29b33daeab55fd7f0963cfdb63a075",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxhdpi/ic_launcher_round.png": {
+    "mtime": 1788822422.1047428,
+    "seen": 1788893023.7632413,
+    "ast_hash": "0a1dfcd30360378974bcc54364973091",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1788822422.1061509,
+    "seen": 1788893023.763242,
+    "ast_hash": "3bb89fd85d1ccfe96b37fb71a277f0dc",
+    "semantic_hash": ""
+  },
+  "companion-codeoss/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png": {
+    "mtime": 1788822422.1061509,
+    "seen": 1788893023.763243,
+    "ast_hash": "86191664ff7370aab31b13651c013275",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/EmulatorWarningBanner.kt": {
+    "mtime": 1788929539.431506,
+    "seen": 1788929624.0690258,
+    "ast_hash": "91219e0bf2f5e0628644b6077ce11bd9",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/MandatoryUpdateBanner.kt": {
+    "mtime": 1788822422.002841,
+    "seen": 1788893023.7630014,
+    "ast_hash": "cd00b5f8bdd0714a5db3bd6ecb89aa37",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/PrivacyWatermarkOverlay.kt": {
+    "mtime": 1788893088.153693,
+    "seen": 1788929624.0690525,
+    "ast_hash": "948f99596f389331ed97871300a3deae",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/VsCodeSnippetView.kt": {
+    "mtime": 1788822422.005841,
+    "seen": 1788893023.763014,
+    "ast_hash": "bf99d38751dae89e6cedea522b6c9a61",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/growth/ReferAndEarnScreen.kt": {
+    "mtime": 1788860295.4598744,
+    "seen": 1788893023.763031,
+    "ast_hash": "1c06e8ae58069f33198fe5946f42d217",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/growth/ShareAppScreen.kt": {
+    "mtime": 1788860295.4608748,
+    "seen": 1788893023.7630324,
+    "ast_hash": "8fe357db0d7cebfb09af4df26d1c1de5",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/onboarding/NotesViewModel.kt": {
+    "mtime": 1788822422.0181584,
+    "seen": 1788893023.7630465,
+    "ast_hash": "aaace309a7b070c4e709d2dd581e5b87",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/ActivityLog.kt": {
+    "mtime": 1788822422.0301588,
+    "seen": 1788893023.7630758,
+    "ast_hash": "819cba3c058838b787fd983ffaba668e",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/BoardLanguage.kt": {
+    "mtime": 1788857657.68355,
+    "seen": 1788893023.7630792,
+    "ast_hash": "8c758e02e1f603f75048cde188e97217",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DeviceFingerprint.kt": {
+    "mtime": 1788854690.603106,
+    "seen": 1788893023.7630832,
+    "ast_hash": "8c68fa5df7a21847cdc42ea811f61cbb",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/DisplayName.kt": {
+    "mtime": 1788822422.0331573,
+    "seen": 1788893023.7630854,
+    "ast_hash": "48b0108384de99e8e43b91600a101813",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/RazorpayBridge.kt": {
+    "mtime": 1788854690.603106,
+    "seen": 1788893023.7630937,
+    "ast_hash": "70f46ee0a6c9c6bcb2fff55c094569a8",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/SecurityProtectionManager.kt": {
+    "mtime": 1788930818.6452522,
+    "seen": 1788931869.6155028,
+    "ast_hash": "d662cf0da9e9198aa1b7ba2c6f54a20d",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/EmulatorSecurityCurtain.kt": {
+    "mtime": 1788977264.215726,
+    "seen": 1788978580.440864,
+    "ast_hash": "ed28f3da96436d57eb0e6aef9886e309",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/screens/auth/BannedScreen.kt": {
+    "mtime": 1788893677.4557664,
+    "seen": 1788929624.0690968,
+    "ast_hash": "809ada7c9908bd7a6e9c0ddcb2517e5a",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/utils/BanManager.kt": {
+    "mtime": 1788893672.0371406,
+    "seen": 1788929624.069342,
+    "ast_hash": "a56fb0b4d160d6f10f892aa56f865be0",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/ui/components/FocusLossBlackoutCurtain.kt": {
+    "mtime": 1788930818.6432405,
+    "seen": 1788931869.6153965,
+    "ast_hash": "d7da0310875c4a3cd5728d363f545927",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/BackendWarmupManager.kt": {
+    "mtime": 1788931929.2641497,
+    "seen": 1788933761.3241334,
+    "ast_hash": "e836852f12bc056501cd76598ba3c990",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/vastavik/computer/data/api/ColdStartRetryInterceptor.kt": {
+    "mtime": 1788931929.2641497,
+    "seen": 1788933761.3241372,
+    "ast_hash": "354d0be6f6f45b1dd32d280aa3b603ba",
+    "semantic_hash": ""
+  },
+  ".github/workflows/keep_alive.yml": {
+    "mtime": 1788931929.2614863,
+    "seen": 1788933761.3244169,
+    "ast_hash": "c093e649c4c410a2bd01fe59203d4bbb",
+    "semantic_hash": ""
+  }
+}

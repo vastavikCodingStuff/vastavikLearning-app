@@ -1,8 +1,8 @@
 {
   "app/build.gradle.kts": {
-    "mtime": 1788978514.935957,
-    "seen": 1788978580.4407964,
-    "ast_hash": "d6c5495e21a0d75eda5da4617e47e6f1",
+    "mtime": 1788980030.5250683,
+    "seen": 1788980412.3374972,
+    "ast_hash": "86d07962c76893e8c680a5923ec7dd7d",
     "semantic_hash": ""
   },
   "app/google-services.json": {
@@ -804,9 +804,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/build.gradle.kts": {
-    "mtime": 1788978514.946178,
-    "seen": 1788978580.441001,
-    "ast_hash": "548d10168e189d417a2eb083dfd1a4e5",
+    "mtime": 1788980026.0944476,
+    "seen": 1788980412.3377323,
+    "ast_hash": "972028da5fdd7df814ed1b587fd4a4b0",
     "semantic_hash": ""
   },
   "companion-codeoss/scripts/start-ubuntu.sh": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/java/com/vastavik/codeoss/MainActivity.kt": {
-    "mtime": 1788933839.0846522,
-    "seen": 1788935354.2185397,
-    "ast_hash": "1518b6aa8c8e487ef1328c9cc4e43fa8",
+    "mtime": 1788979944.1885664,
+    "seen": 1788980412.3378742,
+    "ast_hash": "96b44d03dfd6474fc65e032678062aa1",
     "semantic_hash": ""
   },
   "companion-codeoss/README.md": {
@@ -852,9 +852,9 @@
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/index.html": {
-    "mtime": 1788978514.9501777,
-    "seen": 1788978580.4411612,
-    "ast_hash": "7feae3307af7ed3c85db6074e20a6add",
+    "mtime": 1788980021.8311508,
+    "seen": 1788980412.3379483,
+    "ast_hash": "9cdacf90d37eb9a338efc40fb3be1781",
     "semantic_hash": ""
   },
   "companion-codeoss/src/main/assets/vscode/vs/base/worker/workerMain.js": {

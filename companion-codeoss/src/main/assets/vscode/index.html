@@ -36,21 +36,34 @@
         }
 
         html, body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
             height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
-            background-color: var(--bg-editor);
+            background-color: var(--bg-titlebar);
             color: var(--text-primary);
             font-family: var(--font-ui);
             font-size: 13px;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         #app-root {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            width: 100vw;
-            height: 100vh;
             overflow: hidden;
             background-color: var(--bg-titlebar);
         }
@@ -179,6 +192,8 @@
         #workspace-body {
             display: flex;
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             overflow: hidden;
             position: relative;
         }
@@ -404,6 +419,8 @@
         /* 5. MAIN CONTENT AREA (EDITOR & TERMINAL SPLIT) */
         #main-stage {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -414,6 +431,8 @@
         /* Optional Editor Container (when toggled via layout) */
         #editor-pane {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             display: none;
             flex-direction: column;
             background-color: var(--bg-editor);
@@ -455,6 +474,8 @@
 
         #monaco-mount {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -463,6 +484,8 @@
         /* 6. TERMINAL PANE (MATCHING SCREENSHOT) */
         #terminal-pane {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             background-color: var(--bg-terminal);
@@ -522,6 +545,8 @@
 
         .term-body {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             padding: 8px 12px;
@@ -1059,19 +1084,12 @@
 
     </div>
 
-    <!-- Official Monaco Editor AMD Loader -->
-    <script src="vs/loader.js"></script>
+    <!-- Interactive Code Server IDE & Terminal Engine -->
     <script>
-        // Configure Monaco Loader paths relative to assets
-        require.config({
-            paths: {
-                'vs': 'vs'
-            }
-        });
-
         let activeFile = 'README.md';
         let editorInstance = null;
         let fileModels = {};
+        let monacoInitialized = false;
         const cmdHistory = ['npm run dev', 'curl -s :3000', 'python3 -V', 'git --version', 'npm -v', 'rg --version', 'tmux ls'];
         let historyIdx = cmdHistory.length;
 
@@ -1090,43 +1108,6 @@
             }
         };
 
-        // Initialize Monaco in background for editing
-        require(['vs/editor/editor.main'], function() {
-            for (const [fname, fobj] of Object.entries(defaultContents)) {
-                let text = fobj.content;
-                if (window.AndroidBridge && window.AndroidBridge.readFile) {
-                    const saved = window.AndroidBridge.readFile(fname);
-                    if (saved && saved.length > 0) text = saved;
-                }
-                fileModels[fname] = monaco.editor.createModel(text, fobj.lang);
-            }
-
-            editorInstance = monaco.editor.create(document.getElementById('monaco-mount'), {
-                model: fileModels[activeFile],
-                theme: 'vs-dark',
-                automaticLayout: true,
-                fontSize: 13,
-                fontFamily: 'Menlo, Monaco, "Courier New", Consolas, monospace',
-                minimap: { enabled: false },
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                bracketPairColorization: { enabled: true },
-                renderWhitespace: 'selection',
-                tabSize: 2
-            });
-
-            editorInstance.onDidChangeModelContent(() => {
-                const updated = editorInstance.getValue();
-                if (window.AndroidBridge && window.AndroidBridge.saveFile) {
-                    window.AndroidBridge.saveFile(activeFile, updated);
-                }
-            });
-
-            if (window.AndroidBridge && window.AndroidBridge.onReady) {
-                window.AndroidBridge.onReady();
-            }
-        });
-
         // File Selection & Tab Switch
         function selectFile(filename) {
             activeFile = filename;
@@ -1136,29 +1117,35 @@
             const fItem = document.getElementById('file-' + filename);
             if (fItem) fItem.classList.add('active');
 
-            // Ensure model exists
-            if (!fileModels[filename]) {
-                const ext = filename.split('.').pop();
-                const langMap = { 'py': 'python', 'js': 'javascript', 'json': 'json', 'md': 'markdown', 'sh': 'shell' };
-                let text = '';
-                if (window.AndroidBridge && window.AndroidBridge.readFile) {
-                    text = window.AndroidBridge.readFile(filename);
-                }
-                fileModels[filename] = monaco.editor.createModel(text, langMap[ext] || 'plaintext');
-            }
-
-            if (editorInstance) {
-                editorInstance.setModel(fileModels[filename]);
-            }
-
             // Update editor tabs
             document.querySelectorAll('.ed-tab').forEach(el => el.classList.remove('active'));
             const tItem = document.getElementById('tab-' + filename);
             if (tItem) tItem.classList.add('active');
 
+            // If Monaco is ready, bind the model
+            if (window.monaco && monaco.editor) {
+                try {
+                    if (!fileModels[filename]) {
+                        const ext = filename.split('.').pop();
+                        const langMap = { 'py': 'python', 'js': 'javascript', 'json': 'json', 'md': 'markdown', 'sh': 'shell' };
+                        let text = (defaultContents[filename] && defaultContents[filename].content) || '';
+                        if (window.AndroidBridge && window.AndroidBridge.readFile) {
+                            const saved = window.AndroidBridge.readFile(filename);
+                            if (saved && saved.length > 0) text = saved;
+                        }
+                        fileModels[filename] = monaco.editor.createModel(text, langMap[ext] || 'plaintext');
+                    }
+                    if (editorInstance) {
+                        editorInstance.setModel(fileModels[filename]);
+                    }
+                } catch (e) {
+                    console.warn('Monaco setModel warning:', e);
+                }
+            }
+
             // If editor was hidden, show it in split or editor view
             const edPane = document.getElementById('editor-pane');
-            if (!edPane.classList.contains('visible')) {
+            if (edPane && !edPane.classList.contains('visible')) {
                 toggleEditorView();
             }
         }
@@ -1167,57 +1154,65 @@
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const btn = document.getElementById('btn-toggle-sidebar');
-            sb.classList.toggle('collapsed');
-            btn.classList.toggle('active', !sb.classList.contains('collapsed'));
+            if (sb) sb.classList.toggle('collapsed');
+            if (btn && sb) btn.classList.toggle('active', !sb.classList.contains('collapsed'));
             if (editorInstance) editorInstance.layout();
         }
 
         function showExplorer() {
             const sb = document.getElementById('sidebar');
             const btn = document.getElementById('btn-toggle-sidebar');
-            sb.classList.remove('collapsed');
-            btn.classList.add('active');
+            if (sb) sb.classList.remove('collapsed');
+            if (btn) btn.classList.add('active');
             if (editorInstance) editorInstance.layout();
         }
 
         function toggleTerminalView() {
             const term = document.getElementById('terminal-pane');
             const btn = document.getElementById('btn-toggle-terminal');
+            if (!term) return;
             const isHidden = term.style.display === 'none';
             term.style.display = isHidden ? 'flex' : 'none';
-            btn.classList.toggle('active', isHidden);
+            if (btn) btn.classList.toggle('active', isHidden);
             if (editorInstance) editorInstance.layout();
         }
 
         function toggleEditorView() {
             const edPane = document.getElementById('editor-pane');
+            if (!edPane) return;
             const isVisible = edPane.classList.contains('visible');
             if (isVisible) {
                 edPane.classList.remove('visible');
             } else {
                 edPane.classList.add('visible');
+                // Ensure Monaco layout runs once visible
+                setTimeout(() => {
+                    if (editorInstance) editorInstance.layout();
+                }, 50);
             }
-            if (editorInstance) editorInstance.layout();
         }
 
         function toggleSplitMode() {
             const edPane = document.getElementById('editor-pane');
             const termPane = document.getElementById('terminal-pane');
-            if (edPane.classList.contains('visible') && termPane.style.display !== 'none') {
-                // Currently split: switch to full terminal
-                edPane.classList.remove('visible');
-                termPane.style.display = 'flex';
-            } else {
-                // Split both
-                edPane.classList.add('visible');
-                termPane.style.display = 'flex';
+            if (edPane && termPane) {
+                if (edPane.classList.contains('visible') && termPane.style.display !== 'none') {
+                    edPane.classList.remove('visible');
+                    termPane.style.display = 'flex';
+                } else {
+                    edPane.classList.add('visible');
+                    termPane.style.display = 'flex';
+                }
+                setTimeout(() => {
+                    if (editorInstance) editorInstance.layout();
+                }, 50);
             }
-            if (editorInstance) editorInstance.layout();
         }
 
         function toggleProjectFolder() {
             const list = document.getElementById('file-list-container');
             const chev = document.getElementById('folder-chevron');
+            if (!list || !chev) return;
             if (list.style.display === 'none') {
                 list.style.display = 'flex';
                 chev.textContent = '⌄';
@@ -1252,18 +1247,22 @@
                 try {
                     const files = JSON.parse(window.AndroidBridge.listFiles());
                     const container = document.getElementById('file-list-container');
-                    container.innerHTML = '';
-                    files.forEach(f => {
-                        const iconClass = f.name.endsWith('.md') ? 'icon-md' : (f.name.endsWith('.js') ? 'icon-js' : (f.name.endsWith('.json') ? 'icon-json' : 'icon-py'));
-                        const badgeText = f.name.endsWith('.md') ? 'M↓' : (f.name.endsWith('.js') ? 'JS' : (f.name.endsWith('.json') ? '{ }' : 'PY'));
-                        const div = document.createElement('div');
-                        div.className = 'file-entry' + (f.name === activeFile ? ' active' : '');
-                        div.id = 'file-' + f.name;
-                        div.onclick = () => selectFile(f.name);
-                        div.innerHTML = `<span class="icon-badge ${iconClass}">${badgeText}</span><span>${f.name}</span>`;
-                        container.appendChild(div);
-                    });
-                } catch (e) {}
+                    if (container) {
+                        container.innerHTML = '';
+                        files.forEach(f => {
+                            const iconClass = f.name.endsWith('.md') ? 'icon-md' : (f.name.endsWith('.js') ? 'icon-js' : (f.name.endsWith('.json') ? 'icon-json' : 'icon-py'));
+                            const badgeText = f.name.endsWith('.md') ? 'M↓' : (f.name.endsWith('.js') ? 'JS' : (f.name.endsWith('.json') ? '{ }' : 'PY'));
+                            const div = document.createElement('div');
+                            div.className = 'file-entry' + (f.name === activeFile ? ' active' : '');
+                            div.id = 'file-' + f.name;
+                            div.onclick = () => selectFile(f.name);
+                            div.innerHTML = `<span class="icon-badge ${iconClass}">${badgeText}</span><span>${escapeHtml(f.name)}</span>`;
+                            container.appendChild(div);
+                        });
+                    }
+                } catch (e) {
+                    console.error('refreshFiles error:', e);
+                }
             }
         }
 
@@ -1272,21 +1271,24 @@
         const termContainer = document.getElementById('term-log-container');
         const termScroll = document.getElementById('terminal-scroll');
 
-        termInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = termInput.value.trim();
-                termInput.value = '';
-                if (cmd) {
-                    executeTerminalCommand(cmd);
+        if (termInput) {
+            termInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const cmd = termInput.value.trim();
+                    termInput.value = '';
+                    if (cmd) {
+                        executeTerminalCommand(cmd);
+                    }
+                } else if (e.key === 'ArrowUp') {
+                    historyMove(-1);
+                } else if (e.key === 'ArrowDown') {
+                    historyMove(1);
                 }
-            } else if (e.key === 'ArrowUp') {
-                historyMove(-1);
-            } else if (e.key === 'ArrowDown') {
-                historyMove(1);
-            }
-        });
+            });
+        }
 
         function executeTerminalCommand(cmd) {
+            if (!cmd || !cmd.trim()) return;
             cmdHistory.push(cmd);
             historyIdx = cmdHistory.length;
 
@@ -1296,11 +1298,13 @@
             }
 
             // Append Prompt & Command
-            const cmdRow = document.createElement('div');
-            cmdRow.className = 'line-cmd-row';
-            cmdRow.innerHTML = `<span class="prompt-txt">projects $</span><span class="cmd-txt">${escapeHtml(cmd)}</span>`;
-            termContainer.appendChild(cmdRow);
-            termScroll.scrollTop = termScroll.scrollHeight;
+            if (termContainer) {
+                const cmdRow = document.createElement('div');
+                cmdRow.className = 'line-cmd-row';
+                cmdRow.innerHTML = `<span class="prompt-txt">projects $</span><span class="cmd-txt">${escapeHtml(cmd)}</span>`;
+                termContainer.appendChild(cmdRow);
+                if (termScroll) termScroll.scrollTop = termScroll.scrollHeight;
+            }
 
             if (window.AndroidBridge && window.AndroidBridge.executeCommand) {
                 window.AndroidBridge.executeCommand(cmd);
@@ -1313,6 +1317,7 @@
         }
 
         function appendTerminalLine(text, isError) {
+            if (!termContainer) return;
             const div = document.createElement('div');
             if (isError) {
                 div.className = 'out-err';
@@ -1325,13 +1330,13 @@
             }
             div.textContent = text;
             termContainer.appendChild(div);
-            termScroll.scrollTop = termScroll.scrollHeight;
+            if (termScroll) termScroll.scrollTop = termScroll.scrollHeight;
         }
 
         window.appendTerminalLine = appendTerminalLine;
 
         function clearTerminal() {
-            termContainer.innerHTML = '';
+            if (termContainer) termContainer.innerHTML = '';
         }
 
         function quickRun(cmd) {
@@ -1339,6 +1344,7 @@
         }
 
         function sendAccKey(k) {
+            if (!termInput) return;
             if (k === 'ESC') termInput.value = '';
             else if (k === 'TAB') termInput.value += '    ';
             else if (k === 'CTRL_C') {
@@ -1349,12 +1355,13 @@
         }
 
         function insertAccChar(c) {
+            if (!termInput) return;
             termInput.value += c;
             termInput.focus();
         }
 
         function historyMove(dir) {
-            if (cmdHistory.length === 0) return;
+            if (!termInput || cmdHistory.length === 0) return;
             historyIdx += dir;
             if (historyIdx < 0) historyIdx = 0;
             if (historyIdx >= cmdHistory.length) {
@@ -1366,7 +1373,7 @@
         }
 
         function escapeHtml(str) {
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         // Navigation and Utility
@@ -1423,13 +1430,94 @@
                 lId = 'javascript';
             }
 
-            if (fileModels[fname]) {
-                fileModels[fname].setValue(code);
-            } else {
-                fileModels[fname] = monaco.editor.createModel(code, lId);
+            defaultContents[fname] = { lang: lId, content: code };
+
+            if (window.monaco && monaco.editor) {
+                try {
+                    if (fileModels[fname]) {
+                        fileModels[fname].setValue(code);
+                    } else {
+                        fileModels[fname] = monaco.editor.createModel(code, lId);
+                    }
+                } catch (e) {
+                    console.error('loadPayload Monaco error:', e);
+                }
             }
             selectFile(fname);
         };
+
+        // Ready notification & initial file list
+        window.addEventListener('load', () => {
+            refreshFiles();
+            if (window.AndroidBridge && window.AndroidBridge.onReady) {
+                try { window.AndroidBridge.onReady(); } catch (_) {}
+            }
+        });
+    </script>
+
+    <!-- Official Monaco Editor AMD Loader -->
+    <script src="vs/loader.js"></script>
+    <script>
+        function initMonacoEditor() {
+            if (typeof require === 'undefined') {
+                console.warn('Monaco loader not present');
+                return;
+            }
+            try {
+                require.config({ paths: { 'vs': 'vs' } });
+                require(['vs/editor/editor.main'], function() {
+                    try {
+                        for (const [fname, fobj] of Object.entries(defaultContents)) {
+                            let text = fobj.content;
+                            if (window.AndroidBridge && window.AndroidBridge.readFile) {
+                                const saved = window.AndroidBridge.readFile(fname);
+                                if (saved && saved.length > 0) text = saved;
+                            }
+                            fileModels[fname] = monaco.editor.createModel(text, fobj.lang);
+                        }
+
+                        const mount = document.getElementById('monaco-mount');
+                        if (mount) {
+                            editorInstance = monaco.editor.create(mount, {
+                                model: fileModels[activeFile],
+                                theme: 'vs-dark',
+                                automaticLayout: true,
+                                fontSize: 13,
+                                fontFamily: 'Menlo, Monaco, "Courier New", Consolas, monospace',
+                                minimap: { enabled: false },
+                                lineNumbers: 'on',
+                                scrollBeyondLastLine: false,
+                                bracketPairColorization: { enabled: true },
+                                renderWhitespace: 'selection',
+                                tabSize: 2
+                            });
+
+                            editorInstance.onDidChangeModelContent(() => {
+                                const updated = editorInstance.getValue();
+                                if (window.AndroidBridge && window.AndroidBridge.saveFile) {
+                                    window.AndroidBridge.saveFile(activeFile, updated);
+                                }
+                            });
+                        }
+                        monacoInitialized = true;
+                        console.log('Monaco initialized successfully');
+                    } catch (e) {
+                        console.error('Monaco setup error:', e);
+                    }
+
+                    if (window.AndroidBridge && window.AndroidBridge.onReady) {
+                        try { window.AndroidBridge.onReady(); } catch (_) {}
+                    }
+                });
+            } catch (err) {
+                console.error('require.config error:', err);
+            }
+        }
+
+        // Initialize Monaco after first frame
+        window.addEventListener('load', () => {
+            setTimeout(initMonacoEditor, 80);
+        });
     </script>
 </body>
 </html>
