@@ -13,5 +13,7 @@ class VastavikApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        // Immediately and asynchronously pre-warm Render cloud backend
+        com.vastavik.computer.data.api.BackendWarmupManager.warmUpAsync()
     }
 }
