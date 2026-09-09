@@ -1,14 +1,13 @@
 package com.vastavik.computer.ui.components
 
+import android.content.Intent
+import android.net.Uri
 import android.view.ViewGroup
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,7 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -58,7 +60,10 @@ fun VastavikYouTubePlayer(
     onCurrentSecond: ((Float) -> Unit)? = null
 ) {
     val videoId = remember(youtubeUrl, youtubeVideoId) {
-        youtubeVideoId?.takeIf { it.length == 11 } ?: youtubeUrl?.let { HmacUtil.extractVideoId(it) }
+        val raw = youtubeVideoId?.trim()
+        raw?.takeIf { it.length == 11 && !it.contains("/") && !it.contains("?") && !it.contains("&") }
+            ?: HmacUtil.extractVideoId(raw)
+            ?: HmacUtil.extractVideoId(youtubeUrl)
     }
 
     if (videoId == null) {
@@ -70,7 +75,7 @@ fun VastavikYouTubePlayer(
                 .background(Color.Black),
             contentAlignment = Alignment.Center
         ) {
-            Text("Invalid video", color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
+            Text("Invalid video link", color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
         }
         return
     }
@@ -146,9 +151,47 @@ fun VastavikYouTubePlayer(
             }
         }
 
-        errorMsg?.let {
-            Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.8f)), contentAlignment = Alignment.Center) {
-                Text("Playback error: $it", color = Color.White, fontSize = 12.sp, modifier = Modifier.padding(16.dp))
+        errorMsg?.let { err ->
+            val context = LocalContext.current
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.90f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = if (err.contains("NOT_PLAYABLE", ignoreCase = true) || err.contains("150") || err.contains("101")) {
+                            "Embedding restricted on this video.\nEnsure 'Allow embedding' is enabled in YouTube Studio."
+                        } else {
+                            "Playback unavailable: $err"
+                        },
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 16.sp
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            try {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://www.youtube.com/watch?v=$videoId")
+                                )
+                                context.startActivity(intent)
+                            } catch (_: Exception) {}
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                    ) {
+                        Text("Open Video", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
 
