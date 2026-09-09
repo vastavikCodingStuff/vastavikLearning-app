@@ -204,6 +204,41 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     }
 }
 
+private val DEFAULT_COURSES = listOf(
+    com.vastavik.computer.data.api.model.CourseItem(
+        id = "java-icse-10",
+        title = "Java for ICSE Class 10",
+        description = "Complete ICSE Computer Applications curriculum covering OOP, String handling, Arrays, and Past Year Questions.",
+        iconName = "42 lessons",
+        color = 0xFFE65100L,
+        order = 1
+    ),
+    com.vastavik.computer.data.api.model.CourseItem(
+        id = "python-basics",
+        title = "Python for Beginners",
+        description = "Learn core Python 3 syntax, control structures, functions, lists, dictionaries, and automated problem solving.",
+        iconName = "36 lessons",
+        color = 0xFF1976D2L,
+        order = 2
+    ),
+    com.vastavik.computer.data.api.model.CourseItem(
+        id = "sql-databases",
+        title = "SQL & Relational Databases",
+        description = "Practical database design, queries, table joins, aggregation, subqueries, and ICSE/CBSE exam patterns.",
+        iconName = "28 lessons",
+        color = 0xFF7B1FA2L,
+        order = 3
+    ),
+    com.vastavik.computer.data.api.model.CourseItem(
+        id = "js-web-dev",
+        title = "JavaScript Essentials",
+        description = "Modern JavaScript (ES6+), DOM manipulation, async/await, APIs, and building interactive web projects.",
+        iconName = "51 lessons",
+        color = 0xFFF57C00L,
+        order = 4
+    )
+)
+
 @Composable
 private fun HomeTab(
     modifier: Modifier = Modifier,
@@ -218,9 +253,34 @@ private fun HomeTab(
     val updateInfo by com.vastavik.computer.utils.AppUpdater.updateState.collectAsState()
     val isBlocked = updateInfo?.isUpdateAvailable == true
     val context = androidx.compose.ui.platform.LocalContext.current
-    var fetchedCourses by remember { mutableStateOf<List<com.vastavik.computer.data.api.model.CourseItem>>(emptyList()) }
+    var fetchedCourses by remember { mutableStateOf(DEFAULT_COURSES) }
 
     LaunchedEffect(Unit) {
+        // 1. Real-time stream from Firestore (instant local cache + live admin updates)
+        try {
+            val firestoreRepo = dagger.hilt.android.EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                com.vastavik.computer.di.RepositoryEntryPoint::class.java
+            ).firestoreRepository()
+            launch {
+                firestoreRepo.streamCourses().collect { fsCourses ->
+                    if (fsCourses.isNotEmpty()) {
+                        fetchedCourses = fsCourses.map { c ->
+                            com.vastavik.computer.data.api.model.CourseItem(
+                                id = c.id,
+                                title = c.title,
+                                description = c.description,
+                                iconName = if (c.iconName.isNotBlank() && c.iconName != "code") c.iconName else "40+ lessons",
+                                color = c.color.toLong(),
+                                order = c.order
+                            )
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        // 2. Fetch from backend catalog API
         try {
             val repo = dagger.hilt.android.EntryPointAccessors.fromApplication(
                 context.applicationContext,
@@ -594,19 +654,20 @@ private fun HomeTab(
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
-            if (fetchedCourses.isEmpty()) {
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), contentAlignment = Alignment.Center) {
-                    Text("Loading courses...", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            } else {
-                fetchedCourses.forEach { course ->
-                    PopularTopicItem(
-                        title = course.title,
-                        subject = course.description.take(60).let { if (it.length < course.description.length) "$it..." else it },
-                        duration = course.iconName
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
+            fetchedCourses.forEach { course ->
+                PopularTopicItem(
+                    title = course.title,
+                    subject = course.description.take(60).let { if (it.length < course.description.length) "$it..." else it },
+                    duration = if (course.iconName.isNotBlank() && course.iconName != "code") course.iconName else "Comprehensive",
+                    onClick = {
+                        if (course.title.contains("Java", ignoreCase = true)) {
+                            onNavigate("learning_path")
+                        } else {
+                            onNavigate("coming_soon/${java.net.URLEncoder.encode(course.title, "UTF-8")}")
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
 
@@ -922,9 +983,17 @@ private fun StatsBrutalCard(
 }
 
 @Composable
-private fun PopularTopicItem(title: String, subject: String, duration: String) {
+private fun PopularTopicItem(
+    title: String,
+    subject: String,
+    duration: String,
+    onClick: () -> Unit = {}
+) {
     BrutalCard(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         backgroundColor = MaterialTheme.colorScheme.surface
     ) {
@@ -936,14 +1005,14 @@ private fun PopularTopicItem(title: String, subject: String, duration: String) {
                 modifier = Modifier
                     .size(44.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(12.dp)),
+                    .background(Color(0xFF2563EB).copy(alpha = 0.12f))
+                    .border(BorderStroke(1.dp, Color(0xFF2563EB)), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Filled.PlayArrow,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = Color(0xFF2563EB),
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -965,15 +1034,15 @@ private fun PopularTopicItem(title: String, subject: String, duration: String) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline), RoundedCornerShape(50.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(BorderStroke(1.dp, MaterialTheme.colorScheme.primary), RoundedCornerShape(50.dp))
                     .padding(horizontal = 10.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = "Coming soon",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "Start →",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }

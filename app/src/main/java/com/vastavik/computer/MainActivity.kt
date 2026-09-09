@@ -126,7 +126,10 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
                     )
 
-                    // Emulator security detection banner (when running inside BlueStacks / VM)
+                    // Full-screen opaque Emulator Security Curtain (blocks BlueStacks screenshots & recordings)
+                    com.vastavik.computer.ui.components.EmulatorSecurityCurtain()
+
+                    // Emulator security detection banner (when unlocked or running inside BlueStacks / VM)
                     com.vastavik.computer.ui.components.EmulatorWarningBannerHost(
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
                     )

@@ -41,8 +41,10 @@ fun EmulatorWarningBannerHost(
     val isEmulator = remember { SecurityProtectionManager.isRunningOnEmulator() }
     var dismissed by remember { mutableStateOf(false) }
 
+    val isUnlocked = EmulatorSecuritySession.isOverrideUnlocked
+
     AnimatedVisibility(
-        visible = isEmulator && !dismissed,
+        visible = isEmulator && isUnlocked && !dismissed,
         enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
         modifier = modifier
@@ -98,7 +100,7 @@ fun EmulatorWarningBannerHost(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "EMULATOR DETECTED • PRIVACY ACTIVE",
+                            text = "DEV OVERRIDE ACTIVE • PRIVACY ENFORCED",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 0.5.sp,
@@ -106,7 +108,7 @@ fun EmulatorWarningBannerHost(
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Running in BlueStacks/VM. Screen capture & recordings are prohibited and forensically watermarked.",
+                            text = "Running in BlueStacks preview mode. Screen capture & recordings are forensically watermarked.",
                             fontSize = 10.5.sp,
                             lineHeight = 13.sp,
                             fontWeight = FontWeight.SemiBold,
