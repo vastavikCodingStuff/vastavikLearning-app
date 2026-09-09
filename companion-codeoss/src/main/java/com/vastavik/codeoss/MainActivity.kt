@@ -79,11 +79,12 @@ class MainActivity : ComponentActivity() {
 
     private fun injectPayloadIntoWebView() {
         val wv = webViewInstance ?: return
-        val escapedCode = initialCode.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
-        val escapedQuestion = initialQuestion.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+        val qCode = org.json.JSONObject.quote(initialCode)
+        val qLang = org.json.JSONObject.quote(initialLanguage)
+        val qQuestion = org.json.JSONObject.quote(initialQuestion)
         wv.post {
             wv.evaluateJavascript(
-                "if (window.loadPayload) { window.loadPayload('$escapedCode', '$initialLanguage', '$escapedQuestion'); }",
+                "if (window.loadPayload) { window.loadPayload($qCode, $qLang, $qQuestion); }",
                 null
             )
         }
@@ -112,8 +113,8 @@ class MainActivity : ComponentActivity() {
                         useWideViewPort = true
                         loadWithOverviewMode = true
                         cacheMode = WebSettings.LOAD_DEFAULT
-                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                        javaScriptCanOpenWindowsAutomatically = true
+                        mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                        javaScriptCanOpenWindowsAutomatically = false
                     }
 
                     // Register Javascript bridge
@@ -121,11 +122,12 @@ class MainActivity : ComponentActivity() {
                         object {
                             @JavascriptInterface
                             fun onReady() {
-                                val escapedCode = initialCode.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
-                                val escapedQuestion = initialQuestion.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+                                val qCode = org.json.JSONObject.quote(initialCode)
+                                val qLang = org.json.JSONObject.quote(initialLanguage)
+                                val qQuestion = org.json.JSONObject.quote(initialQuestion)
                                 post {
                                     evaluateJavascript(
-                                        "if (window.loadPayload) { window.loadPayload('$escapedCode', '$initialLanguage', '$escapedQuestion'); }",
+                                        "if (window.loadPayload) { window.loadPayload($qCode, $qLang, $qQuestion); }",
                                         null
                                     )
                                 }
@@ -138,8 +140,14 @@ class MainActivity : ComponentActivity() {
 
                             @JavascriptInterface
                             fun connectCodeServer(serverUrl: String) {
+                                val target = if (serverUrl.isBlank()) "http://127.0.0.1:8080/" else serverUrl
+                                val parsed = try { android.net.Uri.parse(target) } catch (_: Exception) { null }
+                                val host = parsed?.host?.lowercase() ?: ""
+                                if (host != "127.0.0.1" && host != "localhost") {
+                                    android.util.Log.e("CodeOSS", "Blocked external host connection: $host")
+                                    return
+                                }
                                 post {
-                                    val target = if (serverUrl.isBlank()) "http://127.0.0.1:8080/" else serverUrl
                                     loadUrl(target)
                                 }
                             }
@@ -174,10 +182,10 @@ class MainActivity : ComponentActivity() {
                             fun executeCommand(cmd: String) {
                                 scope.launch {
                                     UbuntuTerminalEngine.executeCommand(context, cmd) { output ->
-                                        val esc = output.text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+                                        val qEsc = org.json.JSONObject.quote(output.text)
                                         post {
                                             evaluateJavascript(
-                                                "window.appendTerminalLine('$esc', ${output.isError});",
+                                                "window.appendTerminalLine($qEsc, ${output.isError});",
                                                 null
                                             )
                                         }
@@ -203,10 +211,10 @@ class MainActivity : ComponentActivity() {
                                         codeContext = codeContext,
                                         language = lang
                                     )
-                                    val esc = reply.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+                                    val qEsc = org.json.JSONObject.quote(reply)
                                     post {
                                         evaluateJavascript(
-                                            "if (window.onMistralResponse) { window.onMistralResponse('$esc'); }",
+                                            "if (window.onMistralResponse) { window.onMistralResponse($qEsc); }",
                                             null
                                         )
                                     }
@@ -218,7 +226,20 @@ class MainActivity : ComponentActivity() {
 
                     webViewClient = object : WebViewClient() {
                         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            return false
+                            val url = request?.url?.toString() ?: return false
+                            // Only allow internal assets and local code-server
+                            if (url.startsWith("file:///android_asset/") ||
+                                url.startsWith("http://127.0.0.1:8080") ||
+                                url.startsWith("http://localhost:8080")
+                            ) {
+                                return false
+                            }
+                            // Open any external web links safely in the system browser
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW, request.url)
+                                context.startActivity(intent)
+                            } catch (_: Exception) {}
+                            return true
                         }
                     }
 

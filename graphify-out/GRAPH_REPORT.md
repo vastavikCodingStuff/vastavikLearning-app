@@ -1,55 +1,55 @@
 # Graph Report - vastavikLearning-app  (2026-09-09)
 
 ## Corpus Check
-- 264 files · ~689,113 words
+- 264 files · ~689,448 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 18098 nodes · 69506 edges · 600 communities (488 shown, 112 thin omitted)
+- 18103 nodes · 69521 edges · 574 communities (470 shown, 104 thin omitted)
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 10001 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0d26f02d`
+- Built from commit: `b5f5d435`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - brutalBorderColor
 - AppModule
-- m
-- Pi
+- Gl
+- Yn
 - MainActivity
 - PracticeScreen.kt
 - AppUpdater
-- object@L121
+- object@L122
 - CommonComponents.kt
 - RazorpayPaymentMethod
-- y3e
+- _e
 - AuthViewModel
 - e
-- .indexOf
+- ko
 - FirestoreRepository
 - tsWorker.js
-- s
+- l
 - uae
 - MeetingViewModel
-- QuizTakingScreen.kt
+- oce
 - VastavikApiRepository
 - "src/compiler/parser.ts"
-- t
-- Zn
+- o
+- Rn
 - DeviceSecurityChecker
 - DebugLogBox
 - ChatModel.kt
 - SubscriptionModel.kt
-- R
+- QuizTakingScreen.kt
 - Vastavik Learning App
 - _
 - d2
 - ChatViewModel
 - aoe
-- we
+- Jn
 - vb
 - DownloadProgressReceiver.kt
 - NotificationDismissReceiver.kt
@@ -59,9 +59,9 @@
 - 🚀 Key Highlights in this Release
 - graphify.md
 - VastavikAiDiskCache
-- c
-- ActivityLog
-- Rn
+- we
+- LessonModel
+- p7e
 - npe
 - Kg
 - I
@@ -78,14 +78,14 @@
 - Resource
 - 🚀 Key Highlights in this Release
 - ChatScreen.kt
-- gu
+- ActivityLog
 - CodeEditorScreen.kt
 - UbuntuTerminalEngine
 - jt
 - r
 - start-ubuntu.sh
 - E
-- sl
+- "src/compiler/visitorPublic.ts"
 - Vastavik CodeOSS Extension Pack (Companion Module)
 - a
 - k
@@ -93,7 +93,7 @@
 - get
 - p
 - Ee
-- ue
+- ct
 - d
 - .constructor
 - b
@@ -109,21 +109,19 @@
 - o
 - l
 - jsonMode.js
-- t
-- _e
-- getText
-- Es
+- setNode
+- i
+- Xs
 - A
 - f
 - w
-- .getLineCount
-- zoe
-- .containsPosition
+- .getLineMaxColumn
+- y3e
 - l
 - p
-- _trigger
-- tre
-- getModel
+- w
+- Ms
+- .sort
 - .isEmpty
 - v
 - doComplete
@@ -139,12 +137,12 @@
 - u
 - f
 - doComplete
-- $h
+- on
 - pe
 - getUriComparisonKey
 - h
 - ge
-- _update
+- _onModelChange
 - tsMode.js
 - c
 - ._register
@@ -153,161 +151,151 @@
 - .move
 - c
 - i
-- .update
 - .show
 - .replace
 - .get
 - Ie
 - .getStartLineNumber
-- find
+- .cancel
 - r
 - j
 - pn
 - b
 - ._scheduleRender
-- _insertSuggestion
-- doProvideWithEditorSymbols
-- MeetingEvent
-- Yn
-- o
+- .slice
+- lH
+- Fr
+- M
 - o
 - doComplete
 - .dispose
 - .insertItemInDOM
-- .forEach
+- me
 - .toString
-- pa
+- .forEach
 - TelegramNotificationManager
+- cE
+- .convertModelPositionToViewPosition
 - c
 - y
-- q
 - q
 - _myTokenize
 - .error
 - Se
-- .pop
+- ._constructLines
 - .set
 - .stop
 - getText
+- computeCompletions
 - _hookListeners
 - setScrollPosition
 - add
 - ve
 - .match
 - .forceTokenization
-- je
-- pushStackElement
-- resolveReference
+- .includes
+- q
+- parseStylesheet
 - s
-- .substring
 - .load
-- .cancel
 - .getLineContent
 - ._doDispatch
 - T
 - p
 - Ae
-- setSelection
+- .trim
 - .update
 - d
 - .constructor
-- .renderText
 - Ls
 - TokenManager
 - AiConversationCache
 - _requestRange
 - de
 - _renderStickyScroll
+- .isUri
 - getMetadata
 - .isVisible
-- .getContextValuesContainer
+- .runEditorCommand
 - ._create
+- t
 - getContainerDomNode
-- .getLineTokens
+- getLanguageId
 - .run
+- getFocusedCodeEditor
 - Le
+- ._onResult
 - x
-- .getPosition
 - pe
 - .with
-- .createElement
-- tE
-- et
-- pushEditOperations
-- getOrCreate
+- getDecorationRange
+- .fire
+- doShowOrPick
 - W
 - .intersects
 - .refresh
 - findDocumentSymbols
 - MistralAiClient
 - _isDetailsVisible
-- .getVerticalOffsetForLineNumber
-- n
+- .appendChild
+- .constructor
 - .getId
 - .delete
-- ._innerExecuteCommands
 - .has
-- computeDiff
-- dispose
-- getVersionId
+- ._getModel
+- _trigger
+- _assertNotDisposed
+- Ee
+- n
 - _setState
+- .getAriaLabel
 - m
-- adjustSelection
+- .getDirection
+- showCodeActionList
+- .constructor
 - .contains
-- .fromUser
+- .run
 - _relayout
 - ._beginModelSync
 - createHTML
-- .from
-- startFindDefinition
-- ._computeWhitespaceProps
-- .convertModelPositionToViewPosition
-- showHover
-- .runEditorCommand
+- readResources
+- .registerListeners
+- ._addZone
+- .getCurrentScrollLeft
+- ._getNoResultFoundMessage
 - ._updateBlinking
 - getValue
-- .sort
-- getLanguageId
+- find
 - _setHasFocus
-- Kp
-- _updateFont
+- setActions
 - ._backgroundTokenizeForAtLeast1ms
-- z
-- .includes
-- create
+- _update
+- .parse
+- .from
+- .computeStickyModel
 - _getPicks
-- _createCoordinatedRendering
-- he
-- we
-- .register
+- _recomputeOptions
 - .alloc
-- .getWordAtPosition
+- .reduce
 - loader.js
+- fetch
 - .create
-- ._prepareRenderWidget
-- Ju
-- de
+- getWordUntilPosition
 - getCandidateStickyLinesIntersectingFromStickyModel
+- .set
 - _resolveCodeLensesInViewport
 - _toNormalizedKeybindingItems
-- .getDecorationsInRange
-- _applyLayout
-- .getLineMaxColumn
+- tt
+- ze
 - _configureFont
-- ln
-- finish
 - getEdit
-- .forceRenderingAbove
 - .getZoomFactor
-- .stopForceRenderingAbove
 - getEditorType
-- .readSelectionFromMarkers
-- fetchCopyMetadata
-- be
+- .ordered
+- _createCoordinatedRendering
 - getMarker
-- _getVerticalOffsetAfterPosition
 - st
-- addCommand
+- appendMenuItem
 
 ## God Nodes (most connected - your core abstractions)
 1. `_` - 1628 edges
@@ -336,23 +324,23 @@
 ## Import Cycles
 - None detected.
 
-## Communities (600 total, 112 thin omitted)
+## Communities (574 total, 104 thin omitted)
 
 ### Community 0 - "brutalBorderColor"
 Cohesion: 0.04
-Nodes (111): CourseItem, UpdateProfileRequest, ArrowButton(), BannerAccent, DEV, PROMO, BannerCard(), BannerPage (+103 more)
+Nodes (113): CourseItem, UpdateProfileRequest, ArrowButton(), BannerAccent, DEV, PROMO, BannerCard(), BannerPage (+105 more)
 
 ### Community 1 - "AppModule"
-Cohesion: 0.03
-Nodes (45): AuthInterceptor, Interceptor, Response, BackendLoadBalancer, BackendWarmupManager, StateFlow, ColdStartRetryInterceptor, Interceptor (+37 more)
+Cohesion: 0.04
+Nodes (43): ApiConfig, AuthInterceptor, Interceptor, Response, BackendLoadBalancer, BackendWarmupManager, StateFlow, ColdStartRetryInterceptor (+35 more)
 
-### Community 2 - "m"
-Cohesion: 0.01
-Nodes (230): a$e(), d(), C(), G(), L(), R(), U(), aet() (+222 more)
+### Community 2 - "Gl"
+Cohesion: 0.05
+Nodes (48): bze(), dN(), dre(), E(), v(), FD(), fMe(), Gl() (+40 more)
 
-### Community 3 - "Pi"
-Cohesion: 0.03
-Nodes (151): a1(), A7(), a_e(), Ame(), AT(), awe(), bLe(), bot() (+143 more)
+### Community 3 - "Yn"
+Cohesion: 0.05
+Nodes (79): a1(), a_e(), aA(), aLe(), AT(), awe(), Bet(), c1() (+71 more)
 
 ### Community 4 - "MainActivity"
 Cohesion: 0.04
@@ -366,9 +354,9 @@ Nodes (60): CodingExerciseDto, MCQItemDto, PredictOutputSetDto, PYQResponse, bui
 Cohesion: 0.09
 Nodes (19): AppUpdateInfo, DocumentSnapshot, AnnotatedString, Color, Modifier, MarkdownContent(), parseInlineMarkdown(), ChangelogSplit (+11 more)
 
-### Community 7 - "object@L121"
-Cohesion: 0.11
-Nodes (8): Bundle, ComponentActivity, Intent, MainActivity, object@L121, WebViewClient, WebResourceRequest, WebView
+### Community 7 - "object@L122"
+Cohesion: 0.12
+Nodes (8): Bundle, ComponentActivity, Intent, MainActivity, object@L122, WebViewClient, WebResourceRequest, WebView
 
 ### Community 8 - "CommonComponents.kt"
 Cohesion: 0.12
@@ -378,9 +366,9 @@ Nodes (35): appendFormattedText(), BottomNavItem(), ButtonVariant, Error, Outlin
 Cohesion: 0.40
 Nodes (5): RazorpayPaymentMethod, CARD, NETBANKING, UPI_AUTOPAY, UPI_STANDARD
 
-### Community 10 - "y3e"
+### Community 10 - "_e"
 Cohesion: 0.02
-Nodes (109): _6(), Ae(), F8(), _e(), st(), Wt(), ee(), zt() (+101 more)
+Nodes (215): _6(), ee(), ce(), oe(), H(), D8(), S(), oe() (+207 more)
 
 ### Community 11 - "AuthViewModel"
 Cohesion: 0.07
@@ -388,47 +376,51 @@ Nodes (14): AuthRepository, FirebaseAuth, FirebaseUser, Flow, AuthUiState, AuthV
 
 ### Community 12 - "e"
 Cohesion: 0.02
-Nodes (173): ag(), Ae(), cr(), _e(), F(), gn(), Ki(), mn() (+165 more)
+Nodes (196): Ae(), _e(), en(), jt(), le(), q(), qr(), re() (+188 more)
+
+### Community 13 - "ko"
+Cohesion: 0.05
+Nodes (73): adt(), aot(), aS(), bct(), bge(), bwe(), cdt(), cpt() (+65 more)
 
 ### Community 14 - "FirestoreRepository"
 Cohesion: 0.03
-Nodes (35): BannerModel, DocumentSnapshot, PopularTopicModel, StudentSelection, CourseModel, DocumentSnapshot, LessonModel, PartModel (+27 more)
+Nodes (32): BannerModel, DocumentSnapshot, PopularTopicModel, StudentSelection, CourseModel, DocumentSnapshot, PartModel, SubpartModel (+24 more)
 
 ### Community 15 - "tsWorker.js"
 Cohesion: 0.00
-Nodes (496): _0e(), _3e(), _7e(), _9e(), a0e(), a1e(), a4e(), A6() (+488 more)
+Nodes (461): _0e(), $1(), _3e(), _7e(), _9(), A6(), A8(), aB() (+453 more)
 
-### Community 16 - "s"
+### Community 16 - "l"
 Cohesion: 0.02
-Nodes (370): _5e(), _ae(), A(), E(), K(), m(), S(), v() (+362 more)
+Nodes (240): _4(), $5(), _ae(), A(), K(), m(), S(), v() (+232 more)
 
 ### Community 17 - "uae"
-Cohesion: 0.02
-Nodes (63): kl(), qoe(), A(), ce(), Dt(), ee(), he(), Ke() (+55 more)
+Cohesion: 0.03
+Nodes (40): TS(), uae(), An(), Ar(), At(), ce(), Cn(), Dl() (+32 more)
 
 ### Community 18 - "MeetingViewModel"
 Cohesion: 0.02
-Nodes (73): AuditLogEntry, ClassSession, DisabledFeature, CAMERA, CAPTIONS, CHAT, EMOJI, MIC (+65 more)
+Nodes (94): AssignStarCast, AuditLogEntry, ChatMessageSent, ClassSession, ClassStarted, DisabledFeature, CAMERA, CAPTIONS (+86 more)
 
-### Community 19 - "QuizTakingScreen.kt"
-Cohesion: 0.21
-Nodes (19): QuizManager, QuizQuestionData, callVastavikAiBrief(), containsCode(), drawPdfPageFrame(), androidx, AnnotatedString, Canvas (+11 more)
+### Community 19 - "oce"
+Cohesion: 0.06
+Nodes (52): aHe(), Cde(), cHe(), cO(), CUe(), dj(), d(), A() (+44 more)
 
 ### Community 20 - "VastavikApiRepository"
 Cohesion: 0.03
-Nodes (64): ApiConfig, CircuitBreaker, Result, T, RouteMaintenanceException, AiSessionDto, AppUpdateResponse, AuthResponse (+56 more)
+Nodes (64): CircuitBreaker, Result, T, RouteMaintenanceException, AiSessionDto, AppUpdateResponse, AuthResponse, BannerItem (+56 more)
 
 ### Community 21 - ""src/compiler/parser.ts""
 Cohesion: 0.02
-Nodes (392): Ea(), fi(), J(), Mi(), Sr(), VT(), Xl(), ye() (+384 more)
+Nodes (357): Ea(), Ki(), fi(), J(), Mi(), VT(), Xl(), ye() (+349 more)
 
-### Community 22 - "t"
+### Community 22 - "o"
 Cohesion: 0.02
-Nodes (333): Os(), _3(), $4e(), a3e(), a4(), A9(), AA(), ad() (+325 more)
+Nodes (453): Os(), $4e(), a3e(), a4(), AA(), ad(), C(), E() (+445 more)
 
-### Community 23 - "Zn"
-Cohesion: 0.02
-Nodes (153): $5(), A2(), aHe(), Fn(), Xo(), Py(), AUe(), ax() (+145 more)
+### Community 23 - "Rn"
+Cohesion: 0.01
+Nodes (327): $1e(), _9e(), a0(), a1e(), A2(), a$e(), d(), Ac() (+319 more)
 
 ### Community 24 - "DeviceSecurityChecker"
 Cohesion: 0.32
@@ -446,9 +438,9 @@ Nodes (4): ChatMessage, ChatSession, DocumentSnapshot, NoteModel
 Cohesion: 0.24
 Nodes (4): DocumentSnapshot, SubscriptionModel, SubscriptionPlan, TransactionModel
 
-### Community 28 - "R"
-Cohesion: 0.14
-Nodes (9): FirebaseMessagingService, Intent, MeetingForegroundService, MeetingNotificationManager, IBinder, Notification, R, RemoteMessage (+1 more)
+### Community 28 - "QuizTakingScreen.kt"
+Cohesion: 0.09
+Nodes (28): QuizManager, QuizQuestionData, callVastavikAiBrief(), containsCode(), drawPdfPageFrame(), androidx, AnnotatedString, Canvas (+20 more)
 
 ### Community 29 - "Vastavik Learning App"
 Cohesion: 0.22
@@ -456,11 +448,11 @@ Nodes (9): Admin AI Diagnostics & Log Overlay, Multi-Tier AI Engine Hierarchy, A
 
 ### Community 30 - "_"
 Cohesion: 0.01
-Nodes (101): _, accessibleDiffViewerNext(), addFocusTrap(), addItemWithSeparator(), _allVisibleChecked(), append(), applyDefaultPasteHandler(), beginCompute() (+93 more)
+Nodes (109): _, addDynamicKeybinding(), addDynamicKeybindings(), _addEditOperation(), _addGutterDecoration(), addItemWithSeparator(), append(), applyDefaultPasteHandler() (+101 more)
 
 ### Community 31 - "d2"
-Cohesion: 0.02
-Nodes (353): Be(), Gy(), ir(), p1(), Sa(), Un(), Uy(), w() (+345 more)
+Cohesion: 0.01
+Nodes (386): Be(), Gy(), ir(), p1(), Sa(), sE(), Un(), Uy() (+378 more)
 
 ### Community 32 - "ChatViewModel"
 Cohesion: 0.36
@@ -468,15 +460,15 @@ Nodes (4): ChatViewModel, ChatMessage, StateFlow, ViewModel
 
 ### Community 33 - "aoe"
 Cohesion: 0.02
-Nodes (343): aoe(), _1(), _2e(), _5(), a2e(), a8e(), aA(), aD() (+335 more)
+Nodes (263): aoe(), $0(), a2e(), aD(), af(), age(), ant(), apt() (+255 more)
 
-### Community 35 - "we"
+### Community 35 - "Jn"
 Cohesion: 0.02
-Nodes (336): _6e(), aKe(), an(), ao(), c(), u(), adt(), aE() (+328 more)
+Nodes (266): _1(), A7(), a8e(), aE(), ah(), Ame(), T(), bit() (+258 more)
 
 ### Community 36 - "vb"
 Cohesion: 0.03
-Nodes (236): g(), fp(), Ft(), hpt(), Iv(), PT(), QR(), SP() (+228 more)
+Nodes (269): g(), fp(), u(), Ft(), hpt(), Iv(), JR(), m_() (+261 more)
 
 ### Community 37 - "DownloadProgressReceiver.kt"
 Cohesion: 0.53
@@ -487,60 +479,60 @@ Cohesion: 0.53
 Nodes (4): BroadcastReceiver, Context, Intent, NotificationDismissReceiver
 
 ### Community 39 - "push"
-Cohesion: 0.05
-Nodes (9): _createActionBar(), _deserialize(), _doApplyEdits(), _getHintsRanges(), getModels(), getOffsetAt(), provideColorPresentations(), push() (+1 more)
+Cohesion: 0.04
+Nodes (8): cancel(), _createActionBar(), _deserialize(), getModels(), goToLine(), _onEditorMouseUp(), push(), a()
 
 ### Community 44 - "Vastavik Learning Platform — Master Backend Architecture & Implementation Blueprint"
 Cohesion: 0.07
 Nodes (28): 1. Auth & Profiles, 1. Dynamic Route Maintenance Middleware (Inside Core Go Server), 1. Executive Summary & Hardware Budget (2GB RAM / 2 vCPU), 1. Rate Limiting Matrix, 1. SHA-256 Password Storage, 2. Courses & Curriculum, 2. Dual-Layer HMAC + Bearer Verification, 2. Exhaustive App Audit: Working vs. Mock vs. Broken vs. Missing (+20 more)
 
 ### Community 45 - "w4"
-Cohesion: 0.03
-Nodes (213): _0(), bI(), Ay(), eo(), Fc(), Gy(), H0(), Ir() (+205 more)
+Cohesion: 0.04
+Nodes (157): bI(), Ay(), Ge(), gt(), Gy(), ja(), Js(), Mt() (+149 more)
 
 ### Community 46 - "🚀 Key Highlights in this Release"
 Cohesion: 0.25
 Nodes (7): 1. High-Performance Vastavik AI Engine (`gemini-3.6-flash`), 2. Real-Time Admin Diagnostics Banner Box, 3. Student Info / Profile UI Refinements, 4. App Update Enhancements & Download Cancellation Fixes, 🛠 Fixes & Internal Changes, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.23
 
-### Community 49 - "c"
+### Community 49 - "we"
 Cohesion: 0.03
-Nodes (187): me(), N(), aLe(), am(), aOe(), AP(), g(), T() (+179 more)
+Nodes (251): In(), Kt(), me(), act(), c(), ht(), u(), ahe() (+243 more)
 
-### Community 50 - "ActivityLog"
-Cohesion: 0.08
-Nodes (19): HmacUtil, androidx, Modifier, VastavikYouTubePlayer(), AbstractYouTubePlayerListener, LifecycleEventObserver, callVastavikAiInsight(), CodeNotesTab() (+11 more)
+### Community 50 - "LessonModel"
+Cohesion: 0.09
+Nodes (19): HmacUtil, LessonModel, androidx, Modifier, VastavikYouTubePlayer(), AbstractYouTubePlayerListener, LifecycleEventObserver, callVastavikAiInsight() (+11 more)
 
-### Community 51 - "Rn"
-Cohesion: 0.04
-Nodes (73): _4(), $a(), io(), aj(), b9(), Bve(), cd(), cie() (+65 more)
+### Community 51 - "p7e"
+Cohesion: 0.05
+Nodes (41): a5e(), Wt(), dae(), d(), i(), l(), o(), s() (+33 more)
 
 ### Community 52 - "npe"
-Cohesion: 0.04
-Nodes (56): sut(), Dpe(), eGe(), ele(), FG(), fy(), gj(), hKe() (+48 more)
+Cohesion: 0.05
+Nodes (43): bh(), bW(), ele(), hKe(), hN(), Hq(), hve(), IKe() (+35 more)
 
 ### Community 53 - "Kg"
-Cohesion: 0.03
-Nodes (70): pe(), D8(), F1(), hb(), Kg(), Ae(), be(), ce() (+62 more)
+Cohesion: 0.08
+Nodes (24): F1(), hb(), Kg(), Ae(), ce(), cr(), de(), ee() (+16 more)
 
 ### Community 55 - "Vce"
-Cohesion: 0.03
-Nodes (139): A3(), ee(), Ke(), nt(), tt(), Ue(), b3(), r() (+131 more)
+Cohesion: 0.02
+Nodes (156): Jo(), Ke(), ln(), so(), Ue(), lD(), p_(), Te() (+148 more)
 
 ### Community 56 - "cssWorker.js"
 Cohesion: 0.02
-Nodes (167): acceptKeyword(), acceptUnicodeRange(), acceptVisitor(), addAttr(), addChildren(), addCSSVariable(), addData(), addIssue() (+159 more)
+Nodes (186): a(), acceptUnicodeRange(), acceptVisitor(), addAttr(), addChildren(), addCSSVariable(), addData(), addEntry() (+178 more)
 
 ### Community 57 - "🚀 Key Highlights in this Release"
 Cohesion: 0.20
 Nodes (9): 1. Quiz PDF Safe-Area Formatter & Typography Overhaul, 2. Background GenZ Teacher Notifications & Duplicate Alert Suppression, 3. Predict the Output In-Place NeoBrutalistic Dialog, 4. Code Editor: Voice Prompting & 4-Part Structured Problem Generator, 5. Board PYQs with Authentic Color Banners & AI Search, 6. AI Engine Tiering & AI Chat Architecture Fixes, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.29 (+1 more)
 
 ### Community 58 - "finish"
-Cohesion: 0.08
-Nodes (163): accept(), acceptDelim(), acceptIdent(), _acceptInterpolatedIdent(), acceptOneKeyword(), acceptRegexp(), acceptUnquotedString(), addChild() (+155 more)
+Cohesion: 0.09
+Nodes (157): accept(), acceptDelim(), acceptIdent(), _acceptInterpolatedIdent(), acceptRegexp(), acceptUnquotedString(), addChild(), _addLookupChildren() (+149 more)
 
 ### Community 59 - ".containsRTL"
-Cohesion: 0.14
-Nodes (3): _getLineHtml(), mightContainNonBasicASCII(), mightContainRTL()
+Cohesion: 0.12
+Nodes (4): _createRow(), _getLineHtml(), mightContainNonBasicASCII(), mightContainRTL()
 
 ### Community 60 - "🚀 Key Highlights in this Release"
 Cohesion: 0.22
@@ -548,11 +540,11 @@ Nodes (8): 1. Always-On Admin Access & Offline Diagnostics, 2. FastAPI Backend N
 
 ### Community 62 - "h_"
 Cohesion: 0.03
-Nodes (229): aie(), ab(), at(), au(), Bi(), Bn(), ci(), co() (+221 more)
+Nodes (246): ab(), at(), au(), Bi(), Bn(), ci(), co(), En() (+238 more)
 
 ### Community 63 - "H"
-Cohesion: 0.03
-Nodes (83): ia(), ce(), gi(), Rt(), g4(), io(), On(), Hp() (+75 more)
+Cohesion: 0.02
+Nodes (118): ia(), cr(), gn(), mn(), Rt(), o(), le(), p() (+110 more)
 
 ### Community 64 - "🚀 Key Highlights in this Release"
 Cohesion: 0.25
@@ -567,136 +559,132 @@ Cohesion: 0.33
 Nodes (5): 1. Code Editor Question Overview Dialog Overhaul, 2. "Predict the Output" Comprehensive Suite, 🚀 Key Highlights in this Release, Release Notes — Vastavik Computers v1.0.31, 🛠 Technical Details & Artifacts
 
 ### Community 67 - "ChatScreen.kt"
-Cohesion: 0.08
-Nodes (31): StudentChatMessage, Context, JSONObject, ListenerRegistration, Response, StateFlow, WebSocket, StudentConversationManager (+23 more)
+Cohesion: 0.09
+Nodes (29): StudentChatMessage, Context, JSONObject, ListenerRegistration, Response, StateFlow, WebSocket, StudentConversationManager (+21 more)
 
-### Community 68 - "gu"
-Cohesion: 0.40
-Nodes (5): fat(), mat(), TP(), Xs(), gu()
+### Community 68 - "ActivityLog"
+Cohesion: 0.16
+Nodes (5): ActivityLog, Context, JSONObject, VastavikApplication, Application
 
 ### Community 69 - "CodeEditorScreen.kt"
 Cohesion: 0.11
 Nodes (20): CodeEditorScreen(), defaultCode(), deriveQuestionFromCode(), getStructuredSections(), highlightCode(), parseProblemSections(), ProblemSection, SyntaxColors (+12 more)
 
 ### Community 70 - "UbuntuTerminalEngine"
-Cohesion: 0.29
+Cohesion: 0.28
 Nodes (3): Context, TerminalOutput, UbuntuTerminalEngine
 
 ### Community 71 - "jt"
-Cohesion: 0.06
-Nodes (52): Qt(), Wt(), zt(), ni(), ua(), dd(), H(), Ke() (+44 more)
+Cohesion: 0.03
+Nodes (105): A3(), de(), oe(), cL(), mE(), ni(), S7(), eae() (+97 more)
 
 ### Community 73 - "r"
 Cohesion: 0.01
-Nodes (321): $1(), _2(), $8(), a0(), a5e(), abe(), aee(), aFe() (+313 more)
+Nodes (374): _2(), _3(), $8(), $a(), a4e(), a7e(), A9(), abe() (+366 more)
 
 ### Community 74 - "start-ubuntu.sh"
 Cohesion: 0.29
 Nodes (6): HOME, LANG, PATH, start-ubuntu.sh script, TERM, USER
 
-### Community 76 - "sl"
-Cohesion: 0.06
-Nodes (35): U(), aI(), i(), r(), aW(), bj(), d(), E() (+27 more)
+### Community 76 - ""src/compiler/visitorPublic.ts""
+Cohesion: 0.03
+Nodes (68): U(), are(), d(), h(), i(), r(), t(), B8() (+60 more)
 
 ### Community 82 - "get"
 Cohesion: 0.02
-Nodes (146): a7(), aF(), aV(), b0e(), s(), bA(), bo(), bte() (+138 more)
+Nodes (173): _0(), a0e(), a7(), aF(), Je(), ate(), b0e(), s() (+165 more)
 
 ### Community 84 - "Ee"
 Cohesion: 0.04
-Nodes (68): Ah(), be(), Dt(), en(), ft(), Ge(), he(), K() (+60 more)
+Nodes (64): be(), ce(), Dt(), ft(), Ge(), he(), st(), Te() (+56 more)
 
-### Community 85 - "ue"
+### Community 85 - "ct"
 Cohesion: 0.04
-Nodes (98): $0(), In(), Kt(), ue(), act(), ht(), bit(), brt() (+90 more)
+Nodes (157): aie(), aKe(), _2e(), _5(), $7(), a5(), ve(), vn() (+149 more)
 
 ### Community 87 - ".constructor"
 Cohesion: 0.02
-Nodes (95): _adjustOptionsForLeftHandSide(), _adjustOptionsForRightHandSide(), _adjustOptionsForSubEditor(), _applyMaxDimensions(), beforeRender(), cancelSuggestWidget(), _checkContextKey(), checkCursorPosition() (+87 more)
+Nodes (98): _adjustOptionsForLeftHandSide(), _adjustOptionsForRightHandSide(), _adjustOptionsForSubEditor(), beforeRender(), cancelSuggestWidget(), checkCursorPosition(), _checkStopEmptyWorker(), _checkStopIdleWorker() (+90 more)
 
 ### Community 88 - "b"
 Cohesion: 0.02
-Nodes (5): b(), getElements(), insertColor(), warnInvalidLengthSemanticTokens(), warnOverlappingSemanticTokens()
+Nodes (4): b(), getElements(), warnInvalidLengthSemanticTokens(), warnOverlappingSemanticTokens()
+
+### Community 89 - "z"
+Cohesion: 0.06
+Nodes (4): setSelection(), _setSelectionImpl(), setSelections(), z()
 
 ### Community 94 - "t"
 Cohesion: 0.02
 Nodes (4): t(), H(), M(), triggerSuggest()
 
 ### Community 97 - "_"
-Cohesion: 0.04
-Nodes (25): _, s(), basename(), cwd(), dirname(), ee(), extname(), isAbsolute() (+17 more)
+Cohesion: 0.05
+Nodes (24): _, s(), basename(), cwd(), dirname(), ee(), extname(), isAbsolute() (+16 more)
 
 ### Community 98 - "e"
 Cohesion: 0.03
 Nodes (4): Ce(), e(), s(), T()
 
 ### Community 100 - "l"
-Cohesion: 0.07
-Nodes (23): basename(), h(), createActionGroups(), dirname(), extname(), getLayoutInfo(), i(), isAbsolute() (+15 more)
+Cohesion: 0.08
+Nodes (33): acceptSelected(), basename(), T(), computeDiff(), h(), P(), createActionGroups(), dirname() (+25 more)
 
 ### Community 101 - "jsonMode.js"
 Cohesion: 0.05
 Nodes (74): Ae(), at(), _checkIfIdle(), clone(), constructor(), ct(), dispose(), Dn() (+66 more)
 
-### Community 103 - "_e"
-Cohesion: 0.04
-Nodes (87): gi(), jt(), be(), ce(), dk(), et(), gi(), io() (+79 more)
+### Community 103 - "setNode"
+Cohesion: 0.08
+Nodes (27): acceptKeyword(), adoptChild(), attachTo(), _internalParseIfStatement(), _parseIfStatement(), setContent(), setDeclarations(), setDefaultValue() (+19 more)
 
-### Community 104 - "getText"
-Cohesion: 0.04
-Nodes (123): a(), add(), addEntry(), addScope(), addSymbol(), addSymbolToChildScope(), advanceWhileChar(), an() (+115 more)
+### Community 104 - "i"
+Cohesion: 0.03
+Nodes (94): add(), advanceWhileChar(), ar(), at(), ba(), bo(), i(), r() (+86 more)
 
-### Community 105 - "Es"
-Cohesion: 0.07
-Nodes (44): c1(), eD(), Fy(), gD(), gut(), au(), Gt(), i1() (+36 more)
+### Community 105 - "Xs"
+Cohesion: 0.09
+Nodes (33): _8e(), BT(), c(), eat(), Fy(), Hn(), ku(), no() (+25 more)
 
 ### Community 108 - "w"
 Cohesion: 0.03
-Nodes (7): findPreviousMatch(), handleInitialized(), restoreSerializedState(), restoreState(), restoreViewState(), _syncRanges(), w()
+Nodes (9): findPreviousMatch(), handleInitialized(), _paste(), restoreSerializedState(), restoreState(), restoreViewState(), saveViewState(), serializeState() (+1 more)
 
-### Community 109 - ".getLineCount"
-Cohesion: 0.07
-Nodes (31): _assertNotDisposed(), _createContentChanged2(), detectIndentation(), _emitContentChangedEvent(), findNextMatch(), getCharacterCountInRange(), getEndOfLineSequence(), getEOL() (+23 more)
+### Community 109 - ".getLineMaxColumn"
+Cohesion: 0.05
+Nodes (22): _createContentChanged2(), _doApplyEdits(), _emitContentChangedEvent(), findMatchesLineByLine(), findNextMatch(), getEOL(), getFullModelRange(), getLineDecorations() (+14 more)
 
-### Community 111 - "zoe"
-Cohesion: 0.04
-Nodes (122): H(), le(), Bh(), l1(), jy(), lD(), p_(), ft() (+114 more)
-
-### Community 112 - ".containsPosition"
-Cohesion: 0.09
-Nodes (12): _addLoadingMessage(), cancelSelectionAnchor(), createLoadingMessage(), fetch(), _getSortedHighlights(), _getWord(), moveBack(), moveNext() (+4 more)
+### Community 111 - "y3e"
+Cohesion: 0.02
+Nodes (175): H(), pe(), Ct(), jy(), gi(), gn(), oe(), Te() (+167 more)
 
 ### Community 114 - "p"
 Cohesion: 0.04
 Nodes (3): P(), o(), p()
 
-### Community 115 - "_trigger"
-Cohesion: 0.10
-Nodes (13): _compositionType(), createSuggestFilter(), _createView(), _cut(), _endComposition(), getAction(), rangeContainsOnlyWhitespaceCharacters(), _reportDurationsTelemetry() (+5 more)
+### Community 116 - "Ms"
+Cohesion: 0.07
+Nodes (38): _6e(), b3(), bae(), d(), C9e(), h(), rD(), DWe() (+30 more)
 
-### Community 116 - "tre"
-Cohesion: 0.03
-Nodes (88): bae(), d(), bye(), h(), F(), v(), C9e(), h() (+80 more)
-
-### Community 117 - "getModel"
-Cohesion: 0.10
-Nodes (20): adjustWhitespace(), U(), createEditsAndSnippetsFromEdits(), createEditsAndSnippetsFromSelections(), _createState(), executeCommands(), executeEdits(), getConfiguredWordAtPosition() (+12 more)
+### Community 117 - ".sort"
+Cohesion: 0.11
+Nodes (22): _computeGlyphMarginLanes(), U(), createEditsAndSnippetsFromEdits(), createEditsAndSnippetsFromSelections(), _createState(), doPasteInline(), executeCommands(), executeEdits() (+14 more)
 
 ### Community 118 - ".isEmpty"
-Cohesion: 0.06
-Nodes (15): accept(), _acceptNext(), acceptNextLine(), computeAsync(), _computeAugmentation(), computeStagedValue(), executeCommand(), getColorData() (+7 more)
+Cohesion: 0.04
+Nodes (20): accept(), _acceptNext(), acceptNextLine(), _alertCompletionItem(), cancelSelectionAnchor(), _computeAugmentation(), computeStagedValue(), getBreadcrumbItems() (+12 more)
 
 ### Community 120 - "doComplete"
 Cohesion: 0.07
-Nodes (67): Ce(), computeCompletions(), convertContents(), createFunctionProposals(), createReplaceFunction(), doComplete(), doComplete2(), doesSupportMarkdown() (+59 more)
+Nodes (67): appendFixesForMarker(), Ce(), computeCompletions(), convertContents(), createFunctionProposals(), createReplaceFunction(), d(), doComplete() (+59 more)
 
 ### Community 121 - "htmlWorker.js"
 Cohesion: 0.05
-Nodes (52): advanceWhileChar(), ai(), bi(), bn(), bt(), computeCompletions(), constructor(), convertCompletionList() (+44 more)
+Nodes (52): advanceWhileChar(), bi(), bn(), bt(), constructor(), convertCompletionList(), convertContents(), de() (+44 more)
 
 ### Community 122 - "cssMode.js"
 Cohesion: 0.07
-Nodes (56): At(), _checkIfIdle(), constructor(), dispose(), _doValidate(), f(), Ft(), g() (+48 more)
+Nodes (55): At(), _checkIfIdle(), constructor(), dispose(), _doValidate(), f(), Ft(), g() (+47 more)
 
 ### Community 123 - "htmlMode.js"
 Cohesion: 0.07
@@ -707,36 +695,36 @@ Cohesion: 0.05
 Nodes (60): addChildProperty(), addFilePatternAssociation(), addSchemaHandle(), Br(), clearExternalSchemas(), clearSchema(), configure(), cr() (+52 more)
 
 ### Community 127 - ".render"
-Cohesion: 0.11
-Nodes (3): _beginRenderDecorations(), renderDecorations(), setPosition()
+Cohesion: 0.07
+Nodes (4): getScrollHeight(), onClick(), setPosition(), setWidth()
 
 ### Community 128 - "fae"
-Cohesion: 0.03
-Nodes (113): hd(), Cn(), di(), dn(), _i(), il(), Js(), fae() (+105 more)
+Cohesion: 0.02
+Nodes (169): hd(), eD(), Ma(), dn(), j(), fae(), ae(), An() (+161 more)
 
 ### Community 129 - ".constructor"
-Cohesion: 0.08
-Nodes (5): _createPointerHandlerHelper(), getInput(), _onContextMenu(), _onListMouseDownOrTap(), _renderMarkerHover()
+Cohesion: 0.07
+Nodes (6): create(), getInitialState(), getInput(), _onContextMenu(), _onListMouseDownOrTap(), _renderMarkerHover()
 
 ### Community 133 - "doComplete"
-Cohesion: 0.08
-Nodes (48): f(), a(), c(), ci(), D(), di(), doComplete(), C() (+40 more)
+Cohesion: 0.09
+Nodes (45): f(), c(), ci(), D(), di(), doComplete(), C(), F() (+37 more)
 
-### Community 134 - "$h"
-Cohesion: 0.02
-Nodes (112): Ct(), it(), Je(), Jo(), so(), t(), Tn(), ze() (+104 more)
+### Community 134 - "on"
+Cohesion: 0.22
+Nodes (9): Ct(), it(), t(), ze(), be(), lo(), on(), Qt() (+1 more)
 
 ### Community 136 - "getUriComparisonKey"
-Cohesion: 0.07
-Nodes (38): _acquireLocks(), canRedo(), canUndo(), changeDropType(), changePasteType(), _checkWorkspaceRedo(), _checkWorkspaceUndo(), clearWidgets() (+30 more)
+Cohesion: 0.06
+Nodes (36): _acquireLocks(), applyEditAndShowIfNeeded(), canRedo(), canUndo(), _checkWorkspaceRedo(), _checkWorkspaceUndo(), _confirmAndContinueUndo(), _confirmAndExecuteWorkspaceUndo() (+28 more)
 
 ### Community 137 - "h"
 Cohesion: 0.05
-Nodes (4): getActiveCodeEditor(), h(), listDiffEditors(), registerWindow()
+Nodes (3): h(), listDiffEditors(), we()
 
-### Community 139 - "_update"
-Cohesion: 0.05
-Nodes (46): _addGutterDecoration(), _applyCodeAction(), _cacheHintsForFastRestore(), _cancelModelPromise(), _copyInlayHintsWithCurrentAnchor(), _disposeAllLenses(), _fillInColors(), _getActionBarActions() (+38 more)
+### Community 139 - "_onModelChange"
+Cohesion: 0.16
+Nodes (11): _disposeAllLenses(), executeCommand(), getCommands(), isDominatedByLongLines(), isTooLargeForTokenization(), _onModelChange(), registerCommandAlias(), _renderCodeLensSymbols() (+3 more)
 
 ### Community 140 - "tsMode.js"
 Cohesion: 0.08
@@ -748,63 +736,63 @@ Nodes (41): a(), an(), o(), c(), l(), o(), getColorPresentations(), a() (+33 mor
 
 ### Community 142 - "._register"
 Cohesion: 0.05
-Nodes (28): computeStyles(), controller(), createController(), getScrollLeft(), getScrollTop(), initLinkUnderlineListeners(), installWebKitWriteTextWorkaround(), lt (+20 more)
+Nodes (16): addAction(), _appendImplicitItems(), m(), fe(), getScrollTop(), initLinkUnderlineListeners(), installWebKitWriteTextWorkaround(), me() (+8 more)
 
 ### Community 144 - "m"
-Cohesion: 0.07
+Cohesion: 0.08
 Nodes (3): h(), m(), setParent()
 
 ### Community 145 - ".move"
-Cohesion: 0.06
-Nodes (3): getOverwriteInfo(), normalizeIndentation(), runCoreEditorCommand()
+Cohesion: 0.05
+Nodes (5): adjustWhitespace(), getOverwriteInfo(), _move(), normalizeIndentation(), runCoreEditorCommand()
 
 ### Community 146 - "c"
 Cohesion: 0.07
 Nodes (5): c(), g(), markAsDisposed(), M(), U()
 
 ### Community 149 - ".show"
-Cohesion: 0.05
-Nodes (33): addAction(), adjustHorizontalHoverPosition(), adjustHoverMaxHeight(), adjustValueSelection(), adjustVerticalHoverPosition(), appendMenuItem(), appendMenuItems(), computeXCordinate() (+25 more)
+Cohesion: 0.08
+Nodes (16): createInputBox(), getContainer(), _getHoverContext(), getUI(), _intersectionChange(), _onMouseLeave(), _onWidgetClosed(), _registerHoverListeners() (+8 more)
 
 ### Community 151 - ".get"
 Cohesion: 0.04
-Nodes (22): applyFontInfo(), closeMessage(), collapseAllUnchangedRegions(), createColorHover(), doPasteInline(), getContribution(), getLineChanges(), getLoadStatus() (+14 more)
+Nodes (20): acceptSelectedSuggestion(), applyFontInfo(), _applyLayout(), collapseAllUnchangedRegions(), controller(), createColorHover(), createController(), _ensureReadOnlyAttribute() (+12 more)
 
-### Community 154 - "find"
+### Community 154 - ".cancel"
+Cohesion: 0.04
+Nodes (36): acceptPrevSuggestion(), accessibleDiffViewerPrev(), _cancelAll(), createSuggestFilter(), _deltaSelectedInlineCompletionIndex(), _doInsert(), _doTriggerQuickSuggest(), findScrollWidgetState() (+28 more)
+
+### Community 157 - "j"
 Cohesion: 0.07
-Nodes (27): acceptPrevSuggestion(), accessibleDiffViewerPrev(), _deltaSelectedInlineCompletionIndex(), _doInsert(), find(), findScrollWidgetState(), getAlternativeVersionId(), getFoldingModel() (+19 more)
+Nodes (6): _documentHasFocus(), gutterState(), he(), j(), setLanguage(), _updateGutterLightBulbTitleAndIcon()
 
 ### Community 158 - "pn"
-Cohesion: 0.02
-Nodes (148): _9(), a6e(), aae(), fe(), t(), ate(), b3e(), B8() (+140 more)
+Cohesion: 0.03
+Nodes (135): a6e(), aae(), ag(), Ah(), ei(), F(), fe(), gi() (+127 more)
 
 ### Community 159 - "b"
 Cohesion: 0.08
 Nodes (7): b(), fe(), ge(), f(), K, Se(), ve()
 
 ### Community 161 - "._scheduleRender"
+Cohesion: 0.08
+Nodes (27): addContentWidget(), addGlyphMarginWidget(), addOverlayWidget(), _applyDimensions(), _applyMaxDimensions(), change(), _findAvailableSpaceVertically(), _findMaximumRenderingHeight() (+19 more)
+
+### Community 162 - ".slice"
+Cohesion: 0.12
+Nodes (5): handleItemDidShow(), items(), n(), relative(), toNamespacedPath()
+
+### Community 164 - "lH"
 Cohesion: 0.10
-Nodes (19): addContentWidget(), addGlyphMarginWidget(), addOverlayWidget(), _applyDimensions(), change(), _findAvailableSpaceVertically(), handleEvents(), _layoutContentWidget() (+11 more)
+Nodes (17): lH(), Ae(), be(), De(), _e(), ei(), gi(), he() (+9 more)
 
-### Community 162 - "_insertSuggestion"
-Cohesion: 0.11
-Nodes (10): acceptSelectedSuggestion(), _alertCompletionItem(), getFocusedItem(), handleItemDidShow(), _insertSuggestion(), _installDblClickGesture(), items(), _reportSuggestionAcceptedTelemetry() (+2 more)
-
-### Community 163 - "doProvideWithEditorSymbols"
-Cohesion: 0.21
-Nodes (5): doProvideWithEditorSymbols(), getDocumentSymbols(), provideLabelPick(), provideWithoutTextEditor(), revealRangeInCenter()
-
-### Community 164 - "MeetingEvent"
-Cohesion: 0.10
-Nodes (21): AssignStarCast, ChatMessageSent, ClassStarted, EmojiReaction, FeatureToggle, Join, KickParticipant, Leave (+13 more)
-
-### Community 165 - "Yn"
+### Community 165 - "Fr"
 Cohesion: 0.03
-Nodes (159): $7(), _8e(), A_(), a5(), aat(), age(), ahe(), alt() (+151 more)
+Nodes (118): A_(), aat(), b1(), bat(), bhe(), bw(), c5(), cA() (+110 more)
 
-### Community 166 - "o"
-Cohesion: 0.06
-Nodes (27): acceptSelected(), T(), Ce(), computeSync(), computeWithModel(), A(), M(), P() (+19 more)
+### Community 166 - "M"
+Cohesion: 0.11
+Nodes (10): computeSync(), computeWithModel(), A(), M(), getLanguageConfiguration(), onDidChange(), _readEnvConfiguration(), Se() (+2 more)
 
 ### Community 168 - "o"
 Cohesion: 0.10
@@ -816,23 +804,23 @@ Nodes (43): add(), addBooleanValueCompletion(), addDefaultValueCompletions(), ad
 
 ### Community 170 - ".dispose"
 Cohesion: 0.06
-Nodes (7): addExclusiveWidget(), createDecorationsCollection(), hasContent(), _onDidRemoveEditor(), removeAllDecorations(), showWhile(), Ye()
+Nodes (7): activeService(), addExclusiveWidget(), createDecorationsCollection(), hasContent(), _onDidRemoveEditor(), removeAllDecorations(), showWhile()
 
-### Community 173 - ".forEach"
-Cohesion: 0.08
-Nodes (10): _applyTheme(), q(), _getTopForPosition(), _handleMarkerChange(), H(), Ke, me, _onModelRemoved() (+2 more)
+### Community 173 - "me"
+Cohesion: 0.12
+Nodes (5): Ke, me, re(), registerOpener(), Ye()
 
 ### Community 174 - ".toString"
 Cohesion: 0.06
-Nodes (12): addExtraLib(), _doOpenExternal(), _fireOnDidExtraLibsChangeSoon(), getModelProperty(), join(), ot(), pt(), re() (+4 more)
-
-### Community 175 - "pa"
-Cohesion: 0.14
-Nodes (18): ap(), dHe(), eFe(), EN(), fT(), Hk(), Kpe(), MG() (+10 more)
+Nodes (10): addExtraLib(), _doOpenExternal(), _fireOnDidExtraLibsChangeSoon(), getId(), join(), ot(), pt(), resolveExternalUri() (+2 more)
 
 ### Community 176 - "TelegramNotificationManager"
 Cohesion: 0.20
 Nodes (11): Modifier, TelegramNotificationCard(), TelegramNotificationHost(), Context, StateFlow, TelegramBannerData, TelegramBannerType, APP_UPDATE (+3 more)
+
+### Community 177 - "cE"
+Cohesion: 0.20
+Nodes (14): cE(), B(), O(), Mn(), oc(), r_e(), rrt(), zT() (+6 more)
 
 ### Community 182 - "q"
 Cohesion: 0.09
@@ -840,18 +828,30 @@ Nodes (3): j, q(), z
 
 ### Community 185 - "_myTokenize"
 Cohesion: 0.14
-Nodes (6): _findLeavingNestedLanguageOffset(), _myTokenize(), _nestedTokenize(), _safeRuleName(), tokenize(), tokenizeEncoded()
+Nodes (5): _getNestedEmbeddedLanguageData(), _myTokenize(), _nestedTokenize(), _safeRuleName(), tokenize()
+
+### Community 186 - ".error"
+Cohesion: 0.14
+Nodes (3): getDropEdits(), je(), qe()
 
 ### Community 187 - "Se"
 Cohesion: 0.14
 Nodes (13): Ae(), ht(), Ie(), Oe(), Or(), pt(), y(), Se() (+5 more)
 
-### Community 193 - "getText"
+### Community 191 - ".set"
 Cohesion: 0.12
-Nodes (29): an(), cn(), D(), O(), doQuoteComplete(), doTagComplete(), En(), findNodeAt() (+21 more)
+Nodes (3): getContribution(), _moveIndex(), _updateLensStyle()
+
+### Community 193 - "getText"
+Cohesion: 0.15
+Nodes (23): a(), an(), cn(), doQuoteComplete(), doTagComplete(), En(), findNodeAt(), findNodeBefore() (+15 more)
+
+### Community 194 - "computeCompletions"
+Cohesion: 0.18
+Nodes (13): ai(), computeCompletions(), doComplete2(), D(), O(), li(), oi(), providePathSuggestions() (+5 more)
 
 ### Community 196 - "_hookListeners"
-Cohesion: 0.09
+Cohesion: 0.08
 Nodes (27): _cancelScheduler(), _findHoverAnchorCandidates(), focusedHoverPartIndex(), _getOrCreateContentWidget(), _getOrCreateGlyphWidget(), _hideWidgets(), _hookListeners(), _isContentWidgetResizing() (+19 more)
 
 ### Community 198 - "setScrollPosition"
@@ -859,44 +859,40 @@ Cohesion: 0.13
 Nodes (17): goToBottom(), goToTop(), pageDown(), pageUp(), scrollDown(), scrollLeft(), scrollRight(), scrollTop() (+9 more)
 
 ### Community 199 - "add"
-Cohesion: 0.05
-Nodes (18): add(), clearContents(), _doRender(), hasDocs(), isMouseGettingCloser(), _newlinecount(), _onListFocus(), _renderAtTopLeft() (+10 more)
+Cohesion: 0.04
+Nodes (28): add(), addFocusTrap(), adjustHorizontalHoverPosition(), adjustHoverMaxHeight(), adjustVerticalHoverPosition(), clearContents(), computeXCordinate(), computeYCordinate() (+20 more)
 
-### Community 208 - "resolveReference"
-Cohesion: 0.08
-Nodes (22): ar(), Ca(), endsWith(), fileExists(), findDocumentLinks(), findDocumentLinks2(), findUnresolvedLinks(), getTextProvider() (+14 more)
+### Community 208 - "parseStylesheet"
+Cohesion: 0.17
+Nodes (12): acceptOneKeyword(), addIssue(), getContent(), getNestedProperties(), internalParse(), markError(), _needsSemicolonAfter(), _parsePageDeclaration() (+4 more)
 
 ### Community 209 - "s"
-Cohesion: 0.08
-Nodes (5): c(), provideDocumentColors(), C(), s(), ze()
+Cohesion: 0.13
+Nodes (7): Ce(), c(), getCodeActions(), Ne(), renderMarkerStatusbar(), C(), s()
 
 ### Community 213 - ".getLineContent"
-Cohesion: 0.05
-Nodes (16): _addEditOperation(), buildIndentConverter(), _getAndroidWordAtPosition(), _getCharacterBeforePosition(), getIndentEditsOfMovingBlock(), getLanguageIdAtPosition(), getOptions(), getVisibleColumnFromPosition() (+8 more)
+Cohesion: 0.08
+Nodes (13): buildIndentConverter(), _getColumnSelectResult(), getIndentEditsOfMovingBlock(), getLanguageIdAtPosition(), getOptions(), getVisibleColumnFromPosition(), matchEnterRule(), matchEnterRuleMovingDown() (+5 more)
 
 ### Community 215 - "T"
 Cohesion: 0.17
 Nodes (19): advance(), advanceIfChar(), advanceIfChars(), advanceIfRegExp(), advanceUntilChar(), advanceUntilChars(), advanceUntilRegExp(), b() (+11 more)
 
-### Community 218 - "setSelection"
-Cohesion: 0.16
-Nodes (3): setSelection(), _setSelectionImpl(), setSelections()
-
 ### Community 219 - ".update"
-Cohesion: 0.13
-Nodes (5): clearFocus(), domFocus(), setCheckedElements(), setFocusedElements(), setSelectedElements()
+Cohesion: 0.12
+Nodes (6): clearFocus(), domFocus(), getCheckedElements(), setCheckedElements(), setFocusedElements(), setSelectedElements()
 
 ### Community 221 - "d"
 Cohesion: 0.16
 Nodes (9): ar(), constructor(), d(), g(), getRegisteredSchemaIds(), ii(), lr(), ri() (+1 more)
 
 ### Community 224 - "Ls"
-Cohesion: 0.15
-Nodes (21): u(), b2(), E5e(), eB(), o(), s(), g5e(), l5e() (+13 more)
+Cohesion: 0.06
+Nodes (46): _5e(), b2(), clearFiles(), E5e(), eB(), o(), s(), g5e() (+38 more)
 
 ### Community 225 - "TokenManager"
 Cohesion: 0.18
-Nodes (4): SharedPreferences, TokenManager, BanManager, Context
+Nodes (5): SharedPreferences, TokenManager, BanManager, Context, SecretKey
 
 ### Community 228 - "AiConversationCache"
 Cohesion: 0.38
@@ -908,35 +904,39 @@ Nodes (17): _copy(), createGrammarTokens(), createPreferredTokenProvider(), crea
 
 ### Community 231 - "_renderStickyScroll"
 Cohesion: 0.10
-Nodes (21): _disposeFocusStickyScrollStore(), goToFocused(), _needsUpdate(), _onDidResize(), _onTokensChange(), readConfiguration(), _readConfigurationChange(), _registerMouseListeners() (+13 more)
+Nodes (20): _disposeFocusStickyScrollStore(), goToFocused(), _needsUpdate(), _onDidResize(), _onTokensChange(), readConfiguration(), _readConfigurationChange(), _registerMouseListeners() (+12 more)
 
 ### Community 242 - "getContainerDomNode"
 Cohesion: 0.33
 Nodes (6): activeContainer(), containers(), getContainerDomNode(), hideContextView(), mainContainer(), showContextView()
 
-### Community 244 - ".getLineTokens"
+### Community 244 - "getLanguageId"
 Cohesion: 0.09
-Nodes (7): _doTriggerQuickSuggest(), _findLanguageBoundaries(), isInSnippet(), _onModelAdded(), provideInlineCompletions(), tokenizeIfCheap(), _updateDecorations()
+Nodes (5): createOptions(), _findLanguageBoundaries(), getLanguageId(), _onModelAdded(), _updateDecorations()
+
+### Community 246 - "getFocusedCodeEditor"
+Cohesion: 0.20
+Nodes (9): _checkContextKey(), getFocusedCodeEditor(), hasTextFocus(), hasWidgetFocus(), isFocused(), listCodeEditors(), mapToOtherSide(), removeDecorationType() (+1 more)
 
 ### Community 248 - "Le"
-Cohesion: 0.09
-Nodes (13): closeWidget(), compareByKindAndScore(), compareByScore(), doGetSymbolPicks(), goToNextOrPreviousReference(), _gotoReference(), Le, openCodeEditor() (+5 more)
+Cohesion: 0.14
+Nodes (3): Le, openCodeEditor(), registerCodeEditorOpenHandler()
+
+### Community 249 - "._onResult"
+Cohesion: 0.24
+Nodes (5): closeWidget(), goToNextOrPreviousReference(), _gotoReference(), openReference(), toggleWidget()
+
+### Community 250 - "x"
+Cohesion: 0.05
+Nodes (12): doProvideWithEditorSymbols(), doProvideWithoutEditorSymbols(), _getSortedHighlights(), _getWord(), moveBack(), moveNext(), provideLabelPick(), provideWithoutTextEditor() (+4 more)
 
 ### Community 251 - "pe"
 Cohesion: 0.15
 Nodes (3): pe, y, ye()
 
-### Community 253 - ".createElement"
-Cohesion: 0.09
-Nodes (8): _createRow(), fallbackWriteText(), _fillBody(), _fillContainer(), _fillHead(), _fillTitleIcon(), onClick(), setWidth()
-
-### Community 255 - "tE"
-Cohesion: 0.19
-Nodes (13): dhe(), e1(), F0(), jge(), QI(), tE(), e0(), t() (+5 more)
-
-### Community 258 - "pushEditOperations"
-Cohesion: 0.18
-Nodes (11): applyEdits(), _applyRedo(), _applyUndo(), _applyUndoRedoEdits(), _checkForUnusualLineTerminators(), mightContainUnusualLineTerminators(), _overwriteAlternativeVersionId(), pushEditOperations() (+3 more)
+### Community 258 - "doShowOrPick"
+Cohesion: 0.32
+Nodes (7): adjustValueSelection(), createPicks(), doShowOrPick(), getOrInstantiateProvider(), getQuickAccessProviders(), provide(), registerPickerListeners()
 
 ### Community 267 - "findDocumentSymbols"
 Cohesion: 0.27
@@ -946,136 +946,108 @@ Nodes (11): de(), fe(), findDocumentSymbols(), findDocumentSymbols2(), getDetail
 Cohesion: 0.24
 Nodes (10): afterRender(), cancelInput(), _isDetailsVisible(), _positionDetails(), _setDetailsVisible(), toggleDetails(), toggleDetailsFocus(), toggleExplainMode() (+2 more)
 
+### Community 273 - ".constructor"
+Cohesion: 0.10
+Nodes (4): createQuickPick(), getWindow(), pick(), showSuggestions()
+
 ### Community 275 - ".getId"
-Cohesion: 0.22
+Cohesion: 0.25
 Nodes (3): addCodeEditor(), addDiffEditor(), removeCodeEditor()
 
-### Community 276 - ".delete"
-Cohesion: 0.08
-Nodes (4): getDecorationRange(), goToSelectionAnchor(), isSelectionWithinPlaceholders(), observe()
-
 ### Community 282 - ".has"
-Cohesion: 0.19
-Nodes (6): _appendImplicitItems(), doProvideWithoutEditorSymbols(), provideWithTextEditor(), _splitFutureWorkspaceElement(), _splitPastWorkspaceElement(), waitForLanguageSymbolRegistry()
+Cohesion: 0.15
+Nodes (4): hasWindow(), isEnabled(), _splitFutureWorkspaceElement(), _splitPastWorkspaceElement()
 
-### Community 285 - "computeDiff"
-Cohesion: 0.09
-Nodes (8): computeDefaultDocumentColors(), computeDiff(), computedUnicodeHighlights(), computeMoreMinimalEdits(), computeWordRanges(), findSectionHeaders(), navigateValueSet(), _workerWithResources()
+### Community 286 - "_trigger"
+Cohesion: 0.06
+Nodes (38): _attachModel(), _beginUpdate(), _cancelModelPromise(), _cleanUp(), close(), _compositionType(), _createView(), createViewModel() (+30 more)
 
-### Community 286 - "dispose"
-Cohesion: 0.08
-Nodes (32): _attachModel(), _beginUpdate(), _cleanUp(), clearRanges(), close(), createViewModel(), _detachModel(), dispose() (+24 more)
+### Community 287 - "_assertNotDisposed"
+Cohesion: 0.04
+Nodes (54): applyEdits(), _applyRedo(), _applyUndo(), _applyUndoRedoEdits(), _assertNotDisposed(), _changeDecorationImpl(), _changeDecorationOptionsImpl(), changeDecorations() (+46 more)
 
-### Community 287 - "getVersionId"
-Cohesion: 0.08
-Nodes (26): applyEditAndShowIfNeeded(), _changeDecorationImpl(), _changeDecorationOptionsImpl(), changeDecorations(), createModel(), _createModelData(), deltaDecorations(), _deltaDecorationsImpl() (+18 more)
+### Community 297 - "showCodeActionList"
+Cohesion: 0.33
+Nodes (7): _applyCodeAction(), _getActionBarActions(), _shouldShowHeaders(), showCodeActionList(), showCodeActions(), showCodeActionsFromLightbulb(), toCoords()
 
 ### Community 301 - ".contains"
-Cohesion: 0.10
-Nodes (8): containsNode(), m(), ensureModifiedLineIsVisible(), ensureOriginalLineIsVisible(), filter(), isEmpty(), setElements(), _setElementsToTree()
+Cohesion: 0.13
+Nodes (5): containsNode(), ensureModifiedLineIsVisible(), ensureOriginalLineIsVisible(), getPasteEdits(), isEmpty()
+
+### Community 305 - ".run"
+Cohesion: 0.40
+Nodes (3): acceptNextWord(), accessibleDiffViewerNext(), getParentEditor()
 
 ### Community 308 - "_relayout"
 Cohesion: 0.50
 Nodes (3): computeRequiredHeight(), _relayout(), showStale()
 
 ### Community 309 - "._beginModelSync"
+Cohesion: 0.05
+Nodes (33): clearRanges(), computeDefaultDocumentColors(), computeMoreMinimalEdits(), _createEditorWorkerHost(), _createFallbackLocalWorker(), _createFindWidget(), disposeModel(), findSectionHeaders() (+25 more)
+
+### Community 313 - "readResources"
+Cohesion: 0.22
+Nodes (7): clearInternalState(), clearResourcesState(), computeResourcesStateHash(), fallbackWriteText(), readResources(), readText(), writeText()
+
+### Community 317 - ".registerListeners"
 Cohesion: 0.07
-Nodes (24): _createEditorWorkerHost(), _createFallbackLocalWorker(), _createFindWidget(), disposeModel(), getGlobalBufferTerm(), getLinesContent(), _getOrCreateModelManager(), _getOrCreateWorker() (+16 more)
-
-### Community 313 - ".from"
-Cohesion: 0.14
-Nodes (9): clearInternalState(), clearResourcesState(), computeResourcesStateHash(), _createUniqueUri(), onDidChangeFocus(), onDidChangeSelection(), readResources(), readText() (+1 more)
-
-### Community 317 - "startFindDefinition"
-Cohesion: 0.32
-Nodes (8): findDefinition(), getPreviewRangeBasedOnIndentation(), getPreviewValue(), removeLinkDecorations(), startFindDefinition(), startFindDefinitionFromCursor(), startFindDefinitionFromMouse(), stripIndentationFromPreviewRange()
-
-### Community 322 - "showHover"
-Cohesion: 0.21
-Nodes (11): delay(), doHideHover(), _getHoverContext(), hideHover(), _intersectionChange(), isInstantlyHovering(), _keyDown(), _keyUp() (+3 more)
+Nodes (29): acceptInput(), _addLoadingMessage(), _allVisibleChecked(), _computeLabelFontSize(), createLoadingMessage(), findDefinition(), getPreviewRangeBasedOnIndentation(), getPreviewValue() (+21 more)
 
 ### Community 325 - "getValue"
-Cohesion: 0.07
-Nodes (21): addDynamicKeybinding(), addDynamicKeybindings(), createScriptURL(), ct(), Ft(), getConfiguredCommandHistoryLength(), getLanguage(), getValue() (+13 more)
+Cohesion: 0.09
+Nodes (17): createScriptURL(), ct(), Ft(), getConfiguredCommandHistoryLength(), getLanguage(), getValue(), gotoDefinition(), isFindInputFocused() (+9 more)
 
-### Community 327 - ".sort"
-Cohesion: 0.06
-Nodes (10): _comparator(), createStickyModel(), t(), _findSumOfRangesOfGroup(), getBreadcrumbItems(), getWindows(), load(), _serialize() (+2 more)
-
-### Community 328 - "getLanguageId"
-Cohesion: 0.15
-Nodes (4): createOptions(), getLanguageId(), getWordUntilPosition(), isEnabled()
+### Community 327 - "find"
+Cohesion: 0.09
+Nodes (20): _cacheHintsForFastRestore(), _comparator(), _copyInlayHintsWithCurrentAnchor(), createStickyModel(), doOpenEditor(), find(), findModel(), _findSumOfRangesOfGroup() (+12 more)
 
 ### Community 330 - "_setHasFocus"
 Cohesion: 0.33
 Nodes (6): focusTextArea(), _installSelectionChangeListener(), refreshFocusState(), _setAndWriteTextAreaState(), _setHasFocus(), writeNativeTextAreaContent()
 
-### Community 335 - "Kp"
-Cohesion: 0.47
-Nodes (6): $1e(), _de(), fne(), Ip(), Kp(), Vu()
-
-### Community 337 - "_updateFont"
-Cohesion: 0.40
-Nodes (4): acceptInput(), _computeLabelFontSize(), _updateContents(), _updateFont()
-
-### Community 344 - "z"
-Cohesion: 0.10
-Nodes (4): z(), getLineIndentColumn(), saveViewState(), serializeState()
-
-### Community 345 - ".includes"
-Cohesion: 0.09
-Nodes (3): getOverrideOptions(), open(), openLinkOccurrence()
-
-### Community 351 - "create"
-Cohesion: 0.13
-Nodes (4): create(), createModelFromProvider(), getInitialState(), isProviderValid()
+### Community 344 - "_update"
+Cohesion: 0.05
+Nodes (21): _applyTheme(), computeAsync(), findMatches(), z(), getColorData(), _getHintsRanges(), getLineIndentColumn(), _getMarkdownHovers() (+13 more)
 
 ### Community 353 - "_getPicks"
 Cohesion: 0.20
 Nodes (8): getActions(), getAdditionalCommandPicks(), getCommandPicks(), getMenuActions(), _getPicks(), getSupportedActions(), getTfIdfChunk(), hasAdditionalCommandPicks()
 
-### Community 360 - "_createCoordinatedRendering"
-Cohesion: 0.11
-Nodes (16): _computeGlyphMarginLanes(), _computeOptions(), _createCoordinatedRendering(), _createTextAreaHandlerHelper(), _flushAccumulatedAndRenderNow(), getOffsetForColumn(), getScrolledVisiblePosition(), _readEnvConfiguration() (+8 more)
-
-### Community 374 - ".getWordAtPosition"
-Cohesion: 0.09
-Nodes (4): c(), findMatches(), findMatchesLineByLine(), isDisposed()
-
-### Community 394 - "Ju"
-Cohesion: 0.17
-Nodes (12): Oa(), nV(), am(), dr(), be(), ls(), FT(), rD() (+4 more)
-
-### Community 396 - "de"
-Cohesion: 0.15
-Nodes (3): Ee, getKeyboardNavigationLabel(), de()
+### Community 360 - "_recomputeOptions"
+Cohesion: 0.25
+Nodes (7): _computeOptions(), _readFontInfo(), _recomputeOptions(), setIsDominatedByLongLines(), setModelLineCount(), setReservedHeight(), setViewLineCount()
 
 ### Community 398 - "getCandidateStickyLinesIntersectingFromStickyModel"
 Cohesion: 0.50
 Nodes (3): getCandidateStickyLinesIntersecting(), getCandidateStickyLinesIntersectingFromStickyModel(), updateIndex()
 
-### Community 433 - "ln"
-Cohesion: 0.67
-Nodes (4): isVoidElement(), ln(), vt(), xn()
+### Community 459 - ".ordered"
+Cohesion: 0.07
+Nodes (24): changeDropType(), changePasteType(), clearWidgets(), closeMessage(), compareByKindAndScore(), compareByScore(), doGetSymbolPicks(), fetchCopyMetadata() (+16 more)
 
-### Community 617 - "addCommand"
-Cohesion: 0.50
-Nodes (3): addCommand(), createContextKey(), getModifiedEditor()
+### Community 489 - "_createCoordinatedRendering"
+Cohesion: 0.09
+Nodes (5): _createCoordinatedRendering(), getScrollWidth(), _getViewPartsToRender(), _scheduleRender(), setGlyphMarginDecorationLaneCount()
+
+### Community 617 - "appendMenuItem"
+Cohesion: 0.29
+Nodes (5): addCommand(), appendMenuItem(), appendMenuItems(), createContextKey(), getModifiedEditor()
 
 ## Knowledge Gaps
 - **171 isolated node(s):** `BannerItem`, `TopicItem`, `PartItem`, `SubpartItem`, `CreateOrderRequest` (+166 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **112 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **104 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `_` connect `_` to `.indexOf`, `push`, `I`, `.containsRTL`, `m`, `E`, `a`, `k`, `n`, `p`, `d`, `.constructor`, `b`, `z`, `g`, `c`, `s`, `y`, `t`, `.getEmpty`, `o`, `l`, `t`, `addCommand`, `w`, `.getLineCount`, `.containsPosition`, `l`, `_trigger`, `getModel`, `.isEmpty`, `v`, `.render`, `.constructor`, `r`, `u`, `f`, `pe`, `getUriComparisonKey`, `h`, `ge`, `_update`, `._register`, `ue`, `.move`, `.update`, `.show`, `.replace`, `.get`, `Ie`, `.getStartLineNumber`, `find`, `j`, `._primary`, `._scheduleRender`, `_insertSuggestion`, `doProvideWithEditorSymbols`, `o`, `.dispose`, `.insertItemInDOM`, `.forEach`, `.toString`, `.convertViewPositionToModelPosition`, `.handleEvents`, `q`, `_myTokenize`, `.error`, `.textToConsoleArgs`, `.pop`, `.set`, `.stop`, `_hookListeners`, `setScrollPosition`, `add`, `ve`, `.match`, `.forceTokenization`, `.equals`, `je`, `pushStackElement`, `s`, `.substring`, `.cancel`, `.getLineContent`, `._doDispatch`, `Ae`, `setSelection`, `.update`, `.constructor`, `.renderText`, `_requestRange`, `de`, `_renderStickyScroll`, `getMetadata`, `.isVisible`, `.getContextValuesContainer`, `._create`, `getContainerDomNode`, `.handleChildrenChanged`, `.getLineTokens`, `.run`, `Le`, `x`, `.getPosition`, `.with`, `.createElement`, `.merge`, `et`, `pushEditOperations`, `getOrCreate`, `.intersects`, `.refresh`, `_isDetailsVisible`, `.getVerticalOffsetForLineNumber`, `n`, `.getId`, `.delete`, `._innerExecuteCommands`, `.has`, `.delete`, `computeDiff`, `dispose`, `getVersionId`, `_setState`, `adjustSelection`, `.toLabel`, `.contains`, `.layoutSelectDropDown`, `.fromUser`, `_relayout`, `._beginModelSync`, `createHTML`, `.from`, `startFindDefinition`, `.moveToBeginningOfLine`, `._computeWhitespaceProps`, `.convertModelPositionToViewPosition`, `showHover`, `.runEditorCommand`, `._updateBlinking`, `getValue`, `.sort`, `getLanguageId`, `.tokenTheme`, `_setHasFocus`, `.hasChanged`, `_updateFont`, `._backgroundTokenizeForAtLeast1ms`, `z`, `.includes`, `._executeEdit`, `create`, `_getPicks`, `.clone`, `_createCoordinatedRendering`, `he`, `we`, `.isMonitoring`, `.register`, `.alloc`, `.getWordAtPosition`, `._massageTokens`, `.create`, `._prepareRenderWidget`, `._initAnimation`, `de`, `getCandidateStickyLinesIntersectingFromStickyModel`, `.getTooltip`, `.computeUnicodeHighlightReason`, `_resolveCodeLensesInViewport`, `.peek`, `_toNormalizedKeybindingItems`, `.getDecorationsInRange`, `_applyLayout`, `._viewOverlaysRender`, `.handleBeginTransaction`, `.getLineMaxColumn`, `_configureFont`, `finish`, `.computeMinIndentation`, `getEdit`, `._doFindNextWordOnLine`, `.forceRenderingAbove`, `.getChild`, `.getZoomFactor`, `.stopForceRenderingAbove`, `.forUris`, `getEditorType`, `.getInlineClassNameOfLevel`, `.readSelectionFromMarkers`, `fetchCopyMetadata`, `be`, `getMarker`, `_getVerticalOffsetAfterPosition`, `st`?**
-  _High betweenness centrality (0.065) - this node is a cross-community bridge._
-- **Why does `d2()` connect `d2` to `fae`, `m`, `Pi`, `$h`, `Ju`, `y3e`, `e`, `tsWorker.js`, `s`, `"src/compiler/parser.ts"`, `t`, `pn`, `aoe`, `we`, `vb`, `Yn`, `w4`, `c`, `Rn`, `Kg`, `Vce`, `Se`, `h_`, `H`, `gu`, `jt`, `Ee`, `ue`, `Ls`, `_e`, `Es`, `zoe`, `tE`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `aoe()` connect `aoe` to `m`, `Pi`, `e`, `tsWorker.js`, `s`, `"src/compiler/parser.ts"`, `t`, `Zn`, `pn`, `d2`, `we`, `vb`, `Yn`, `c`, `Rn`, `npe`, `h_`, `gu`, `sl`, `ue`, `Es`, `zoe`, `tE`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `_` connect `_` to `push`, `I`, `.containsRTL`, `m`, `E`, `a`, `k`, `n`, `p`, `d`, `.constructor`, `b`, `z`, `g`, `c`, `s`, `y`, `t`, `.getEmpty`, `o`, `l`, `appendMenuItem`, `w`, `.getLineMaxColumn`, `l`, `.sort`, `.isEmpty`, `v`, `.render`, `.constructor`, `r`, `u`, `f`, `pe`, `getUriComparisonKey`, `h`, `ge`, `_onModelChange`, `._register`, `ue`, `.move`, `.update`, `.show`, `.replace`, `.get`, `Ie`, `.getStartLineNumber`, `.cancel`, `j`, `._primary`, `._scheduleRender`, `.slice`, `M`, `.dispose`, `.insertItemInDOM`, `me`, `.toString`, `.forEach`, `.convertModelPositionToViewPosition`, `.handleEvents`, `_myTokenize`, `.error`, `.textToConsoleArgs`, `.set`, `.stop`, `_hookListeners`, `setScrollPosition`, `add`, `ve`, `.match`, `.forceTokenization`, `.equals`, `.includes`, `q`, `s`, `.substring`, `.getLineContent`, `._doDispatch`, `Ae`, `.trim`, `.update`, `.constructor`, `_requestRange`, `de`, `_renderStickyScroll`, `.isUri`, `getMetadata`, `.isVisible`, `.runEditorCommand`, `._create`, `t`, `getContainerDomNode`, `.handleChildrenChanged`, `getLanguageId`, `.run`, `getFocusedCodeEditor`, `Le`, `._onResult`, `x`, `.with`, `.getStorage`, `getDecorationRange`, `.merge`, `.fire`, `doShowOrPick`, `.intersects`, `.refresh`, `_isDetailsVisible`, `.appendChild`, `.constructor`, `.getId`, `.delete`, `.has`, `.set`, `._getModel`, `_trigger`, `_assertNotDisposed`, `Ee`, `n`, `_setState`, `.getAriaLabel`, `.getDirection`, `showCodeActionList`, `.toLabel`, `.constructor`, `.contains`, `.checkLogLevel`, `.run`, `.readHorizontalRanges`, `_relayout`, `._beginModelSync`, `createHTML`, `readResources`, `.registerListeners`, `._addZone`, `.getCurrentScrollLeft`, `._getNoResultFoundMessage`, `._updateBlinking`, `getValue`, `find`, `_setHasFocus`, `setActions`, `._backgroundTokenizeForAtLeast1ms`, `_update`, `.parse`, `.from`, `.computeStickyModel`, `_getPicks`, `.clone`, `_recomputeOptions`, `.dispose`, `.alloc`, `._massageTokens`, `fetch`, `.create`, `._initAnimation`, `getWordUntilPosition`, `getCandidateStickyLinesIntersectingFromStickyModel`, `.getTooltip`, `.set`, `.computeUnicodeHighlightReason`, `.getRegExpStr`, `_resolveCodeLensesInViewport`, `.peek`, `_toNormalizedKeybindingItems`, `tt`, `ze`, `._viewOverlaysRender`, `.handleBeginTransaction`, `_configureFont`, `.computeMinIndentation`, `getEdit`, `._doFindNextWordOnLine`, `.getChild`, `.getZoomFactor`, `.forUris`, `getEditorType`, `.ordered`, `_createCoordinatedRendering`, `getMarker`, `st`?**
+  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `d2()` connect `d2` to `fae`, `Yn`, `on`, `_e`, `e`, `tsWorker.js`, `l`, `oce`, `"src/compiler/parser.ts"`, `o`, `pn`, `aoe`, `Jn`, `vb`, `Fr`, `w4`, `cE`, `we`, `Vce`, `Se`, `h_`, `H`, `jt`, `r`, `Ee`, `ct`, `Xs`, `y3e`, `Ms`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
+- **Why does `a()` connect `a` to `.constructor`, `._createAndCacheServiceInstance`, `f`, `W`, `getUriComparisonKey`, `_onModelChange`, `._register`, `ue`, `.constructor`, `.update`, `.show`, `.replace`, `.get`, `.mouseTargetIsWidget`, `.getStartLineNumber`, `.has`, `.cancel`, `j`, `_`, `._primary`, `._scheduleRender`, `.slice`, `n`, `.getAriaLabel`, `push`, `M`, `.dispose`, `.contains`, `.toString`, `.affectsSome`, `._render`, `I`, `.error`, `.doAddView`, `setScrollPosition`, `add`, `.match`, `._getMouseColumn`, `.forceTokenization`, `E`, `.includes`, `s`, `.substring`, `._backgroundTokenizeForAtLeast1ms`, `p`, `.getLineContent`, `.constructor`, `_update`, `.parse`, `.trim`, `.computeStickyModel`, `l`, `.clone`, `appendMenuItem`, `.isUri`, `getMetadata`, `w`, `.evaluate`, `.sort`, `.isEmpty`, `.update`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Are the 69 inferred relationships involving `aoe()` (e.g. with `ao()` and `a_e()`) actually correct?**
   _`aoe()` has 69 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 390 inferred relationships involving `d2()` (e.g. with `Se()` and `aD()`) actually correct?**

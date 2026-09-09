@@ -155,16 +155,32 @@ object UbuntuTerminalEngine {
         }.sortedWith(compareBy({ !(it["isDirectory"] as Boolean) }, { it["name"] as String }))
     }
 
+    /**
+     * Resolves a workspace file while strictly preventing directory traversal attacks.
+     * Returns null if the target path escapes the workspace root directory.
+     */
+    private fun getSafeWorkspaceFile(context: Context, filename: String): File? {
+        return try {
+            val workspace = getWorkspaceDir(context).canonicalFile
+            val target = File(workspace, filename).canonicalFile
+            if (target.path == workspace.path || target.path.startsWith(workspace.path + File.separator)) {
+                target
+            } else {
+                null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     fun readFileContent(context: Context, filename: String): String {
-        val workspace = getWorkspaceDir(context)
-        val file = File(workspace, filename)
+        val file = getSafeWorkspaceFile(context, filename) ?: return ""
         return if (file.exists() && file.isFile) file.readText() else ""
     }
 
     fun saveFileContent(context: Context, filename: String, content: String): Boolean {
+        val file = getSafeWorkspaceFile(context, filename) ?: return false
         return try {
-            val workspace = getWorkspaceDir(context)
-            val file = File(workspace, filename)
             file.writeText(content)
             true
         } catch (_: Exception) {
@@ -283,9 +299,8 @@ object UbuntuTerminalEngine {
     }
 
     fun createFile(context: Context, filename: String): Boolean {
+        val file = getSafeWorkspaceFile(context, filename) ?: return false
         return try {
-            val workspace = getWorkspaceDir(context)
-            val file = File(workspace, filename)
             if (!file.exists()) file.createNewFile() else true
         } catch (_: Exception) {
             false
@@ -293,9 +308,8 @@ object UbuntuTerminalEngine {
     }
 
     fun deleteFile(context: Context, filename: String): Boolean {
+        val file = getSafeWorkspaceFile(context, filename) ?: return false
         return try {
-            val workspace = getWorkspaceDir(context)
-            val file = File(workspace, filename)
             if (file.exists()) file.delete() else true
         } catch (_: Exception) {
             false
