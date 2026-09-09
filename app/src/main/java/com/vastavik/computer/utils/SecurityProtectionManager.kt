@@ -6,6 +6,8 @@ import android.os.Build
 import android.view.Window
 import android.view.WindowManager
 import java.io.File
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Security Protection Manager for Vastavik Learning.
@@ -137,5 +139,48 @@ object SecurityProtectionManager {
         }
 
         return false
+    }
+
+    private val _isWindowFocused = kotlinx.coroutines.flow.MutableStateFlow(true)
+    val isWindowFocused: kotlinx.coroutines.flow.StateFlow<Boolean> = _isWindowFocused
+
+    private val _isScreenshotBlackoutActive = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val isScreenshotBlackoutActive: kotlinx.coroutines.flow.StateFlow<Boolean> = _isScreenshotBlackoutActive
+
+    private var blackoutJob: kotlinx.coroutines.Job? = null
+    private val securityScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main + kotlinx.coroutines.SupervisorJob())
+
+    /**
+     * Called whenever Activity window focus changes.
+     * When focus is lost (e.g. Windows Snipping Tool, Win+Shift+S, Alt+Tab, Taskbar click),
+     * the screen is immediately blacked out before the host OS can sample any pixels.
+     */
+    fun setWindowFocused(focused: Boolean) {
+        _isWindowFocused.value = focused
+        if (!focused) {
+            _isScreenshotBlackoutActive.value = true
+        } else {
+            securityScope.launch {
+                kotlinx.coroutines.delay(350)
+                if (_isWindowFocused.value) {
+                    _isScreenshotBlackoutActive.value = false
+                }
+            }
+        }
+    }
+
+    /**
+     * Triggered when a screenshot key (PrintScreen, SysRq, Ctrl+Shift+S) is intercepted.
+     * Keeps the screen blanked for the specified duration to defeat rapid capture.
+     */
+    fun triggerScreenshotDefense(durationMillis: Long = 4000L) {
+        _isScreenshotBlackoutActive.value = true
+        blackoutJob?.cancel()
+        blackoutJob = securityScope.launch {
+            kotlinx.coroutines.delay(durationMillis)
+            if (_isWindowFocused.value) {
+                _isScreenshotBlackoutActive.value = false
+            }
+        }
     }
 }

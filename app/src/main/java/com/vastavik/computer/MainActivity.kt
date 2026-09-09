@@ -126,6 +126,9 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         modifier = Modifier.align(androidx.compose.ui.Alignment.TopCenter)
                     )
 
+                    // Focus-loss instant blackout curtain (blocks Windows host screenshots, Snipping Tool, and PrtScn)
+                    com.vastavik.computer.ui.components.FocusLossBlackoutCurtain()
+
                     // Full-screen opaque Emulator Security Curtain (blocks BlueStacks screenshots & recordings)
                     com.vastavik.computer.ui.components.EmulatorSecurityCurtain()
 
@@ -240,5 +243,38 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     override fun onPaymentError(code: Int, description: String?) {
         com.vastavik.computer.utils.RazorpayBridge.onError?.invoke(code, description)
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        com.vastavik.computer.utils.SecurityProtectionManager.setWindowFocused(hasFocus)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        com.vastavik.computer.utils.SecurityProtectionManager.setWindowFocused(false)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        com.vastavik.computer.utils.SecurityProtectionManager.setWindowFocused(hasWindowFocus())
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(4000L)
+    }
+
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        val keyCode = event.keyCode
+        val isSysRq = keyCode == android.view.KeyEvent.KEYCODE_SYSRQ
+        val isCtrlShiftS = event.isCtrlPressed && event.isShiftPressed && keyCode == android.view.KeyEvent.KEYCODE_S
+        val isCamera = keyCode == android.view.KeyEvent.KEYCODE_CAMERA
+
+        if (isSysRq || isCtrlShiftS || isCamera) {
+            com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(5000L)
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 }
