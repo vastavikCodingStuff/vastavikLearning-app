@@ -28,6 +28,7 @@ import dagger.hilt.EntryPoint
 @InstallIn(SingletonComponent::class)
 interface RepositoryEntryPoint {
     fun vastavikApiRepository(): VastavikApiRepository
+    fun firestoreRepository(): com.vastavik.computer.data.repository.FirestoreRepository
 }
 
 @Module

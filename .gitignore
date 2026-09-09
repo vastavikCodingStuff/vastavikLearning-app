@@ -79,4 +79,7 @@ cmake_install.cmake
 
 # Kotlin
 .kotlin/
-.kotlin_module
+.kotlin_module
+
+# Graphify Cache
+graphify-out/cache/
