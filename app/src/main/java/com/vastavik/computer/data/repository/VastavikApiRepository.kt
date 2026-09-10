@@ -64,6 +64,7 @@ class VastavikApiRepository @Inject constructor(
         val res = api.signup(SignupRequest(email, password, name, board, language, referralCode, shareToken, deviceFingerprint, deviceName, platform))
         if (res.success && res.accessToken != null && res.refreshToken != null) {
             tokenManager.saveTokens(res.accessToken, res.refreshToken)
+            tokenManager.saveUser(res.userId, res.name, res.email)
         }
         res
     }
@@ -76,6 +77,7 @@ class VastavikApiRepository @Inject constructor(
         val res = api.login(LoginRequest(email, password, deviceFingerprint))
         if (res.success && res.accessToken != null && res.refreshToken != null) {
             tokenManager.saveTokens(res.accessToken, res.refreshToken)
+            tokenManager.saveUser(res.userId, res.name, res.email)
         }
         res
     }
@@ -84,6 +86,7 @@ class VastavikApiRepository @Inject constructor(
         val res = api.loginWithGoogle(OAuthGoogleRequest(idToken))
         if (res.success && res.accessToken != null && res.refreshToken != null) {
             tokenManager.saveTokens(res.accessToken, res.refreshToken)
+            tokenManager.saveUser(res.userId, res.name, res.email)
         }
         res
     }
@@ -92,17 +95,27 @@ class VastavikApiRepository @Inject constructor(
         val res = api.loginWithGitHub(OAuthGitHubRequest(code))
         if (res.success && res.accessToken != null && res.refreshToken != null) {
             tokenManager.saveTokens(res.accessToken, res.refreshToken)
+            tokenManager.saveUser(res.userId, res.name, res.email)
         }
         res
     }
 
     suspend fun getUserProfile(): Result<UserProfileResponse> = safeApiCall {
-        api.getUserProfile()
+        val profile = api.getUserProfile()
+        if (profile.userId.isNotBlank()) {
+            tokenManager.saveUser(profile.userId, profile.name, profile.email)
+        }
+        profile
     }
 
     fun logout() {
         tokenManager.clearTokens()
     }
+
+    fun getCurrentUserId(): String? = tokenManager.getUserId()
+    fun getCurrentUserEmail(): String? = tokenManager.getUserEmail()
+    fun getCurrentUserName(): String? = tokenManager.getUserName()
+    fun getAccessToken(): String? = tokenManager.getAccessToken()
 
     /**
      * Send a batch of activity log entries to the backend. Returns true on
@@ -111,10 +124,14 @@ class VastavikApiRepository @Inject constructor(
     suspend fun logActivity(payloadJson: String): Boolean {
         return try {
             val raw = okhttp3.RequestBody.create("application/json".toMediaTypeOrNull(), payloadJson)
-            val req = okhttp3.Request.Builder()
+            val builder = okhttp3.Request.Builder()
                 .url("${ApiConfig.BASE_URL.removeSuffix("/")}/api/v1/activity/log")
                 .post(raw)
-                .build()
+            val token = tokenManager.getAccessToken()
+            if (!token.isNullOrBlank()) {
+                builder.header("Authorization", "Bearer $token")
+            }
+            val req = builder.build()
             val client = okhttp3.OkHttpClient.Builder()
                 .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
                 .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
@@ -212,6 +229,18 @@ class VastavikApiRepository @Inject constructor(
         courseId: String? = null
     ): Result<List<QuizSetDto>> = safeApiCall {
         api.getQuizzes(subject, courseId)
+    }
+
+    suspend fun submitPracticeAttempt(request: PracticeSubmitRequest): Result<CommonResponse> = safeApiCall {
+        api.submitPracticeAttempt(request)
+    }
+
+    suspend fun getPracticeHistory(): Result<List<PracticeAttemptItem>> = safeApiCall {
+        api.getPracticeHistory()
+    }
+
+    suspend fun getSearchHistory(): Result<List<SearchHistoryItem>> = safeApiCall {
+        api.getSearchHistory()
     }
 
     // ==========================================

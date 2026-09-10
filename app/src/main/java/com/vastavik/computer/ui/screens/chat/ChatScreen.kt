@@ -142,10 +142,30 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
     var partialTranscript by remember { mutableStateOf("") }
     var speechRecognizer by remember { mutableStateOf<SpeechRecognizer?>(null) }
 
+    // User identity & Token
+    val tokenManager = remember {
+        try {
+            dagger.hilt.android.EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                com.vastavik.computer.di.RepositoryEntryPoint::class.java
+            ).tokenManager()
+        } catch (_: Throwable) { null }
+    }
+    val currentUserId = tokenManager?.getUserId()
+    val currentToken = tokenManager?.getAccessToken()
+
     // Sidebar state
     var showSidebar by remember { mutableStateOf(false) }
-    var conversations by remember { mutableStateOf(AiConversationCache.loadConversations(context)) }
-    var activeConversationId by remember { mutableStateOf(AiConversationCache.getActiveConversationId(context) ?: UUID.randomUUID().toString()) }
+    var conversations by remember { mutableStateOf(AiConversationCache.loadConversations(context, currentUserId)) }
+    var activeConversationId by remember { mutableStateOf(AiConversationCache.getActiveConversationId(context, currentUserId) ?: UUID.randomUUID().toString()) }
+
+    LaunchedEffect(currentUserId) {
+        conversations = AiConversationCache.loadConversations(context, currentUserId)
+        activeConversationId = AiConversationCache.getActiveConversationId(context, currentUserId) ?: UUID.randomUUID().toString()
+        AiConversationSyncManager.restoreUserConversationsFromServer(context, currentUserId, currentToken) { restored ->
+            conversations = restored
+        }
+    }
 
     // Model selector state (Default: Mistral is GOD)
     var selectedAiModel by remember { mutableStateOf(com.vastavik.computer.utils.AiEngineModel.MISTRAL_GOD) }
@@ -170,6 +190,9 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     doOutput = true
                     setRequestProperty("Content-Type", "application/json; charset=utf-8")
                     setRequestProperty("User-Agent", "VastavikLearningApp/${BuildConfig.VERSION_NAME}")
+                    if (!currentToken.isNullOrBlank()) {
+                        setRequestProperty("Authorization", "Bearer $currentToken")
+                    }
                 }
                 val historyArray = JSONArray()
                 messages.takeLast(6).forEach { msg ->
@@ -202,12 +225,24 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
             "$prompt\n\n[System: User board language preference is $lang — respond with code examples in $lang unless user explicitly requests another language.]"
         } else prompt
         val backendResp = callBackendAiChat(enhancedPrompt, activeConversationId)
-        if (!backendResp.isNullOrBlank()) {
-            return backendResp
+        val reply = if (!backendResp.isNullOrBlank()) {
+            backendResp
+        } else {
+            withContext(Dispatchers.IO) {
+                callVastavikAiChat(selectedAiModel, messages + ChatMessage(enhancedPrompt, isUser = true))
+            }
         }
-        return withContext(Dispatchers.IO) {
-            callVastavikAiChat(selectedAiModel, messages + ChatMessage(enhancedPrompt, isUser = true))
-        }
+        com.vastavik.computer.utils.ActivityLog.log(
+            context,
+            "ai_chat",
+            mapOf(
+                "model" to selectedAiModel.name,
+                "prompt" to prompt,
+                "response" to reply,
+                "session_id" to activeConversationId
+            )
+        )
+        return reply
     }
 
     fun sendToAI(text: String) {
@@ -222,6 +257,17 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                     val resp = askVastavikAi(userText)
                     viewModel.addMessage(ChatMessage(resp, isUser = false))
                     listState.animateScrollToItem(messages.lastIndex)
+
+                    val updatedList = viewModel.messages.value.map { ChatMessageData(it.text, it.isUser) }
+                    val finalConv = AiConversation(
+                        id = activeConversationId,
+                        title = updatedList.firstOrNull { it.isUser }?.text?.take(40) ?: userText.take(40),
+                        messages = updatedList,
+                        updatedAt = System.currentTimeMillis()
+                    )
+                    AiConversationCache.saveConversation(context, finalConv, currentUserId)
+                    AiConversationSyncManager.syncConversationToServer(finalConv, currentToken, context)
+                    conversations = AiConversationCache.loadConversations(context, currentUserId)
                 } finally { isLoading = false }
             }
         }
@@ -422,8 +468,8 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                         messages = messages.map { ChatMessageData(it.text, it.isUser) },
                                         updatedAt = System.currentTimeMillis()
                                     )
-                                    AiConversationCache.saveConversation(context, conv)
-                                    conversations = AiConversationCache.loadConversations(context)
+                                    AiConversationCache.saveConversation(context, conv, currentUserId)
+                                    conversations = AiConversationCache.loadConversations(context, currentUserId)
                                 }
                                 activeConversationId = UUID.randomUUID().toString()
                                 viewModel.clearMessages()
@@ -471,9 +517,9 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                             messages = updatedMsgs.map { ChatMessageData(it.text, it.isUser) },
                                             updatedAt = System.currentTimeMillis()
                                         )
-                                        AiConversationCache.saveConversation(context, conv)
-                                        AiConversationSyncManager.syncConversationToServer(conv)
-                                        conversations = AiConversationCache.loadConversations(context)
+                                        AiConversationCache.saveConversation(context, conv, currentUserId)
+                                        AiConversationSyncManager.syncConversationToServer(conv, currentToken, context)
+                                        conversations = AiConversationCache.loadConversations(context, currentUserId)
                                     }
                                 }
                             },
@@ -692,8 +738,8 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                 messages = liveList,
                                                 updatedAt = System.currentTimeMillis()
                                             )
-                                            AiConversationCache.saveConversation(context, userConv)
-                                            conversations = AiConversationCache.loadConversations(context)
+                                            AiConversationCache.saveConversation(context, userConv, currentUserId)
+                                            conversations = AiConversationCache.loadConversations(context, currentUserId)
 
                                             isLoading = true
                                             coroutineScope.launch {
@@ -717,9 +763,9 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                         messages = updatedList,
                                                         updatedAt = System.currentTimeMillis()
                                                     )
-                                                    AiConversationCache.saveConversation(context, finalConv)
-                                                    AiConversationSyncManager.syncConversationToServer(finalConv)
-                                                    conversations = AiConversationCache.loadConversations(context)
+                                                    AiConversationCache.saveConversation(context, finalConv, currentUserId)
+                                                    AiConversationSyncManager.syncConversationToServer(finalConv, currentToken, context)
+                                                    conversations = AiConversationCache.loadConversations(context, currentUserId)
                                                 } finally { isLoading = false }
                                             }
                                         }
@@ -809,7 +855,7 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                     .clickable {
                                         activeConversationId = UUID.randomUUID().toString()
                                         viewModel.clearMessages()
-                                        conversations = AiConversationCache.loadConversations(context)
+                                        conversations = AiConversationCache.loadConversations(context, currentUserId)
                                         showSidebar = false
                                     }
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -859,12 +905,12 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                     messages = currentData,
                                                     updatedAt = System.currentTimeMillis()
                                                 )
-                                                AiConversationCache.saveConversation(context, cur)
+                                                AiConversationCache.saveConversation(context, cur, currentUserId)
                                             }
                                             activeConversationId = conv.id
-                                            AiConversationCache.setActiveConversationId(context, conv.id)
+                                            AiConversationCache.setActiveConversationId(context, conv.id, currentUserId)
                                             viewModel.setMessages(conv.messages.map { ChatMessage(it.text, it.isUser) })
-                                            conversations = AiConversationCache.loadConversations(context)
+                                            conversations = AiConversationCache.loadConversations(context, currentUserId)
                                             showSidebar = false
                                         },
                                     shape = RoundedCornerShape(12.dp),
@@ -912,13 +958,13 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                                                         },
                                                         onClick = {
                                                             showMenu = false
-                                                            AiConversationCache.deleteConversation(context, conv.id)
-                                                            conversations = AiConversationCache.loadConversations(context)
+                                                            AiConversationCache.deleteConversation(context, conv.id, currentUserId)
+                                                            conversations = AiConversationCache.loadConversations(context, currentUserId)
                                                             if (activeConversationId == conv.id) {
                                                                 val nextConv = conversations.firstOrNull()
                                                                 if (nextConv != null) {
                                                                     activeConversationId = nextConv.id
-                                                                    AiConversationCache.setActiveConversationId(context, nextConv.id)
+                                                                    AiConversationCache.setActiveConversationId(context, nextConv.id, currentUserId)
                                                                     viewModel.setMessages(nextConv.messages.map { ChatMessage(it.text, it.isUser) })
                                                                 } else {
                                                                     activeConversationId = UUID.randomUUID().toString()

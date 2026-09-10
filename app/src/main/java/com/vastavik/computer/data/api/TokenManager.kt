@@ -86,11 +86,25 @@ class TokenManager @Inject constructor(
 
     fun getRefreshToken(): String? = decrypt(prefs.getString(KEY_REFRESH_TOKEN, null))
 
+    fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
+
+    fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
+
+    fun getUserEmail(): String? = prefs.getString(KEY_USER_EMAIL, null)
+
     fun saveTokens(accessToken: String, refreshToken: String) {
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, encrypt(accessToken))
             .putString(KEY_REFRESH_TOKEN, encrypt(refreshToken))
             .apply()
+    }
+
+    fun saveUser(userId: String?, name: String?, email: String?) {
+        val editor = prefs.edit()
+        if (userId != null) editor.putString(KEY_USER_ID, userId) else editor.remove(KEY_USER_ID)
+        if (name != null) editor.putString(KEY_USER_NAME, name) else editor.remove(KEY_USER_NAME)
+        if (email != null) editor.putString(KEY_USER_EMAIL, email) else editor.remove(KEY_USER_EMAIL)
+        editor.apply()
     }
 
     fun saveAccessToken(accessToken: String) {
@@ -101,6 +115,9 @@ class TokenManager @Inject constructor(
         prefs.edit()
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_REFRESH_TOKEN)
+            .remove(KEY_USER_ID)
+            .remove(KEY_USER_NAME)
+            .remove(KEY_USER_EMAIL)
             .apply()
     }
 
@@ -110,5 +127,8 @@ class TokenManager @Inject constructor(
         private const val PREFS_NAME = "vastavik_auth_tokens_enc"
         private const val KEY_ACCESS_TOKEN = "jwt_access_token"
         private const val KEY_REFRESH_TOKEN = "jwt_refresh_token"
+        private const val KEY_USER_ID = "jwt_user_id"
+        private const val KEY_USER_NAME = "jwt_user_name"
+        private const val KEY_USER_EMAIL = "jwt_user_email"
     }
 }

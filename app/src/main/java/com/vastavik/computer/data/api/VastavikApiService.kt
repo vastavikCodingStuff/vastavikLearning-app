@@ -120,6 +120,12 @@ interface VastavikApiService {
         @Query("course_id") courseId: String? = null
     ): List<QuizSetDto>
 
+    @POST("api/v1/practice/submit")
+    suspend fun submitPracticeAttempt(@Body request: PracticeSubmitRequest): CommonResponse
+
+    @GET("api/v1/practice/history")
+    suspend fun getPracticeHistory(): List<PracticeAttemptItem>
+
     // ==========================================
     // Code Runner & OCR
     // ==========================================
@@ -162,6 +168,9 @@ interface VastavikApiService {
 
     @GET("api/v1/search")
     suspend fun searchCatalog(@Query("q") query: String): SearchResponse
+
+    @GET("api/v1/search/history")
+    suspend fun getSearchHistory(): List<SearchHistoryItem>
 
     // ==========================================
     // Payments

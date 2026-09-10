@@ -64,8 +64,18 @@ object ActivityLog {
     fun log(context: Context?, event: String, payload: Map<String, Any?> = emptyMap()) {
         val ctx = context ?: try { VastavikApplication.instance } catch (_: Throwable) { null } ?: return
         try {
+            val tokenManager = try {
+                EntryPointAccessors.fromApplication(
+                    ctx.applicationContext,
+                    RepositoryEntryPoint::class.java
+                ).tokenManager()
+            } catch (_: Throwable) { null }
+
             val uid = try { FirebaseAuth.getInstance().currentUser?.uid } catch (_: Throwable) { null }
+                ?: tokenManager?.getUserId()
             val email = try { FirebaseAuth.getInstance().currentUser?.email } catch (_: Throwable) { null }
+                ?: tokenManager?.getUserEmail()
+            val name = tokenManager?.getUserName()
             val isAdmin = AdminSession.isAdmin.value
             val entry = JSONObject().apply {
                 put("id", UUID.randomUUID().toString())
@@ -73,6 +83,7 @@ object ActivityLog {
                 put("event", event)
                 put("uid", uid ?: "anonymous")
                 put("email", email ?: "")
+                put("name", name ?: "")
                 put("role", if (isAdmin) "admin" else (uid?.let { "student" } ?: "anonymous"))
                 put("app_version", try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName } catch (_: Throwable) { "" })
                 put("os_version", Build.VERSION.RELEASE ?: "")

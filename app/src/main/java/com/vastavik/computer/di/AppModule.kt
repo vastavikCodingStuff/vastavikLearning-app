@@ -29,6 +29,7 @@ import dagger.hilt.EntryPoint
 interface RepositoryEntryPoint {
     fun vastavikApiRepository(): VastavikApiRepository
     fun firestoreRepository(): com.vastavik.computer.data.repository.FirestoreRepository
+    fun tokenManager(): com.vastavik.computer.data.api.TokenManager
 }
 
 @Module

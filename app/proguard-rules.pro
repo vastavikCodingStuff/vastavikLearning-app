@@ -231,3 +231,19 @@
 # ==========================================
 -keep class com.vastavik.computer.VastavikApplication { *; }
 -keep class com.vastavik.computer.MainActivity { *; }
+
+# ==========================================
+# External libraries warnings suppression (R8)
+# ==========================================
+-dontwarn com.google.android.apps.nbu.paisa.inapp.client.api.PaymentsClient
+-dontwarn com.google.android.apps.nbu.paisa.inapp.client.api.Wallet
+-dontwarn com.google.android.apps.nbu.paisa.inapp.client.api.WalletUtils
+-dontwarn com.squareup.okhttp.CipherSuite
+-dontwarn com.squareup.okhttp.ConnectionSpec
+-dontwarn com.squareup.okhttp.TlsVersion
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
+-dontwarn java.lang.reflect.AnnotatedType
+-dontwarn proguard.annotation.Keep
+-dontwarn proguard.annotation.KeepClassMembers
+

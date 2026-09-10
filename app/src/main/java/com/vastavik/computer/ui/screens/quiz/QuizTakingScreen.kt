@@ -530,6 +530,7 @@ fun QuizTakingScreen(
     var score by remember { mutableIntStateOf(0) }
     val userAnswers = remember { mutableStateMapOf<Int, Int>() }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
 
@@ -731,8 +732,58 @@ fun QuizTakingScreen(
                                         currentQuestion++
                                         selectedAnswer = userAnswers[currentQuestion] ?: -1
                                     } else {
-                                        score = userAnswers.entries.count { (idx, ans) -> ans == questions[idx].correctIndex }
+                                        val finalScore = userAnswers.entries.count { (idx, ans) -> ans == questions[idx].correctIndex }
+                                        score = finalScore
                                         showResult = true
+
+                                        coroutineScope.launch {
+                                            val repo = try {
+                                                dagger.hilt.android.EntryPointAccessors.fromApplication(
+                                                    context.applicationContext,
+                                                    com.vastavik.computer.di.RepositoryEntryPoint::class.java
+                                                ).vastavikApiRepository()
+                                            } catch (_: Exception) { null }
+
+                                            // 1. Submit overall quiz summary
+                                            repo?.submitPracticeAttempt(
+                                                com.vastavik.computer.data.api.model.PracticeSubmitRequest(
+                                                    type = "quiz",
+                                                    topic = quizId,
+                                                    score = finalScore,
+                                                    totalQuestions = questions.size,
+                                                    verdict = if (finalScore * 2 >= questions.size) "PASSED" else "NEEDS_IMPROVEMENT"
+                                                )
+                                            )
+
+                                            // 2. Submit individual MCQ questions & student choices
+                                            questions.forEachIndexed { qIdx, q ->
+                                                val chosen = userAnswers[qIdx] ?: -1
+                                                val isCorrect = chosen == q.correctIndex
+                                                repo?.submitPracticeAttempt(
+                                                    com.vastavik.computer.data.api.model.PracticeSubmitRequest(
+                                                        type = "mcq",
+                                                        topic = quizId,
+                                                        question = q.question,
+                                                        options = q.options,
+                                                        selectedOption = q.options.getOrNull(chosen),
+                                                        correctOption = q.options.getOrNull(q.correctIndex),
+                                                        isCorrect = isCorrect,
+                                                        verdict = if (isCorrect) "CORRECT" else "INCORRECT",
+                                                        explanation = null
+                                                    )
+                                                )
+                                            }
+
+                                            com.vastavik.computer.utils.ActivityLog.log(
+                                                context,
+                                                "PRACTICE_QUIZ",
+                                                mapOf(
+                                                    "topic" to quizId,
+                                                    "score" to finalScore,
+                                                    "total" to questions.size
+                                                )
+                                            )
+                                        }
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(50.dp).border(BorderStroke(2.dp, bb), RoundedCornerShape(12.dp)),

@@ -323,6 +323,38 @@ fun PredictOutputSetScreen(
                     canonical.explanation
                 }
                 results[currentIndex] = OutputCheckResult(isCorrect, actual, explanation)
+
+                val repo = try {
+                    dagger.hilt.android.EntryPointAccessors.fromApplication(
+                        context.applicationContext,
+                        com.vastavik.computer.di.RepositoryEntryPoint::class.java
+                    ).vastavikApiRepository()
+                } catch (_: Exception) { null }
+                repo?.submitPracticeAttempt(
+                    com.vastavik.computer.data.api.model.PracticeSubmitRequest(
+                        type = "predict_output",
+                        topic = currentQ.topic,
+                        language = selectedLanguage,
+                        codeSnippet = snippet,
+                        predictedOutput = inputToVerify,
+                        actualOutput = actual,
+                        explanation = explanation,
+                        verdict = if (isCorrect) "CORRECT" else "INCORRECT",
+                        isCorrect = isCorrect
+                    )
+                )
+                com.vastavik.computer.utils.ActivityLog.log(
+                    context,
+                    "PRACTICE_PREDICT_OUTPUT",
+                    mapOf(
+                        "topic" to currentQ.topic,
+                        "language" to selectedLanguage,
+                        "predicted_output" to inputToVerify,
+                        "actual_output" to actual,
+                        "verdict" to if (isCorrect) "CORRECT" else "INCORRECT",
+                        "is_correct" to isCorrect
+                    )
+                )
             } catch (e: Exception) {
                 results[currentIndex] = OutputCheckResult(
                     isCorrect = isLocallyCorrect,

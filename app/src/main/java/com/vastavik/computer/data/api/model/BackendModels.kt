@@ -491,3 +491,69 @@ data class CreditsBalanceResponse(
     @SerializedName("credit_balance_inr") val creditBalanceInr: Double = 0.0,
     val ledger: List<CreditLedgerEntry> = emptyList()
 )
+
+// ==========================================
+// Practice Submission & History Models
+// ==========================================
+
+data class PracticeSubmitRequest(
+    val id: String? = null,
+    val type: String, // "mcq", "predict_output", "coding", "quiz"
+    val topic: String? = null,
+    val difficulty: String? = null,
+    val language: String? = null,
+    val question: String? = null,
+    val options: List<String>? = null,
+    @SerializedName("selected_option") val selectedOption: String? = null,
+    @SerializedName("correct_option") val correctOption: String? = null,
+    @SerializedName("code_snippet") val codeSnippet: String? = null,
+    @SerializedName("predicted_output") val predictedOutput: String? = null,
+    @SerializedName("actual_output") val actualOutput: String? = null,
+    @SerializedName("problem_title") val problemTitle: String? = null,
+    @SerializedName("solution_code") val solutionCode: String? = null,
+    @SerializedName("user_code") val userCode: String? = null,
+    val verdict: String? = null,
+    @SerializedName("is_correct") val isCorrect: Boolean? = null,
+    val score: Int? = null,
+    @SerializedName("total_questions") val totalQuestions: Int? = null,
+    val explanation: String? = null,
+    val timestamp: String? = null
+)
+
+data class PracticeAttemptItem(
+    val id: String = "",
+    val uid: String = "",
+    @SerializedName("student_name") val studentName: String = "",
+    @SerializedName("student_email") val studentEmail: String = "",
+    val type: String = "",
+    val topic: String = "",
+    val difficulty: String = "",
+    val language: String = "",
+    val question: String = "",
+    val options: List<String> = emptyList(),
+    @SerializedName("selected_option") val selectedOption: String? = null,
+    @SerializedName("correct_option") val correctOption: String? = null,
+    @SerializedName("code_snippet") val codeSnippet: String = "",
+    @SerializedName("predicted_output") val predictedOutput: String = "",
+    @SerializedName("actual_output") val actualOutput: String = "",
+    @SerializedName("problem_title") val problemTitle: String = "",
+    @SerializedName("solution_code") val solutionCode: String = "",
+    @SerializedName("user_code") val userCode: String = "",
+    val verdict: String = "",
+    @SerializedName("is_correct") val isCorrect: Boolean? = null,
+    val score: Int? = null,
+    @SerializedName("total_questions") val totalQuestions: Int? = null,
+    val explanation: String = "",
+    @SerializedName("created_at") val createdAt: String = ""
+)
+
+data class SearchHistoryItem(
+    val id: String = "",
+    val uid: String = "",
+    val query: String = "",
+    @SerializedName("student_name") val studentName: String? = null,
+    @SerializedName("student_email") val studentEmail: String? = null,
+    @SerializedName("results_count") val resultsCount: Int = 0,
+    @SerializedName("created_at") val createdAt: String = ""
+)
+
