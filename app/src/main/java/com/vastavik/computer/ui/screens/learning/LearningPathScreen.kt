@@ -34,17 +34,29 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LearningPathScreen(onNavigate: (String) -> Unit) {
+fun LearningPathScreen(
+    onNavigate: (String) -> Unit,
+    viewModel: LearningViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
-    val courses = listOf("Java", "Python", "C++", "Web Dev")
-    var selectedCourse by remember { mutableStateOf("Java") }
-    var showPartSheet by remember { mutableStateOf(false) }
-    var selectedPart by remember { mutableStateOf("") }
 
-    val nodes = listOf(
-        "Array", "String", "Functions", "Constructor", "Wrapper Functions"
-    )
+    val courses by viewModel.courses.collectAsState()
+    val selectedCourseId by viewModel.selectedCourseId.collectAsState()
+    val curriculumParts by viewModel.curriculumParts.collectAsState()
+    val visitedParts by viewModel.visitedParts.collectAsState()
+
+    var showPartSheet by remember { mutableStateOf(false) }
+    var selectedPartItem by remember { mutableStateOf<com.vastavik.computer.data.api.model.PartItem?>(null) }
+
+    val currentCourse = courses.find { it.id == selectedCourseId } ?: courses.firstOrNull()
+
+    // Dynamic nodes from curriculum parts; fallback if still loading or empty
+    val nodes = if (curriculumParts.isNotEmpty()) {
+        curriculumParts.map { it.title }
+    } else {
+        listOf("String in Java", "Functions in Java", "Array in Java")
+    }
     val offsets = listOf(0f, 0.4f, 0f, -0.4f, 0f)
 
     Scaffold(
@@ -136,28 +148,31 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
 
             // Course selector chips
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    courses.forEach { course ->
-                        val isSelected = selectedCourse == course
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50.dp))
-                                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                                .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
-                                .clickable { selectedCourse = course }
-                                .padding(horizontal = 18.dp, vertical = 10.dp)
-                        ) {
-                            Text(
-                                text = course,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground
-                            )
+                if (courses.isNotEmpty()) {
+                    androidx.compose.foundation.lazy.LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(courses.size) { idx ->
+                            val course = courses[idx]
+                            val isSelected = course.id == selectedCourseId
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(50.dp))
+                                    .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
+                                    .clickable { viewModel.selectCourse(course.id, course.title) }
+                                    .padding(horizontal = 18.dp, vertical = 10.dp)
+                            ) {
+                                Text(
+                                    text = course.title,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
                     }
                 }
@@ -165,6 +180,20 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
 
             // Unit Header brutal card
             item {
+                val unitTitle = currentCourse?.title ?: "Course Curriculum"
+                val unitSummary = if (curriculumParts.isNotEmpty()) {
+                    curriculumParts.joinToString(" • ") { it.title }
+                } else {
+                    currentCourse?.description?.ifBlank { "String in Java • Functions in Java • Array in Java" } ?: "Lessons & Curriculum"
+                }
+
+                val completedCount = curriculumParts.count { part ->
+                    visitedParts.contains("${selectedCourseId}::${part.partId}") || visitedParts.contains(part.partId)
+                }
+                val progressFraction = if (curriculumParts.isNotEmpty()) {
+                    (completedCount.toFloat() / curriculumParts.size.toFloat()).coerceIn(0f, 1f)
+                } else 0f
+
                 Box(modifier = Modifier.padding(horizontal = 16.dp).padding(end = 5.dp, bottom = 5.dp)) {
                     Box(
                         modifier = Modifier
@@ -188,12 +217,12 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     .border(BorderStroke(1.dp, bb), RoundedCornerShape(8.dp))
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
-                                Text("UNIT 1", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.sp)
+                                Text("CURRICULUM", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.sp)
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Java Fundamentals", color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                            Text(unitTitle, color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Array • String • Functions • Constructor • Wrapper Functions", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                            Text(unitSummary, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                             Spacer(modifier = Modifier.height(12.dp))
                             Box(
                                 modifier = Modifier
@@ -205,14 +234,14 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth(0.0f)
+                                        .fillMaxWidth(progressFraction)
                                         .fillMaxHeight()
                                         .clip(RoundedCornerShape(50.dp))
                                         .background(MaterialTheme.colorScheme.primary)
                                 )
                             }
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text("0% completed", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
+                            Text("${(progressFraction * 100).toInt()}% completed", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -225,10 +254,14 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                     nodes = nodes,
                     offsets = offsets,
                     onNodeClick = { node, index ->
-                        if (index != nodes.lastIndex) {
-                            selectedPart = node
-                            showPartSheet = true
-                        }
+                        val item = curriculumParts.getOrNull(index) ?: com.vastavik.computer.data.api.model.PartItem(
+                            partId = "part_${index + 1}",
+                            title = node,
+                            order = index + 1,
+                            subparts = emptyList()
+                        )
+                        selectedPartItem = item
+                        showPartSheet = true
                     }
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -236,7 +269,8 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
         }
     }
 
-    if (showPartSheet) {
+    if (showPartSheet && selectedPartItem != null) {
+        val part = selectedPartItem!!
         ModalBottomSheet(
             onDismissRequest = { showPartSheet = false },
             containerColor = MaterialTheme.colorScheme.surface
@@ -244,19 +278,103 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
             ) {
                 Text(
-                    text = selectedPart,
+                    text = part.title,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                Text(
+                    text = "${part.subparts.size} Video Lessons",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val subparts = listOf("Video Lesson", "Practice Quiz", "Coding Exercise", "Notes")
-                subparts.forEach { subpart ->
-                    Box(modifier = Modifier.padding(vertical = 6.dp).padding(end = 4.dp, bottom = 4.dp)) {
+                // If subparts exist, render actual video lessons from curriculum
+                if (part.subparts.isNotEmpty()) {
+                    Text(
+                        text = "Video Lectures",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    part.subparts.forEachIndexed { idx, subpart ->
+                        val lessonId = subpart.lessonId.ifBlank { subpart.subpartId }
+                        Box(modifier = Modifier.padding(vertical = 5.dp).padding(end = 4.dp, bottom = 4.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .offset(x = 4.dp, y = 4.dp)
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(bs)
+                            )
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showPartSheet = false
+                                        viewModel.markPartVisited(selectedCourseId, part.partId)
+                                        onNavigate("video_lesson/$lessonId/$selectedCourseId/${part.partId}/${subpart.subpartId}")
+                                    },
+                                shape = RoundedCornerShape(14.dp),
+                                border = BorderStroke(2.dp, bb),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(14.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Filled.PlayCircle,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = subpart.title,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onBackground,
+                                            fontSize = 14.sp
+                                        )
+                                        if (subpart.lessonId.isNotBlank()) {
+                                            Text(
+                                                text = "Lesson ID: ${subpart.lessonId}",
+                                                fontSize = 11.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "${idx + 1}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                // Interactive practice & notes for this topic
+                Text(
+                    text = "Module Practice & Notes",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+                val practiceOptions = listOf("Practice Quiz", "Coding Exercise", "Notes")
+                practiceOptions.forEach { opt ->
+                    Box(modifier = Modifier.padding(vertical = 4.dp).padding(end = 4.dp, bottom = 4.dp)) {
                         Box(
                             modifier = Modifier
                                 .matchParentSize()
@@ -269,19 +387,22 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                 .fillMaxWidth()
                                 .clickable {
                                     showPartSheet = false
-                                    onNavigate("video_lesson/1/1/1/1")
+                                    when (opt) {
+                                        "Practice Quiz" -> onNavigate("quiz_setup/${part.title}")
+                                        "Coding Exercise" -> onNavigate("practice")
+                                        else -> onNavigate("my_notes")
+                                    }
                                 },
                             shape = RoundedCornerShape(14.dp),
                             border = BorderStroke(2.dp, bb),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                         ) {
                             Row(
-                                modifier = Modifier.padding(16.dp),
+                                modifier = Modifier.padding(14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    when (subpart) {
-                                        "Video Lesson" -> Icons.Filled.PlayCircle
+                                    when (opt) {
                                         "Practice Quiz" -> Icons.Filled.Quiz
                                         "Coding Exercise" -> Icons.Filled.Code
                                         else -> Icons.Filled.Note
@@ -290,7 +411,7 @@ fun LearningPathScreen(onNavigate: (String) -> Unit) {
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(subpart, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+                                Text(opt, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
                                 Spacer(modifier = Modifier.weight(1f))
                                 Icon(
                                     Icons.Filled.ChevronRight,

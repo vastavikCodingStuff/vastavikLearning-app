@@ -232,15 +232,10 @@ fun ChatScreen(onNavigate: (String) -> Unit) {
                 callVastavikAiChat(selectedAiModel, messages + ChatMessage(enhancedPrompt, isUser = true))
             }
         }
-        com.vastavik.computer.utils.ActivityLog.log(
+        com.vastavik.computer.utils.ActivityLog.aiChat(
             context,
-            "ai_chat",
-            mapOf(
-                "model" to selectedAiModel.name,
-                "prompt" to prompt,
-                "response" to reply,
-                "session_id" to activeConversationId
-            )
+            selectedAiModel.name,
+            prompt.length
         )
         return reply
     }
