@@ -177,6 +177,34 @@ fun PracticeScreen(
             VastavikAiDiskCache.saveSolution(context, cacheKey, response)
             aiSolutionMarkdown = response
             isGeneratingCode = false
+
+            val repo = try {
+                dagger.hilt.android.EntryPointAccessors.fromApplication(
+                    context.applicationContext,
+                    com.vastavik.computer.di.RepositoryEntryPoint::class.java
+                ).vastavikApiRepository()
+            } catch (_: Exception) { null }
+            repo?.submitPracticeAttempt(
+                com.vastavik.computer.data.api.model.PracticeSubmitRequest(
+                    type = "coding",
+                    problemTitle = item.title,
+                    topic = item.topic,
+                    difficulty = item.difficulty,
+                    language = lang,
+                    solutionCode = response,
+                    verdict = "GENERATED"
+                )
+            )
+            com.vastavik.computer.utils.ActivityLog.log(
+                context,
+                "PRACTICE_CODING",
+                mapOf(
+                    "problem_title" to item.title,
+                    "topic" to item.topic,
+                    "difficulty" to item.difficulty,
+                    "language" to lang
+                )
+            )
         }
     }
 
@@ -1047,6 +1075,38 @@ EXPLANATION:
                                                         response.trim()
                                                     }
                                                     outputCheckResult = OutputCheckResult(isCorrect, actualOutput, explanation)
+
+                                                    val repo = try {
+                                                        dagger.hilt.android.EntryPointAccessors.fromApplication(
+                                                            context.applicationContext,
+                                                            com.vastavik.computer.di.RepositoryEntryPoint::class.java
+                                                        ).vastavikApiRepository()
+                                                    } catch (_: Exception) { null }
+                                                    repo?.submitPracticeAttempt(
+                                                        com.vastavik.computer.data.api.model.PracticeSubmitRequest(
+                                                            type = "predict_output",
+                                                            topic = item.topic,
+                                                            language = dialogLanguage,
+                                                            codeSnippet = activeSnippet,
+                                                            predictedOutput = studentPredictedOutput,
+                                                            actualOutput = actualOutput,
+                                                            explanation = explanation,
+                                                            verdict = if (isCorrect) "CORRECT" else "INCORRECT",
+                                                            isCorrect = isCorrect
+                                                        )
+                                                    )
+                                                    com.vastavik.computer.utils.ActivityLog.log(
+                                                        context,
+                                                        "PRACTICE_PREDICT_OUTPUT",
+                                                        mapOf(
+                                                            "topic" to item.topic,
+                                                            "language" to dialogLanguage,
+                                                            "predicted_output" to studentPredictedOutput,
+                                                            "actual_output" to actualOutput,
+                                                            "verdict" to if (isCorrect) "CORRECT" else "INCORRECT",
+                                                            "is_correct" to isCorrect
+                                                        )
+                                                    )
                                                 } catch (e: Exception) {
                                                     outputCheckResult = OutputCheckResult(
                                                         isCorrect = false,
