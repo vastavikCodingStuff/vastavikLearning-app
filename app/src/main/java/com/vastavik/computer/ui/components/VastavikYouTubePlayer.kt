@@ -75,8 +75,18 @@ fun VastavikYouTubePlayer(
                 .background(Color.Black),
             contentAlignment = Alignment.Center
         ) {
-            Text("Invalid video link", color = Color.White.copy(alpha = 0.7f), fontSize = 13.sp)
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
+                Text("Invalid video link", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Ask your admin to check the YouTube URL (needs an 11-character video ID). Pull to refresh Learn after it is fixed.",
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
+        onError?.invoke("invalid_video_link")
         return
     }
 

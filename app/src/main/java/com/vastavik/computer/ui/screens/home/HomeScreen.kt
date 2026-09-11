@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -591,7 +592,17 @@ private fun HomeTab(
                 )
             }
             Spacer(modifier = Modifier.height(12.dp))
-            CourseCatalogGrid(courses = courses, onNavigate = onNavigate)
+            // Course catalog grid now uses live backend courses (same source as Popular Topics)
+            val gridColors = listOf(
+                Color(0xFF8B5CF6) to Color(0xFF6366F1),
+                Color(0xFF10B981) to Color(0xFF14B8A6),
+                Color(0xFFF59E0B) to Color(0xFFF97316),
+                Color(0xFF06B6D4) to Color(0xFF3B82F6)
+            )
+            val gridCourses = fetchedCourses.mapIndexed { idx, c ->
+                Triple(c.title, gridColors[idx % gridColors.size], c.iconName.ifBlank { "40+ lessons" })
+            }
+            CourseCatalogGrid(courses = gridCourses, onNavigate = onNavigate)
         }
 
         item { Spacer(modifier = Modifier.height(28.dp)) }
@@ -888,11 +899,8 @@ private fun CourseCatalogGrid(
                     colors = colors,
                     lessons = lessons,
                     onClick = {
-                        if (title == "Java Programming") {
-                            onNavigate("learning_path")
-                        } else {
-                            onNavigate("coming_soon/${java.net.URLEncoder.encode(title, "UTF-8")}")
-                        }
+                        // All catalog courses are real backend courses now — go to Learn path
+                        onNavigate("learning_path")
                     }
                 )
             }
@@ -908,11 +916,7 @@ private fun CourseCatalogGrid(
                     colors = colors,
                     lessons = lessons,
                     onClick = {
-                        if (title == "Java Programming") {
-                            onNavigate("learning_path")
-                        } else {
-                            onNavigate("coming_soon/${java.net.URLEncoder.encode(title, "UTF-8")}")
-                        }
+                        onNavigate("learning_path")
                     }
                 )
             }

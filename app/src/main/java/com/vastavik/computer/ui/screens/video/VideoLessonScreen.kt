@@ -69,6 +69,33 @@ fun VideoLessonScreen(
         viewModel.loadLesson(courseId, partId, subpartId, lessonId)
     }
 
+    // Persist like/dislike + comments per lesson so they survive process death
+    LaunchedEffect(lessonId) {
+        try {
+            val prefs = context.getSharedPreferences("lesson_feedback", android.content.Context.MODE_PRIVATE)
+            liked = prefs.getBoolean("like_$lessonId", false)
+            disliked = prefs.getBoolean("dislike_$lessonId", false)
+            val saved = prefs.getStringSet("comments_$lessonId", null)
+            if (saved != null) {
+                comments = saved.mapNotNull { raw ->
+                    val parts = raw.split("||", limit = 3)
+                    if (parts.size == 3) LessonComment(parts[0], parts[1], parts[2]) else null
+                }.toMutableList()
+            }
+        } catch (_: Exception) {}
+    }
+
+    fun persistFeedback() {
+        try {
+            val prefs = context.getSharedPreferences("lesson_feedback", android.content.Context.MODE_PRIVATE)
+            prefs.edit()
+                .putBoolean("like_$lessonId", liked)
+                .putBoolean("dislike_$lessonId", disliked)
+                .putStringSet("comments_$lessonId", comments.map { "${it.author}||${it.text}||${it.timestamp}" }.toSet())
+                .apply()
+        } catch (_: Exception) {}
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -106,9 +133,47 @@ fun VideoLessonScreen(
                         Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color.White.copy(alpha = 0.7f), modifier = Modifier.size(48.dp))
                         Spacer(Modifier.height(8.dp))
                         Text(error ?: "Failed to load", color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center)
+                        Spacer(Modifier.height(12.dp))
+                        Row {
+                            FilledTonalButton(onClick = { viewModel.loadLesson(courseId, partId, subpartId, lessonId) }) {
+                                Text("Retry", fontSize = 13.sp)
+                            }
+                            Spacer(Modifier.width(8.dp))
+                            FilledTonalButton(onClick = { onNavigate("learning_path") }) {
+                                Text("Back to Learn", fontSize = 13.sp)
+                            }
+                        }
                     }
                 }
             } else {
+                // Learn with Vastavik — unlisted playback, Vastavik branding (no YouTube logo shown to students)
+                Surface(
+                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                    color = Color(0xFF0F172A)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier.size(24.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFF2563EB)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("V", color = Color.White, fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "Learn with Vastavik",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (lesson?.isPremium == true) {
+                            Text("PRO", color = Color(0xFFFFB800), fontWeight = FontWeight.Black, fontSize = 11.sp)
+                        }
+                    }
+                }
                 var lastReportedSec by remember { mutableStateOf(-1) }
                 VastavikYouTubePlayer(
                     youtubeUrl = lesson?.youtubeUrl,
@@ -209,6 +274,7 @@ fun VideoLessonScreen(
                 FilledTonalButton(
                     onClick = {
                         liked = !liked; if (liked) disliked = false
+                        persistFeedback()
                         com.vastavik.computer.utils.ActivityLog.videoLike(context, lessonId, liked)
                     },
                     shape = neoShape(20.dp),
@@ -224,6 +290,7 @@ fun VideoLessonScreen(
                 FilledTonalButton(
                     onClick = {
                         disliked = !disliked; if (disliked) liked = false
+                        persistFeedback()
                         com.vastavik.computer.utils.ActivityLog.log(context, "video_dislike", mapOf("lesson_id" to lessonId, "disliked" to disliked))
                     },
                     shape = neoShape(20.dp),
@@ -270,7 +337,14 @@ fun VideoLessonScreen(
             CommentsBottomSheet(
                 comments = comments,
                 onDismiss = { showComments = false },
-                onPost = { newComment -> comments = (comments + newComment).toMutableList() }
+                onPost = { newComment ->
+                    comments = (comments + newComment).toMutableList()
+                    persistFeedback()
+                    com.vastavik.computer.utils.ActivityLog.log(
+                        context, "video_comment",
+                        mapOf("lesson_id" to lessonId, "text" to newComment.text.take(200))
+                    )
+                }
             )
         }
     }
