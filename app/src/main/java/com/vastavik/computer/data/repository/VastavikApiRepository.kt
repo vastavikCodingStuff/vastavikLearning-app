@@ -33,12 +33,12 @@ class VastavikApiRepository @Inject constructor(
         api.getLessonV1(lessonId)
     }
 
-    suspend fun getHomeCatalog(): Result<HomeCatalogResponse> = safeApiCall {
-        api.getHomeCatalog()
+    suspend fun getHomeCatalog(force: Boolean = false): Result<HomeCatalogResponse> = safeApiCall {
+        api.getHomeCatalog(force)
     }
 
-    suspend fun getCurriculum(courseId: String): Result<CurriculumResponse> = safeApiCall {
-        api.getCurriculum(courseId)
+    suspend fun getCurriculum(courseId: String, force: Boolean = false): Result<CurriculumResponse> = safeApiCall {
+        api.getCurriculum(courseId, force)
     }
 
     suspend fun markPartVisited(courseId: String, partId: String): Result<CommonResponse> = safeApiCall {

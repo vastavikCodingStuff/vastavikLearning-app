@@ -62,12 +62,18 @@ fun LearningPathScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(
+        val isRefreshing by viewModel.isLoadingCurriculum.collectAsState()
+        androidx.compose.material3.pulltorefresh.PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refresh() },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(bottom = 100.dp)
+                .padding(padding)
         ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
             // Top bar: "Learn Path" + profile
             item {
                 Row(
@@ -175,6 +181,35 @@ fun LearningPathScreen(
                             }
                         }
                     }
+                }
+            }
+
+            // Refresh — force fetch from backend (instant update after admin upload)
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val isRefreshing by viewModel.isLoadingCurriculum.collectAsState()
+                    Button(
+                        onClick = { viewModel.refresh() },
+                        enabled = !isRefreshing,
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
+                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outline),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        if (isRefreshing) {
+                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
+                        } else {
+                            Icon(Icons.Filled.Refresh, contentDescription = "Refresh", modifier = Modifier.size(14.dp))
+                        }
+                        Spacer(Modifier.width(6.dp))
+                        Text(if (isRefreshing) "Refreshing..." else "Refresh", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Text("Tap to fetch latest videos", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -598,6 +633,8 @@ private fun LearningPathWindingView(
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
+            }
+        }
             }
         }
     }
