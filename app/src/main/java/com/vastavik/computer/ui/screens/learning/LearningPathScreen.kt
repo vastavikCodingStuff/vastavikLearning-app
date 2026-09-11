@@ -62,18 +62,12 @@ fun LearningPathScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        val isRefreshing by viewModel.isLoadingCurriculum.collectAsState()
-        androidx.compose.material3.pulltorefresh.PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refresh() },
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(padding),
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 100.dp)
-            ) {
             // Top bar: "Learn Path" + profile
             item {
                 Row(
@@ -633,8 +627,6 @@ private fun LearningPathWindingView(
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
-            }
-        }
             }
         }
     }
