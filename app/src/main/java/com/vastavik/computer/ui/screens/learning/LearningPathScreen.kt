@@ -146,64 +146,52 @@ fun LearningPathScreen(
                 }
             }
 
-            // Course selector chips
+            // Course selector chips + Refresh on the same line (right side)
             item {
                 if (courses.isNotEmpty()) {
-                    androidx.compose.foundation.lazy.LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(courses.size) { idx ->
-                            val course = courses[idx]
-                            val isSelected = course.id == selectedCourseId
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(50.dp))
-                                    .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
-                                    .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
-                                    .clickable { viewModel.selectCourse(course.id, course.title) }
-                                    .padding(horizontal = 18.dp, vertical = 10.dp)
-                            ) {
-                                Text(
-                                    text = course.title,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground
-                                )
+                        androidx.compose.foundation.lazy.LazyRow(
+                            modifier = Modifier.weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(courses.size) { idx ->
+                                val course = courses[idx]
+                                val isSelected = course.id == selectedCourseId
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50.dp))
+                                        .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
+                                        .border(BorderStroke(2.dp, bb), RoundedCornerShape(50.dp))
+                                        .clickable { viewModel.selectCourse(course.id, course.title) }
+                                        .padding(horizontal = 18.dp, vertical = 10.dp)
+                                ) {
+                                    Text(
+                                        text = course.title,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) Color.White else MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        val isRefreshing by viewModel.isLoadingCurriculum.collectAsState()
+                        FilledTonalButton(
+                            onClick = { viewModel.refresh() },
+                            enabled = !isRefreshing,
+                            shape = RoundedCornerShape(50.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            if (isRefreshing) {
+                                CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                            } else {
+                                Icon(Icons.Filled.Refresh, contentDescription = "Refresh latest videos", modifier = Modifier.size(16.dp))
                             }
                         }
                     }
-                }
-            }
-
-            // Refresh — force fetch from backend (instant update after admin upload)
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val isRefreshing by viewModel.isLoadingCurriculum.collectAsState()
-                    Button(
-                        onClick = { viewModel.refresh() },
-                        enabled = !isRefreshing,
-                        shape = RoundedCornerShape(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface, contentColor = MaterialTheme.colorScheme.onSurface),
-                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outline),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        if (isRefreshing) {
-                            CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
-                        } else {
-                            Icon(Icons.Filled.Refresh, contentDescription = "Refresh", modifier = Modifier.size(14.dp))
-                        }
-                        Spacer(Modifier.width(6.dp))
-                        Text(if (isRefreshing) "Refreshing..." else "Refresh", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Text("Tap to fetch latest videos", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
