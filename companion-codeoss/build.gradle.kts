@@ -12,8 +12,8 @@ android {
         applicationId = "com.vastavik.codeoss"
         minSdk = 24
         targetSdk = 35
-        versionCode = 25
-        versionName = "1.0.58"
+        versionCode = 26
+        versionName = "1.0.59"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
