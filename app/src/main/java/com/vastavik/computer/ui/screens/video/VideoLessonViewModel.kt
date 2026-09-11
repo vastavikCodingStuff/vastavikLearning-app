@@ -64,6 +64,31 @@ class VideoLessonViewModel @Inject constructor(
                 }
             } catch (_: Exception) { /* fall through */ }
 
+            // 1.5) Resolve via the curriculum subpart link (fixes "Video not found"
+            // when the id is a subpart link or the video lives nested under it)
+            try {
+                val resp = apiRepository.getLessonBySubpart(courseId, partId, subpartId).getOrNull()
+                if (resp != null && (resp.title.isNotBlank() || resp.youtubeVideoId.isNotBlank() || resp.youtubeUrl.isNotBlank())) {
+                    _lessonData.value = LessonModel(
+                        id = resp.id.ifBlank { lessonId },
+                        title = resp.title,
+                        description = resp.description,
+                        youtubeUrl = resp.youtubeUrl,
+                        whiteboardImageUrl = resp.whiteboardImageUrl,
+                        codeSample = resp.codeSample,
+                        notes = resp.notes,
+                        order = resp.order,
+                        youtubeVideoId = resp.youtubeVideoId,
+                        durationSec = resp.durationSec,
+                        isPremium = resp.isPremium,
+                        videoFormat = resp.videoFormat.ifBlank { "screen_recording" }
+                    )
+                    _isLoading.value = false
+                    _usingBackend.value = true
+                    return@launch
+                }
+            } catch (_: Exception) { /* fall through */ }
+
             // 2) Legacy single-lesson endpoint
             try {
                 val lesson = apiRepository.getLesson(lessonId)
