@@ -33,6 +33,10 @@ class VastavikApiRepository @Inject constructor(
         api.getLessonV1(lessonId)
     }
 
+    suspend fun getLessonBySubpart(courseId: String, partId: String, subpartId: String): Result<LessonResponse> = safeApiCall {
+        api.getLessonBySubpart(courseId, partId, subpartId)
+    }
+
     suspend fun getHomeCatalog(force: Boolean = false): Result<HomeCatalogResponse> = safeApiCall {
         api.getHomeCatalog(force)
     }

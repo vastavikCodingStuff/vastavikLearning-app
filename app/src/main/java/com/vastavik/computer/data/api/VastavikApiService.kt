@@ -53,6 +53,13 @@ interface VastavikApiService {
     @GET("api/v1/lessons/{lessonId}")
     suspend fun getLessonV1(@Path("lessonId") lessonId: String): LessonResponse
 
+    @GET("api/v1/lessons/by-subpart/{courseId}/{partId}/{subpartId}")
+    suspend fun getLessonBySubpart(
+        @Path("courseId") courseId: String,
+        @Path("partId") partId: String,
+        @Path("subpartId") subpartId: String
+    ): LessonResponse
+
     @POST("api/v1/progress/visited")
     suspend fun markPartVisited(@Body request: VisitedRequest): CommonResponse
 
