@@ -45,10 +45,10 @@ interface VastavikApiService {
     // ==========================================
 
     @GET("api/v1/catalog/home")
-    suspend fun getHomeCatalog(): HomeCatalogResponse
+    suspend fun getHomeCatalog(@Query("force") force: Boolean = false): HomeCatalogResponse
 
     @GET("api/v1/courses/{courseId}/curriculum")
-    suspend fun getCurriculum(@Path("courseId") courseId: String): CurriculumResponse
+    suspend fun getCurriculum(@Path("courseId") courseId: String, @Query("force") force: Boolean = false): CurriculumResponse
 
     @GET("api/v1/lessons/{lessonId}")
     suspend fun getLessonV1(@Path("lessonId") lessonId: String): LessonResponse

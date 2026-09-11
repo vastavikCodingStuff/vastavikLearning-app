@@ -19,9 +19,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -146,12 +148,12 @@ class LearningViewModel @Inject constructor(
         loadCurriculum(courseId)
     }
 
-    fun loadCurriculum(courseId: String) {
+    fun loadCurriculum(courseId: String, force: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoadingCurriculum.value = true
             var loaded = false
             try {
-                val result = apiRepository.getCurriculum(courseId)
+                val result = apiRepository.getCurriculum(courseId, force)
                 val resp = result.getOrNull()
                 if (resp != null && resp.parts.isNotEmpty()) {
                     _curriculumParts.value = resp.parts
@@ -161,22 +163,55 @@ class LearningViewModel @Inject constructor(
 
             if (!loaded) {
                 try {
-                    firestoreRepository.streamParts(courseId).collect { parts ->
-                        if (parts.isNotEmpty()) {
-                            val converted = parts.map { p ->
-                                PartItem(
-                                    partId = p.id,
-                                    title = p.title,
-                                    order = p.order,
-                                    subparts = emptyList()
-                                )
-                            }
-                            _curriculumParts.value = converted
+                    val fallbackParts = withTimeoutOrNull(3000) {
+                        firestoreRepository.streamParts(courseId).first()
+                    }
+                    if (fallbackParts != null && fallbackParts.isNotEmpty()) {
+                        val converted = fallbackParts.map { p ->
+                            PartItem(
+                                partId = p.id,
+                                title = p.title,
+                                order = p.order,
+                                subparts = emptyList()
+                            )
                         }
+                        _curriculumParts.value = converted
                     }
                 } catch (_: Exception) {}
             }
             _isLoadingCurriculum.value = false
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _isLoadingCurriculum.value = true
+            try {
+                val catalogResult = apiRepository.getHomeCatalog(force = true)
+                catalogResult.getOrNull()?.courses?.let { apiCourses ->
+                    if (apiCourses.isNotEmpty()) {
+                        val mapped = apiCourses.map { c ->
+                            CourseModel(
+                                id = c.id,
+                                title = c.title,
+                                description = c.description,
+                                iconName = c.iconName,
+                                color = c.color,
+                                order = c.order
+                            )
+                        }
+                        val currentList = _courses.value
+                        val merged = (mapped + currentList).distinctBy { it.id }
+                        _courses.value = merged
+                    }
+                }
+            } catch (_: Exception) {}
+            val courseId = _selectedCourseId.value
+            if (courseId.isNotEmpty()) {
+                loadCurriculum(courseId, force = true)
+            } else {
+                _isLoadingCurriculum.value = false
+            }
         }
     }
 
