@@ -147,19 +147,67 @@ object SecurityProtectionManager {
     private val _isScreenshotBlackoutActive = kotlinx.coroutines.flow.MutableStateFlow(false)
     val isScreenshotBlackoutActive: kotlinx.coroutines.flow.StateFlow<Boolean> = _isScreenshotBlackoutActive
 
+    /**
+     * Controls whether the loud "SCREEN CAPTURE BLOCKED" message is rendered.
+     * Kept separate from the blackout itself so backgrounding the app blacks out
+     * SILENTLY (nothing the user should see on return), while a genuine overlay /
+     * screenshot attempt shows the message.
+     */
+    private val _isBlockedMessageVisible = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val isBlockedMessageVisible: kotlinx.coroutines.flow.StateFlow<Boolean> = _isBlockedMessageVisible
+
     private var blackoutJob: kotlinx.coroutines.Job? = null
+    private var messageJob: kotlinx.coroutines.Job? = null
+    private var isActivityResumed = true
     private val securityScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main + kotlinx.coroutines.SupervisorJob())
+
+    /** Delay before the blocked message appears after focus loss, so quick system
+     *  dialogs / resume transitions never flash the message. */
+    private const val MESSAGE_REVEAL_DELAY_MS = 250L
+
+    /**
+     * Called from Activity.onResume/onPause. When the activity is no longer resumed
+     * (user went Home, switched apps, screen-share in a call, etc.) the blocked
+     * message must never show — the blackout stays purely silent.
+     */
+    fun setActivityResumed(resumed: Boolean) {
+        isActivityResumed = resumed
+        if (!resumed) {
+            messageJob?.cancel()
+            messageJob = null
+            _isBlockedMessageVisible.value = false
+        }
+    }
 
     /**
      * Called whenever Activity window focus changes.
-     * When focus is lost (e.g. Windows Snipping Tool, Win+Shift+S, Alt+Tab, Taskbar click),
-     * the screen is immediately blacked out before the host OS can sample any pixels.
+     *
+     * - Focus lost while STILL RESUMED → another window is floating on top of the
+     *   visible app (floating window, system dialog, expanded shade): black out and,
+     *   after a short confirmation delay, show the "SCREEN CAPTURE BLOCKED" message.
+     * - Focus lost while NOT resumed (backgrounding) → black out silently.
+     * - Focus regained → cancel every stale defense timer so returning to the app
+     *   never shows a lingering blocked screen, then clear after a short grace period.
      */
     fun setWindowFocused(focused: Boolean) {
         _isWindowFocused.value = focused
         if (!focused) {
             _isScreenshotBlackoutActive.value = true
+            messageJob?.cancel()
+            messageJob = securityScope.launch {
+                kotlinx.coroutines.delay(MESSAGE_REVEAL_DELAY_MS)
+                if (!_isWindowFocused.value && isActivityResumed) {
+                    _isBlockedMessageVisible.value = true
+                }
+            }
         } else {
+            messageJob?.cancel()
+            messageJob = null
+            _isBlockedMessageVisible.value = false
+            // Cancel stale onUserLeaveHint / screenshot-key defense timers so they
+            // cannot surface the blocked screen after the user has returned.
+            blackoutJob?.cancel()
+            blackoutJob = null
             securityScope.launch {
                 kotlinx.coroutines.delay(350)
                 if (_isWindowFocused.value) {
@@ -170,16 +218,21 @@ object SecurityProtectionManager {
     }
 
     /**
-     * Triggered when a screenshot key (PrintScreen, SysRq, Ctrl+Shift+S) is intercepted.
-     * Keeps the screen blanked for the specified duration to defeat rapid capture.
+     * Triggered on a genuine capture attempt: intercepted screenshot keys or the
+     * Android 14+ ScreenCaptureCallback. Blacks out and shows the message for the
+     * given duration (cleared instantly if the window regains focus meanwhile).
      */
-    fun triggerScreenshotDefense(durationMillis: Long = 4000L) {
+    fun triggerScreenshotDefense(durationMillis: Long = 4000L, showMessage: Boolean = true) {
         _isScreenshotBlackoutActive.value = true
+        if (showMessage && isActivityResumed) {
+            _isBlockedMessageVisible.value = true
+        }
         blackoutJob?.cancel()
         blackoutJob = securityScope.launch {
             kotlinx.coroutines.delay(durationMillis)
             if (_isWindowFocused.value) {
                 _isScreenshotBlackoutActive.value = false
+                _isBlockedMessageVisible.value = false
             }
         }
     }

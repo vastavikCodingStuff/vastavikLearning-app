@@ -47,6 +47,7 @@ fun FocusLossBlackoutCurtain(
 ) {
     val isFocused by SecurityProtectionManager.isWindowFocused.collectAsState()
     val isBlackoutActive by SecurityProtectionManager.isScreenshotBlackoutActive.collectAsState()
+    val showMessage by SecurityProtectionManager.isBlockedMessageVisible.collectAsState()
 
     val shouldBlackout = !isFocused || isBlackoutActive
 
@@ -64,68 +65,73 @@ fun FocusLossBlackoutCurtain(
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF1E293B))
-                        .border(BorderStroke(2.dp, Color(0xFFEF4444)), CircleShape),
-                    contentAlignment = Alignment.Center
+            // Plain black by default (silent defense while backgrounded).
+            // The "SCREEN CAPTURE BLOCKED" message only renders for genuine events:
+            // another window floating over the visible app, or a real screenshot attempt.
+            if (showMessage) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Shield,
-                        contentDescription = "Screen Capture Protected",
-                        tint = Color(0xFFEF4444),
-                        modifier = Modifier.size(38.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .padding(end = 4.dp, bottom = 4.dp)
-                ) {
-                    // NeoBrutalistic Black Shadow
                     Box(
                         modifier = Modifier
-                            .matchParentSize()
-                            .offset(x = 4.dp, y = 4.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF0F172A))
-                    )
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
-                        border = BorderStroke(2.dp, Color(0xFFEF4444))
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF1E293B))
+                            .border(BorderStroke(2.dp, Color(0xFFEF4444)), CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Column(
+                        Icon(
+                            imageVector = Icons.Filled.Shield,
+                            contentDescription = "Screen Capture Protected",
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(38.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .padding(end = 4.dp, bottom = 4.dp)
+                    ) {
+                        // NeoBrutalistic Black Shadow
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .matchParentSize()
+                                .offset(x = 4.dp, y = 4.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color(0xFF0F172A))
+                        )
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                            border = BorderStroke(2.dp, Color(0xFFEF4444))
                         ) {
-                            Text(
-                                text = "SCREEN CAPTURE BLOCKED",
-                                fontWeight = FontWeight.Black,
-                                fontSize = 14.sp,
-                                color = Color(0xFFEF4444),
-                                letterSpacing = 0.5.sp
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = "Window focus lost or screenshot attempt detected.\nDisplay obscured to protect course content and privacy.",
-                                fontSize = 11.sp,
-                                lineHeight = 15.sp,
-                                color = Color(0xFF94A3B8),
-                                textAlign = TextAlign.Center
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "SCREEN CAPTURE BLOCKED",
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 14.sp,
+                                    color = Color(0xFFEF4444),
+                                    letterSpacing = 0.5.sp
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = "Another app is covering this screen or a screenshot was attempted.\nDisplay obscured to protect course content and privacy.",
+                                    fontSize = 11.sp,
+                                    lineHeight = 15.sp,
+                                    color = Color(0xFF94A3B8),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }

@@ -274,7 +274,7 @@ fun EmulatorSecurityCurtain(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Enter developer bypass PIN to preview app on BlueStacks. Forensics watermark will remain active.",
+                            text = "Enter developer bypass PIN to preview app on BlueStacks. Screen capture stays blocked.",
                             fontSize = 11.5.sp,
                             color = Color(0xFF475569),
                             textAlign = TextAlign.Center

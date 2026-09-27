@@ -37,6 +37,10 @@ data class OAuthGitHubRequest(
     val code: String
 )
 
+data class OAuthClerkRequest(
+    @SerializedName("session_token") val sessionToken: String
+)
+
 data class DeviceVerifyRequest(
     @SerializedName("device_id") val deviceId: String,
     @SerializedName("is_rooted") val isRooted: Boolean = false,

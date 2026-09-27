@@ -134,21 +134,6 @@ fun SettingsScreen(
                             )
                         }
                     }
-                    Spacer(Modifier.height(12.dp))
-                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                    Spacer(Modifier.height(12.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Fingerprint, contentDescription = null, tint = accent)
-                        Spacer(Modifier.width(16.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Anti-Leak Forensic Watermark", fontWeight = FontWeight.W500, color = textPrimary)
-                            Text(
-                                "Active — student ID stamped across display to trace external camera leaks",
-                                fontSize = 12.sp,
-                                color = textSecondary
-                            )
-                        }
-                    }
                 }
             }
 

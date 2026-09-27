@@ -34,6 +34,22 @@ object VastavikAiDiskCache {
     }
 
     /**
+     * Distinguishes "never saved" (seed defaults) from "saved empty" (user deleted
+     * everything — respect the empty list and show the empty state).
+     */
+    fun hasSavedMCQs(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(KEY_AI_MCQS)
+
+    fun hasSavedPredictOutput(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(KEY_AI_PREDICT_OUTPUT)
+
+    fun hasSavedCoding(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(KEY_AI_CODING)
+
+    fun hasSavedPYQs(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(KEY_AI_PYQS)
+
+    /**
      * Removes a cached solution from disk.
      */
     fun removeSolution(context: Context, key: String) {

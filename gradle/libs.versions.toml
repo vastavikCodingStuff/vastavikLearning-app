@@ -1,8 +1,8 @@
 [versions]
-agp = "8.7.3"
-kotlin = "2.0.20"
+agp = "8.9.1"
+kotlin = "2.4.20"
 composeBom = "2024.12.01"
-hilt = "2.52"
+hilt = "2.58"
 hiltNavigationCompose = "1.2.0"
 coreKtx = "1.15.0"
 splashscreen = "1.0.1"

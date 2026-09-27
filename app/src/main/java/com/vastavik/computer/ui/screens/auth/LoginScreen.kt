@@ -1,6 +1,8 @@
 package com.vastavik.computer.ui.screens.auth
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +43,8 @@ import com.vastavik.computer.ui.theme.brutalShadowColor
 import com.vastavik.computer.utils.AdminSession
 import kotlinx.coroutines.launch
 import com.vastavik.computer.utils.ActivityLog
+import com.vastavik.computer.utils.GitHubOAuth
+import com.vastavik.computer.utils.GitHubOAuthBridge
 
 private val PrimaryIndigo = Color(0xFF2563EB)
 private val AdminRed = Color(0xFFDC2626)
@@ -57,6 +61,9 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
     var showAdminConfirm by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+    var formError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
@@ -175,7 +182,11 @@ fun LoginScreen(
             // ---- Email ----
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    emailError = null
+                    formError = null
+                },
                 label = { Text("Email") },
                 leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -184,17 +195,26 @@ fun LoginScreen(
                     unfocusedBorderColor = bb,
                     focusedBorderColor = bb,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    errorBorderColor = Color(0xFFEF4444),
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true
+                singleLine = true,
+                isError = emailError != null,
+                supportingText = emailError?.let { msg ->
+                    { Text(msg, color = Color(0xFFEF4444)) }
+                }
             )
             Spacer(modifier = Modifier.height(12.dp))
 
             // ---- Password ----
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    passwordError = null
+                    formError = null
+                },
                 label = { Text("Password") },
                 leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                 trailingIcon = {
@@ -212,10 +232,15 @@ fun LoginScreen(
                     unfocusedBorderColor = bb,
                     focusedBorderColor = bb,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    errorBorderColor = Color(0xFFEF4444),
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true
+                singleLine = true,
+                isError = passwordError != null,
+                supportingText = passwordError?.let { msg ->
+                    { Text(msg, color = Color(0xFFEF4444)) }
+                }
             )
             TextButton(
                 onClick = { onNavigate("forgot_password") },
@@ -236,11 +261,22 @@ fun LoginScreen(
                 )
                 Button(
                     onClick = {
-                        if (email.isNotBlank() && password.isNotBlank()) {
-                            ActivityLog.log(context, "login_email_submit", mapOf("email" to email.trim()))
-                            viewModel.signIn(email.trim(), password.trim(), context)
-                        } else {
-                            android.widget.Toast.makeText(context, "Please enter your email and password", android.widget.Toast.LENGTH_SHORT).show()
+                        emailError = null
+                        passwordError = null
+                        formError = null
+                        when {
+                            email.isBlank() -> emailError = "Please enter your email"
+                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches() ->
+                                emailError = "Please enter a valid email address"
+                            password.isBlank() -> passwordError = "Please enter your password"
+                            else -> {
+                                ActivityLog.log(context, "login_email_submit", mapOf("email" to email.trim()))
+                                if (viewModel.clerkEnabled) {
+                                    viewModel.signInWithClerk(email.trim(), password.trim())
+                                } else {
+                                    viewModel.signIn(email.trim(), password.trim(), context)
+                                }
+                            }
                         }
                     },
                     modifier = Modifier
@@ -261,6 +297,19 @@ fun LoginScreen(
                 }
             }
 
+            // Inline server-side / validation error — never a floating notification.
+            formError?.let { msg ->
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = msg,
+                    color = Color(0xFFEF4444),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(18.dp))
 
             // ---- Google ----
@@ -273,7 +322,13 @@ fun LoginScreen(
                         .background(bs)
                 )
                 Button(
-                    onClick = { googleLauncher.launch(googleSignInClient.signInIntent) },
+                    onClick = {
+                        if (viewModel.clerkEnabled) {
+                            viewModel.signInWithClerkOAuth(com.clerk.api.sso.OAuthProvider.GOOGLE)
+                        } else {
+                            googleLauncher.launch(googleSignInClient.signInIntent)
+                        }
+                    },
                     enabled = !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -310,12 +365,38 @@ fun LoginScreen(
                 )
                 Button(
                     onClick = {
+                        if (viewModel.clerkEnabled) {
+                            viewModel.signInWithClerkOAuth(com.clerk.api.sso.OAuthProvider.GITHUB)
+                            return@Button
+                        }
                         ActivityLog.log(context, "login_github_clicked", emptyMap())
-                        android.widget.Toast.makeText(
-                            context,
-                            "GitHub sign-in is being configured. Please use email login for now.",
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
+                        if (!GitHubOAuth.isConfigured) {
+                            android.widget.Toast.makeText(
+                                context,
+                                "GitHub sign-in is not configured. Set GITHUB_CLIENT_ID in local.properties.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                            return@Button
+                        }
+                        val state = GitHubOAuth.newPendingState(context)
+                        val url = GitHubOAuth.buildAuthorizeUrl(state)
+                        if (url == null) {
+                            android.widget.Toast.makeText(
+                                context,
+                                "GitHub sign-in could not be started. Please use email login.",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            } catch (_: Exception) {
+                                android.widget.Toast.makeText(
+                                    context,
+                                    "No browser found to complete GitHub sign-in.",
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     },
                     enabled = !uiState.isLoading,
                     modifier = Modifier
@@ -381,6 +462,42 @@ fun LoginScreen(
         )
     }
 
+    // GitHub OAuth redirect receiver (vastavik://oauth/github?code=..&state=..)
+    DisposableEffect(Unit) {
+        GitHubOAuthBridge.onResult = { code, state, error ->
+            val expectedState = GitHubOAuth.consumePendingState(context)
+            when {
+                !error.isNullOrEmpty() -> {
+                    ActivityLog.log(context, "login_github_denied", mapOf("error" to error))
+                    android.widget.Toast.makeText(
+                        context,
+                        "GitHub sign-in was cancelled.",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+                code.isNullOrEmpty() -> {
+                    android.widget.Toast.makeText(
+                        context,
+                        "GitHub sign-in failed: no authorization code received.",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+                expectedState == null || state != expectedState -> {
+                    ActivityLog.log(context, "login_github_state_mismatch", emptyMap())
+                    android.widget.Toast.makeText(
+                        context,
+                        "GitHub sign-in failed the security check. Please try again.",
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+                else -> {
+                    viewModel.signInWithGitHub(code)
+                }
+            }
+        }
+        onDispose { GitHubOAuthBridge.onResult = null }
+    }
+
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             viewModel.clearSuccess()
@@ -390,7 +507,7 @@ fun LoginScreen(
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
-            android.widget.Toast.makeText(context, error, android.widget.Toast.LENGTH_LONG).show()
+            formError = error
             viewModel.clearError()
         }
     }

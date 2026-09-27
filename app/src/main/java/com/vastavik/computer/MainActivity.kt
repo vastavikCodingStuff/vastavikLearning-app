@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         enableEdgeToEdge()
 
         captureGrowthAttribution(intent)
+        handleOAuthRedirect(intent)
 
         // Track app-open / app-background so the activity log captures session boundaries.
         com.vastavik.computer.utils.ActivityLog.appOpen(this)
@@ -111,9 +112,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                         navController = navController,
                         startRoute = getStartRoute(intent)
                     )
-
-                    // Forensic anti-leak watermark overlay across all screens
-                    com.vastavik.computer.ui.components.PrivacyWatermarkOverlay()
 
                     // Telegram-style floating heads-up in-app notification banner
                     com.vastavik.computer.ui.components.TelegramNotificationHost(
@@ -190,6 +188,24 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        handleOAuthRedirect(intent)
+    }
+
+    /**
+     * Handles the GitHub OAuth return (vastavik://oauth/github?code=..&state=..).
+     * The code is single-use, so the data URI is cleared to prevent redelivery.
+     */
+    private fun handleOAuthRedirect(intent: Intent?) {
+        val data = intent?.data ?: return
+        if (data.scheme != "vastavik" || data.host != "oauth") return
+        if (!data.pathSegments.contains("github")) return
+        val code = data.getQueryParameter("code")
+        val state = data.getQueryParameter("state")
+        val error = data.getQueryParameter("error")
+        if (code != null || error != null) {
+            com.vastavik.computer.utils.GitHubOAuthBridge.deliver(code, state, error)
+            intent.data = null
+        }
     }
 
     private fun getStartRoute(intent: Intent?): String {
@@ -251,18 +267,51 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     }
 
     override fun onPause() {
+        com.vastavik.computer.utils.SecurityProtectionManager.setActivityResumed(false)
         super.onPause()
+        unregisterScreenCaptureWatcher()
         com.vastavik.computer.utils.SecurityProtectionManager.setWindowFocused(false)
     }
 
     override fun onResume() {
         super.onResume()
+        com.vastavik.computer.utils.SecurityProtectionManager.setActivityResumed(true)
         com.vastavik.computer.utils.SecurityProtectionManager.setWindowFocused(hasWindowFocus())
+        registerScreenCaptureWatcher()
     }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(4000L)
+        // Backgrounding blacks out SILENTLY — no "SCREEN CAPTURE BLOCKED" message
+        // may ever surface when the user returns to the app.
+        com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(4000L, showMessage = false)
+    }
+
+    // Android 14+ real screenshot detection: the only authoritative signal that a
+    // capture actually happened. Shows the blocked message only on genuine attempts.
+    private var screenCaptureWatcher: android.app.Activity.ScreenCaptureCallback? = null
+
+    private fun registerScreenCaptureWatcher() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+        if (screenCaptureWatcher != null) return
+        val watcher = android.app.Activity.ScreenCaptureCallback {
+            com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(2500L, showMessage = true)
+        }
+        screenCaptureWatcher = watcher
+        try {
+            registerScreenCaptureCallback(mainExecutor, watcher)
+        } catch (_: Exception) {
+            screenCaptureWatcher = null
+        }
+    }
+
+    private fun unregisterScreenCaptureWatcher() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+        val watcher = screenCaptureWatcher ?: return
+        screenCaptureWatcher = null
+        try {
+            unregisterScreenCaptureCallback(watcher)
+        } catch (_: Exception) { }
     }
 
     override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
@@ -272,7 +321,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         val isCamera = keyCode == android.view.KeyEvent.KEYCODE_CAMERA
 
         if (isSysRq || isCtrlShiftS || isCamera) {
-            com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(5000L)
+            com.vastavik.computer.utils.SecurityProtectionManager.triggerScreenshotDefense(5000L, showMessage = true)
             return true
         }
         return super.dispatchKeyEvent(event)

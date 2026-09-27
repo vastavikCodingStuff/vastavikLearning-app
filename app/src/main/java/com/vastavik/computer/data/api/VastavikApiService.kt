@@ -31,6 +31,9 @@ interface VastavikApiService {
     @POST("api/v1/auth/oauth/github")
     suspend fun loginWithGitHub(@Body request: OAuthGitHubRequest): AuthResponse
 
+    @POST("api/v1/auth/clerk")
+    suspend fun loginWithClerk(@Body request: OAuthClerkRequest): AuthResponse
+
     @POST("api/v1/auth/device-verify")
     suspend fun verifyDevice(@Body request: DeviceVerifyRequest): CommonResponse
 

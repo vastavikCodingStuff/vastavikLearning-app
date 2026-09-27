@@ -72,6 +72,7 @@ import com.vastavik.computer.utils.VastavikAiDiskCache
 import com.vastavik.computer.utils.OutputCheckResult
 import com.vastavik.computer.ui.components.VsCodeSnippetView
 import com.vastavik.computer.ui.components.buildVsCodeAnnotatedString
+import com.vastavik.computer.ui.components.EmptyState
 
 private enum class QuestionSource(val label: String, val tagBg: Color, val tagText: Color) {
     AI("AI-Generated", Color(0xFF2563EB), Color.White),
@@ -2470,7 +2471,9 @@ private fun MCQContent(
     val saved = remember { VastavikAiDiskCache.getSavedMCQs(context) }
     val aiItems = remember {
         mutableStateListOf<MCQItem>().apply {
-            if (saved.isNotEmpty()) {
+            // Only seed defaults when nothing was ever saved — a user who deleted
+            // every topic keeps seeing their (empty) list across restarts.
+            if (VastavikAiDiskCache.hasSavedMCQs(context)) {
                 addAll(saved.map { MCQItem(it.first, it.second, QuestionSource.AI) })
             } else {
                 addAll(listOf(
@@ -2518,18 +2521,30 @@ private fun MCQContent(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
-        items(displayedItems, key = { it.title + it.sub }) { item ->
-            MCQCard(
-                item = item,
-                onNavigate = onNavigate,
-                onDelete = if (item.source == QuestionSource.AI) {
-                    { toDelete ->
-                        aiItems.remove(toDelete)
-                        VastavikAiDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
-                        Toast.makeText(context, "Quiz topic removed", Toast.LENGTH_SHORT).show()
-                    }
-                } else null
-            )
+        if (displayedItems.isEmpty()) {
+            item {
+                EmptyState(
+                    icon = Icons.Filled.Quiz,
+                    message = "No MCQ topics here yet",
+                    subtitle = if (selectedSource == QuestionSource.AI) "Tap the + icon above or generate fresh questions with VastavikAI" else null,
+                    actionText = if (selectedSource == QuestionSource.AI) "Generate MCQs" else null,
+                    onActionClick = if (selectedSource == QuestionSource.AI) ({ showDialog = true }) else null
+                )
+            }
+        } else {
+            items(displayedItems, key = { it.title + it.sub }) { item ->
+                MCQCard(
+                    item = item,
+                    onNavigate = onNavigate,
+                    onDelete = if (item.source == QuestionSource.AI) {
+                        { toDelete ->
+                            aiItems.remove(toDelete)
+                            VastavikAiDiskCache.saveMCQs(context, aiItems.map { Pair(it.title, it.sub) })
+                            Toast.makeText(context, "Quiz topic removed", Toast.LENGTH_SHORT).show()
+                        }
+                    } else null
+                )
+            }
         }
     }
 }
@@ -2545,7 +2560,7 @@ private fun PredictOutputContent(
     val saved = remember { VastavikAiDiskCache.getSavedPredictOutput(context) }
     val aiItems = remember {
         mutableStateListOf<PredictOutputItem>().apply {
-            if (saved.isNotEmpty()) {
+            if (VastavikAiDiskCache.hasSavedPredictOutput(context)) {
                 addAll(saved.mapIndexed { idx, item ->
                     PredictOutputItem(
                         setNumber = idx + 1,
@@ -2676,19 +2691,31 @@ private fun PredictOutputContent(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
-        items(displayedItems, key = { it.title + it.setNumber }) { item ->
-            PredictOutputCard(
-                item = item,
-                onNavigate = onNavigate,
-                onSolveSet = onSolveSet,
-                onDelete = if (item.source == QuestionSource.AI) {
-                    { toDelete ->
-                        aiItems.remove(toDelete)
-                        VastavikAiDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
-                        Toast.makeText(context, "Set deleted", Toast.LENGTH_SHORT).show()
-                    }
-                } else null
-            )
+        if (displayedItems.isEmpty()) {
+            item {
+                EmptyState(
+                    icon = Icons.Filled.Lightbulb,
+                    message = "No predict-the-output sets yet",
+                    subtitle = if (selectedSource == QuestionSource.AI) "Tap the + icon above or generate fresh sets with VastavikAI" else null,
+                    actionText = if (selectedSource == QuestionSource.AI) "Generate Sets" else null,
+                    onActionClick = if (selectedSource == QuestionSource.AI) ({ showDialog = true }) else null
+                )
+            }
+        } else {
+            items(displayedItems, key = { it.title + it.setNumber }) { item ->
+                PredictOutputCard(
+                    item = item,
+                    onNavigate = onNavigate,
+                    onSolveSet = onSolveSet,
+                    onDelete = if (item.source == QuestionSource.AI) {
+                        { toDelete ->
+                            aiItems.remove(toDelete)
+                            VastavikAiDiskCache.savePredictOutput(context, aiItems.map { Triple(it.title, it.questionCount, it.difficulty) })
+                            Toast.makeText(context, "Set deleted", Toast.LENGTH_SHORT).show()
+                        }
+                    } else null
+                )
+            }
         }
     }
 }
@@ -2914,7 +2941,7 @@ private fun CodingContent(
     val saved = remember { VastavikAiDiskCache.getSavedCoding(context) }
     val aiItems = remember {
         mutableStateListOf<CodingItem>().apply {
-            if (saved.isNotEmpty()) {
+            if (VastavikAiDiskCache.hasSavedCoding(context)) {
                 addAll(saved.map { CodingItem(it.first, it.second, it.third, QuestionSource.AI) })
             } else {
                 val defaults = listOf(
@@ -2965,23 +2992,35 @@ private fun CodingContent(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
-        items(displayedItems) { item ->
-            CodingCard(
-                item = item,
-                onNavigate = onNavigate,
-                onOpenVastavikAi = onOpenVastavikAi,
-                onDelete = if (item.source == QuestionSource.AI) {
-                    { toDelete ->
-                        aiItems.remove(toDelete)
-                        VastavikAiDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
-                        val sanitizedTitle = toDelete.title.trim().lowercase().replace(Regex("[^a-z0-9]"), "_")
-                        listOf("java", "python", "c++", "javascript").forEach { lang ->
-                            VastavikAiDiskCache.removeSolution(context, "code_${sanitizedTitle}_$lang")
+        if (displayedItems.isEmpty()) {
+            item {
+                EmptyState(
+                    icon = Icons.Filled.Code,
+                    message = "No coding questions yet",
+                    subtitle = if (selectedSource == QuestionSource.AI) "Tap the + icon above or generate fresh problems with VastavikAI" else null,
+                    actionText = if (selectedSource == QuestionSource.AI) "Generate Questions" else null,
+                    onActionClick = if (selectedSource == QuestionSource.AI) ({ showDialog = true }) else null
+                )
+            }
+        } else {
+            items(displayedItems) { item ->
+                CodingCard(
+                    item = item,
+                    onNavigate = onNavigate,
+                    onOpenVastavikAi = onOpenVastavikAi,
+                    onDelete = if (item.source == QuestionSource.AI) {
+                        { toDelete ->
+                            aiItems.remove(toDelete)
+                            VastavikAiDiskCache.saveCoding(context, aiItems.map { Triple(it.title, it.difficulty, it.topic) })
+                            val sanitizedTitle = toDelete.title.trim().lowercase().replace(Regex("[^a-z0-9]"), "_")
+                            listOf("java", "python", "c++", "javascript").forEach { lang ->
+                                VastavikAiDiskCache.removeSolution(context, "code_${sanitizedTitle}_$lang")
+                            }
+                            Toast.makeText(context, "Question deleted", Toast.LENGTH_SHORT).show()
                         }
-                        Toast.makeText(context, "Question deleted", Toast.LENGTH_SHORT).show()
-                    }
-                } else null
-            )
+                    } else null
+                )
+            }
         }
     }
 }
@@ -2996,7 +3035,7 @@ private fun PYQContent(
     val saved = remember { VastavikAiDiskCache.getSavedPYQs(context) }
     val aiItems = remember {
         mutableStateListOf<PYQItem>().apply {
-            if (saved.isNotEmpty()) {
+            if (VastavikAiDiskCache.hasSavedPYQs(context)) {
                 addAll(saved.map { PYQItem(it.first, it.second, QuestionSource.AI) })
             } else {
                 addAll(listOf(
@@ -3043,7 +3082,31 @@ private fun PYQContent(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         item { SectionHeading(selectedSource, onSuggestNew = { showDialog = true }) }
-        items(displayedItems) { item -> PYQCard(item, onNavigate) }
+        if (displayedItems.isEmpty()) {
+            item {
+                EmptyState(
+                    icon = Icons.Filled.Article,
+                    message = "No PYQ papers here yet",
+                    subtitle = if (selectedSource == QuestionSource.AI) "Tap the + icon above to add a paper or topic" else null,
+                    actionText = if (selectedSource == QuestionSource.AI) "Add Topic" else null,
+                    onActionClick = if (selectedSource == QuestionSource.AI) ({ showDialog = true }) else null
+                )
+            }
+        } else {
+            items(displayedItems) { item ->
+                PYQCard(
+                    item = item,
+                    onNavigate = onNavigate,
+                    onDelete = if (item.source == QuestionSource.AI) {
+                        { toDelete ->
+                            aiItems.remove(toDelete)
+                            VastavikAiDiskCache.savePYQs(context, aiItems.map { Pair(it.title, it.questions) })
+                            Toast.makeText(context, "PYQ paper removed", Toast.LENGTH_SHORT).show()
+                        }
+                    } else null
+                )
+            }
+        }
     }
 }
 
@@ -3345,7 +3408,11 @@ private fun CodingCard(
 }
 
 @Composable
-private fun PYQCard(item: PYQItem, onNavigate: (String) -> Unit) {
+private fun PYQCard(
+    item: PYQItem,
+    onNavigate: (String) -> Unit,
+    onDelete: ((PYQItem) -> Unit)? = null
+) {
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     Box(modifier = Modifier.padding(end = 5.dp, bottom = 12.dp)) {
@@ -3389,6 +3456,25 @@ private fun PYQCard(item: PYQItem, onNavigate: (String) -> Unit) {
                     Text(item.title, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(item.questions, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (onDelete != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                            .border(BorderStroke(1.5.dp, Color(0xFFEF4444).copy(alpha = 0.55f)), RoundedCornerShape(8.dp))
+                            .clickable { onDelete(item) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.DeleteOutline,
+                            contentDescription = "Delete PYQ paper",
+                            tint = Color(0xFFDC2626),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
                 Icon(
                     Icons.Filled.ChevronRight,

@@ -1,4 +1,5 @@
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,14 +13,14 @@ plugins {
 
 android {
     namespace = "com.vastavik.computer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.vastavik.computer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 61
-        versionName = "1.0.61"
+        versionCode = 62
+        versionName = "1.0.62"
         multiDexEnabled = true
         vectorDrawables {
             useSupportLibrary = true
@@ -42,6 +43,13 @@ android {
         // Judge0 self-hosted instance on http://139.84.172.230:2358 — set JUDGE0_AUTH_TOKEN in local.properties
         buildConfigField("String", "JUDGE0_AUTH_TOKEN", "\"${properties.getProperty("JUDGE0_AUTH_TOKEN", "4187f0c558ee335d9be43697718fa5f7")}\"")
         buildConfigField("String", "RAZORPAY_KEY_ID", "\"${properties.getProperty("RAZORPAY_KEY_ID", "")}\"")
+        // GitHub OAuth App client id — create the app at https://github.com/settings/developers
+        // with Authorization callback URL = GITHUB_OAUTH_REDIRECT_URI, then set it in local.properties.
+        buildConfigField("String", "GITHUB_CLIENT_ID", "\"${properties.getProperty("GITHUB_CLIENT_ID", "")}\"")
+        buildConfigField("String", "GITHUB_OAUTH_REDIRECT_URI", "\"${properties.getProperty("GITHUB_OAUTH_REDIRECT_URI", "vastavik://oauth/github")}\"")
+        // Clerk publishable key (Clerk Dashboard -> API keys). Blank = Clerk disabled,
+        // the app keeps using the built-in backend/Firebase auth flows.
+        buildConfigField("String", "CLERK_PUBLISHABLE_KEY", "\"${properties.getProperty("CLERK_PUBLISHABLE_KEY", "")}\"")
     }
 
     signingConfigs {
@@ -74,10 +82,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -95,12 +99,19 @@ android {
             excludes += "/META-INF/LICENSE.txt"
             excludes += "/META-INF/NOTICE"
             excludes += "/META-INF/NOTICE.txt"
+            excludes += "/META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
     }
 
     lint {
         checkReleaseBuilds = false
         abortOnError = false
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
     }
 }
 
@@ -135,6 +146,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
+    // Hilt's metadata reader must understand Kotlin 2.4 class files (metadata 2.4.0)
+    kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.20")
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -182,6 +195,9 @@ dependencies {
 
     // Razorpay Checkout
     implementation(libs.razorpay)
+
+    // Clerk Android SDK — email/password + Google/GitHub OAuth + email OTP auth
+    implementation("com.clerk:clerk-android-api:1.1.9")
 
     // Testing
     testImplementation(libs.junit)
