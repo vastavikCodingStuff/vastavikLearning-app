@@ -104,6 +104,19 @@ class VastavikApiRepository @Inject constructor(
         res
     }
 
+    /**
+     * Exchanges a Clerk session token for backend JWTs so every existing API keeps
+     * working unchanged after Clerk-based sign-in / sign-up.
+     */
+    suspend fun loginWithClerk(sessionToken: String): Result<AuthResponse> = safeApiCall {
+        val res = api.loginWithClerk(OAuthClerkRequest(sessionToken))
+        if (res.success && res.accessToken != null && res.refreshToken != null) {
+            tokenManager.saveTokens(res.accessToken, res.refreshToken)
+            tokenManager.saveUser(res.userId, res.name, res.email)
+        }
+        res
+    }
+
     suspend fun getUserProfile(): Result<UserProfileResponse> = safeApiCall {
         val profile = api.getUserProfile()
         if (profile.userId.isNotBlank()) {

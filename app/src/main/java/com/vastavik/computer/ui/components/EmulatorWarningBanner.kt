@@ -108,7 +108,7 @@ fun EmulatorWarningBannerHost(
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "Running in BlueStacks preview mode. Screen capture & recordings are forensically watermarked.",
+                            text = "Running in BlueStacks preview mode. Screen capture & recordings are blocked.",
                             fontSize = 10.5.sp,
                             lineHeight = 13.sp,
                             fontWeight = FontWeight.SemiBold,

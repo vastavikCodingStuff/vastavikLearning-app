@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.vastavik.computer.BuildConfig
 import com.vastavik.computer.ui.theme.brutalBorderColor
@@ -31,6 +32,7 @@ private val PrimaryIndigo = Color(0xFF2563EB)
 @Composable
 fun SplashScreen(onNavigate: (String) -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val authViewModel: AuthViewModel = hiltViewModel()
     val bb = brutalBorderColor()
     val bs = brutalShadowColor()
     val scale = remember { Animatable(0.5f) }
@@ -67,7 +69,15 @@ fun SplashScreen(onNavigate: (String) -> Unit) {
                 }
             }
 
-            if (FirebaseAuth.getInstance().currentUser != null || com.vastavik.computer.utils.AdminSession.isAdmin.value) {
+            val backendOrClerkSession = try {
+                authViewModel.hasPersistedSession()
+            } catch (e: Exception) {
+                false
+            }
+            if (FirebaseAuth.getInstance().currentUser != null ||
+                com.vastavik.computer.utils.AdminSession.isAdmin.value ||
+                backendOrClerkSession
+            ) {
                 onNavigate("home")
             } else {
                 onNavigate("login")
